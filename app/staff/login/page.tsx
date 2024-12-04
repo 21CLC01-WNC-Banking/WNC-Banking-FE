@@ -1,20 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import {
     Anchor,
     Button,
     Center,
     Container,
-    Group,
     Paper,
     PasswordInput,
     TextInput,
     Title,
 } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
+import Link from "next/link";
 
 const Login = () => {
     const router = useRouter();
@@ -32,13 +31,13 @@ const Login = () => {
 
     const handleSubmit = (values: typeof form.values) => {
         console.log(values);
-        router.push("/customer");
+        router.push("/staff");
     };
 
     return (
         <Center style={{ height: "100vh" }}>
             <Container size={420} my={40}>
-                <Title ta="center">WNC Banking App</Title>
+                <Title ta="center">Cổng nhân viên WNC Banking</Title>
 
                 <Paper withBorder shadow="md" p={30} mt={30} radius="md">
                     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -57,26 +56,16 @@ const Login = () => {
                             {...form.getInputProps("password")}
                         />
 
-                        <Group justify="center">
-                            <Button fullWidth type="submit" mt="xl">
-                                Đăng nhập
-                            </Button>
-
-                            <Link
-                                href="/customer/forgot-password"
-                                passHref
-                                style={{ textDecoration: "none" }}
-                            >
-                                <Anchor component="button">Quên mật khẩu</Anchor>
-                            </Link>
-                        </Group>
+                        <Button fullWidth type="submit" mt="xl">
+                            Đăng nhập
+                        </Button>
                     </form>
                 </Paper>
 
                 <Center>
-                    <Link href="/staff/login" passHref style={{ textDecoration: "none" }}>
+                    <Link href="/customer/login" passHref style={{ textDecoration: "none" }}>
                         <Anchor component="button" mt="lg">
-                            Chuyển sang portal nhân viên
+                            Chuyển sang portal khách hàng
                         </Anchor>
                     </Link>
                 </Center>
