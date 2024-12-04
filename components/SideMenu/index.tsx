@@ -1,47 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import {
-    IconCreditCard,
-    IconUsers,
-    IconCreditCardPay,
-    IconMessageDollar,
-    IconKey,
-    IconLogout,
-} from "@tabler/icons-react";
-import { Text, NavLink } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+import { Text, NavLink } from "@mantine/core";
+import { IconLogout } from "@tabler/icons-react";
+
 import classes from "./SideMenu.module.css";
 
-const data = [
-    { link: "/customer/accounts", label: "Danh sách tài khoản", icon: IconCreditCard },
-    { link: "/customer/recipients", label: "Danh sách người nhận", icon: IconUsers },
-    { link: "/customer/transfer", label: "Chuyển khoản", icon: IconCreditCardPay },
-    { link: "/customer/request-payment", label: "Nhắc nợ", icon: IconMessageDollar },
-];
+export interface SideMenuProps {
+    forCustomer: boolean;
+    items: { link: string; label: string; icon: JSX.Element; top: boolean }[];
+}
 
-const SideMenu = () => {
+const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
     const [active, setActive] = useState(0);
     const router = useRouter();
 
     const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
-        router.push("/customer/login");
+
+        if (forCustomer) {
+            router.push("/customer/login");
+        } else {
+            router.push("/staff/login");
+        }
     };
 
-    const links = data.map((item, index) => (
-        <NavLink
-            component={Link}
-            className={classes.link}
-            active={index === active}
-            href={item.link}
-            key={item.label}
-            label={item.label}
-            leftSection={<item.icon />}
-            onClick={() => setActive(index)}
-        />
-    ));
+    const links = items.map(
+        (item, index) =>
+            item.top && (
+                <NavLink
+                    component={Link}
+                    className={classes.link}
+                    active={index === active}
+                    href={item.link}
+                    key={item.label}
+                    label={item.label}
+                    leftSection={item.icon}
+                    onClick={() => setActive(index)}
+                />
+            )
+    );
 
     return (
         <nav className={classes.navbar}>
@@ -53,13 +54,28 @@ const SideMenu = () => {
             </div>
 
             <div className={classes.footer}>
-                <Link href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-                    <IconKey className={classes.linkIcon} stroke={1.5} />
-                    <span>Đổi mật khẩu</span>
-                </Link>
+                {items.map(
+                    (item, index) =>
+                        !item.top && (
+                            <NavLink
+                                component={Link}
+                                className={classes.link}
+                                active={index === active}
+                                href={item.link}
+                                key={item.label}
+                                label={item.label}
+                                leftSection={item.icon}
+                                onClick={() => setActive(index)}
+                            />
+                        )
+                )}
 
-                <Link href="/customer/logout" className={classes.link} onClick={handleLogout}>
-                    <IconLogout className={classes.linkIcon} stroke={1.5} />
+                <Link
+                    href={forCustomer ? "/customer/logout" : "/staff/logout"}
+                    className={classes.link}
+                    onClick={handleLogout}
+                >
+                    <IconLogout className={classes.linkIcon} />
                     <span>Đăng xuất</span>
                 </Link>
             </div>
