@@ -25,6 +25,8 @@
 
 .title {
     color: var(--mantine-color-white);
+    font-weight: var(--mantine-h2-font-weight);
+    font-size: var(--mantine-h2-font-size);
 }
 
 .link {
