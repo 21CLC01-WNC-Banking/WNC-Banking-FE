@@ -63,7 +63,7 @@
 }
 
 .linkIcon {
-    color: var(--mantine-color-blue-1);
+    color: var(--mantine-color-white);
     margin-right: var(--mantine-spacing-sm);
     width: 25px;
     height: 25px;

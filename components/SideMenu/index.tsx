@@ -73,7 +73,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                     onClick={handleLogout}
                 >
                     <IconLogout className={classes.linkIcon} />
-                    <span>Đăng xuất</span>
+                    <span style={{ marginLeft: "25" }}>Đăng xuất</span>
                 </Link>
             </div>
         </nav>
