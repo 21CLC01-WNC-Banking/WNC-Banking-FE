@@ -1,31 +1,19 @@
 import { Group } from "@mantine/core";
-import {
-    IconCreditCard,
-    IconUsers,
-    IconCreditCardPay,
-    IconMessageDollar,
-    IconKey,
-} from "@tabler/icons-react";
+import { IconUsers, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
 
 const menuItems = [
     {
-        link: "/customer/accounts",
-        label: "Danh sách tài khoản",
-        icon: <IconCreditCard />,
+        link: "/customer/transfer",
+        label: "Chuyển khoản",
+        icon: <IconCreditCardPay />,
         top: true,
     },
     {
         link: "/customer/recipients",
         label: "Danh sách người nhận",
         icon: <IconUsers />,
-        top: true,
-    },
-    {
-        link: "/customer/transfer",
-        label: "Chuyển khoản",
-        icon: <IconCreditCardPay />,
         top: true,
     },
     {

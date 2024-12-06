@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
@@ -15,8 +14,8 @@ export interface SideMenuProps {
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
-    const [active, setActive] = useState(0);
     const router = useRouter();
+    const pathname = usePathname();
 
     const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -29,17 +28,16 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
     };
 
     const links = items.map(
-        (item, index) =>
+        (item) =>
             item.top && (
                 <NavLink
                     component={Link}
                     className={classes.link}
-                    active={index === active}
+                    active={pathname === item.link}
                     href={item.link}
                     key={item.label}
                     label={item.label}
                     leftSection={item.icon}
-                    onClick={() => setActive(index)}
                 />
             )
     );
@@ -55,17 +53,16 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
 
             <div className={classes.footer}>
                 {items.map(
-                    (item, index) =>
+                    (item) =>
                         !item.top && (
                             <NavLink
                                 component={Link}
                                 className={classes.link}
-                                active={index === active}
+                                active={pathname === item.link}
                                 href={item.link}
                                 key={item.label}
                                 label={item.label}
                                 leftSection={item.icon}
-                                onClick={() => setActive(index)}
                             />
                         )
                 )}
