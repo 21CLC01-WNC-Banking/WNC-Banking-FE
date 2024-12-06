@@ -75,7 +75,10 @@ const TransferHistoryTable: React.FC = () => {
 
     // Create table rows for current page
     const rows = currentPageTransactions.map((transaction, index) => (
-        <Table.Tr key={index}>
+        <Table.Tr
+            key={index}
+            bg={transaction.transactionType === "Chuyển khoản" ? "yellow.1" : transaction.transactionType === "Nhận tiền" ? "green.1" : "red.2"}
+        >
             <Table.Td>{transaction.dateTime}</Table.Td>
             <Table.Td>{transaction.accountType}</Table.Td>
             <Table.Td>{transaction.amount}</Table.Td>
