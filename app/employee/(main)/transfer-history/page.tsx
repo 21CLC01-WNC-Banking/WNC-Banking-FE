@@ -5,7 +5,7 @@ const TransferHistory: React.FC = () => {
     return (
         <Flex direction="column">
             <Center>
-                <Title my={10}>Lịch sử giao dịch</Title>
+                <Title my={10}>LỊCH SỬ GIAO DỊCH</Title>
             </Center>
             <TransferHistoryTable />
         </Flex>

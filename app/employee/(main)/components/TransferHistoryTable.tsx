@@ -89,7 +89,7 @@ const TransferHistoryTable: React.FC = () => {
 
     return (
         <Paper radius="md" p="md">
-            <Flex align="flex-start" gap="md">
+            <Flex align="flex-start" gap="md" py={10}>
                 {/* Search Bar */}
                 <Flex
                     align="center"

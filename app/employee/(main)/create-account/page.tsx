@@ -5,7 +5,7 @@ const CreateAccount: React.FC = () => {
     return (
         <Flex direction="column">
             <Center>
-                <Title my={10}>Tạo tài khoản khách hàng</Title>
+                <Title my={10}>TẠO TÀI KHOẢN KHÁCH HÀNG</Title>
             </Center>
             <UserForm />
         </Flex>

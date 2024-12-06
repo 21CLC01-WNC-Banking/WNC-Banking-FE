@@ -8,6 +8,7 @@ import {
 
 import SideMenu from "@/components/SideMenu";
 import CurrentTime from "./components/CurrentTime";
+import EmployeePortalShortcut from "./components/EmployeePortalShortcut";
 
 const menuItems = [
     {
@@ -41,7 +42,10 @@ export default function EmployeeLayout({ children }: Readonly<{ children: React.
         <Group align="top" bg="#E6EDF4">
             <SideMenu forCustomer items={menuItems} />
             <Flex direction="column" p={20} style={{ flexGrow: 1 }}>
-                <CurrentTime />
+                <Flex justify="space-between">
+                    <CurrentTime />
+                    <EmployeePortalShortcut />
+                </Flex>
                 {children}
             </Flex>
         </Group>
