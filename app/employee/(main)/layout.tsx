@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
-import CurrentTime from "./components/currentTime";
+import CurrentTime from "./components/CurrentTime";
 
 const menuItems = [
     {
@@ -40,7 +40,7 @@ export default function EmployeeLayout({ children }: Readonly<{ children: React.
     return (
         <Group align="top" bg="#E6EDF4">
             <SideMenu forCustomer items={menuItems} />
-            <Flex direction="column">
+            <Flex direction="column" p={20} style={{ flexGrow: 1 }}>
                 <CurrentTime />
                 {children}
             </Flex>

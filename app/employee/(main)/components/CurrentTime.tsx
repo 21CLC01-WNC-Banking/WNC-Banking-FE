@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Text, Flex } from "@mantine/core";
+import { Text, Box } from "@mantine/core";
 
 const CurrentTime: React.FC = () => {
 
@@ -39,10 +39,10 @@ const CurrentTime: React.FC = () => {
     }, []);
 
     return (
-        <Flex direction="column">
-            <Text size="xl" fs="Bold" c="gray">{currentTime}</Text>
+        <Box>
+            <Text size="xl" fw={700} c="gray">{currentTime}</Text>
             <Text size="lg" c="gray">{currentDate}</Text>
-        </Flex>
+        </Box>
     );
 }
 export default CurrentTime;
