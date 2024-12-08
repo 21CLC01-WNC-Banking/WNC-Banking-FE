@@ -1,15 +1,25 @@
 "use client";
 
+import { useParams } from "next/navigation";
+
 import Steppy from "@/components/Steppy";
+
 import TransferForm from "./TransferForm";
 import ConfirmationForm from "./ConfirmationForm";
 import CompletionScreen from "./CompletionScreen";
 
 const Transfer = () => {
+    const params = useParams();
+
     const steps = [
         {
             label: "Nhập thông tin",
-            component: (props: { handleNextStep?: () => void }) => <TransferForm {...props} />,
+            component: (props: { handleNextStep?: () => void }) => (
+                <TransferForm
+                    {...props}
+                    type={Array.isArray(params.type) ? params.type[0] : params.type}
+                />
+            ),
         },
         {
             label: "Xác nhận",

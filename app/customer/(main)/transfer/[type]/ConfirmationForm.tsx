@@ -45,7 +45,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ handleNextStep }) =
                     {...form.getInputProps("otp")}
                 />
 
-                <Button fullWidth type="submit" mt="xl" radius="md">
+                <Button fullWidth type="submit" mt={40} radius="md">
                     Tiếp tục
                 </Button>
             </form>

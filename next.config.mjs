@@ -4,12 +4,17 @@ const nextConfig = {
         return [
             {
                 source: "/",
-                destination: "/customer/transfer",
+                destination: "/customer/home",
                 permanent: true,
             },
             {
                 source: "/customer",
-                destination: "/customer/transfer",
+                destination: "/customer/home",
+                permanent: true,
+            },
+            {
+                source: "/customer/transfer",
+                destination: "/customer/transfer/internal",
                 permanent: true,
             },
             {

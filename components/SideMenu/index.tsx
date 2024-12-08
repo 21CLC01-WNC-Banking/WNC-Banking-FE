@@ -6,11 +6,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
 
+import LinkGroup from "@/components/LinkGroup";
+
 import classes from "./SideMenu.module.css";
 
-export interface SideMenuProps {
+interface SideMenuProps {
     forCustomer: boolean;
-    items: { link: string; label: string; icon: JSX.Element; top: boolean }[];
+    items: {
+        link?: string;
+        label: string;
+        icon: JSX.Element;
+        top: boolean;
+        innerLinks?: { link: string; label: string }[];
+    }[];
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
@@ -27,19 +35,25 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
         }
     };
 
-    const links = items.map(
-        (item) =>
-            item.top && (
-                <NavLink
-                    component={Link}
-                    className={classes.link}
-                    active={pathname === item.link}
-                    href={item.link}
-                    key={item.label}
-                    label={item.label}
-                    leftSection={item.icon}
-                />
-            )
+    const links = items.map((item) =>
+        item.top && item.innerLinks ? (
+            <LinkGroup
+                icon={item.icon}
+                label={item.label}
+                links={item.innerLinks}
+                key={item.label}
+            />
+        ) : item.top ? (
+            <NavLink
+                component={Link}
+                className={classes.link}
+                active={pathname === item.link}
+                href={item.link ? item.link : "#"}
+                key={item.label}
+                label={item.label}
+                leftSection={item.icon}
+            />
+        ) : null
     );
 
     return (
@@ -59,7 +73,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                                 component={Link}
                                 className={classes.link}
                                 active={pathname === item.link}
-                                href={item.link}
+                                href={item.link ? item.link : "#"}
                                 key={item.label}
                                 label={item.label}
                                 leftSection={item.icon}

@@ -13,10 +13,19 @@ const menuItems = [
         top: true,
     },
     {
-        link: "/customer/transfer",
         label: "Chuyển khoản",
         icon: <IconCreditCardPay />,
         top: true,
+        innerLinks: [
+            {
+                link: "/customer/transfer/internal",
+                label: "Nội bộ",
+            },
+            {
+                link: "/customer/transfer/external",
+                label: "Liên ngân hàng",
+            },
+        ],
     },
     {
         link: "/customer/request-payment",
