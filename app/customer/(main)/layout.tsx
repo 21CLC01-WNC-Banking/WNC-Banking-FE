@@ -1,8 +1,10 @@
+import { Suspense } from "react";
+
 import { Group } from "@mantine/core";
 import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
-import { Suspense } from "react";
+
 import Loading from "./loading";
 
 const menuItems = [
