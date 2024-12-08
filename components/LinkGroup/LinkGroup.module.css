@@ -1,0 +1,54 @@
+.control {
+    width: 100%;
+    display: block;
+    align-items: center;
+    text-decoration: none;
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-white);
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+    border-radius: var(--mantine-radius-md);
+    font-weight: 500;
+
+    @mixin hover {
+        background-color: var(--mantine-color-blue-7);
+        color: var(--mantine-color-white);
+
+        .linkIcon {
+            color: var(--mantine-color-white);
+        }
+    }
+
+    &[data-active] {
+        &,
+        &:hover {
+            box-shadow: var(--mantine-shadow-sm);
+            background-color: var(--mantine-color-white);
+            color: var(--mantine-color-blue-filled);
+
+            .linkIcon {
+                color: var(--mantine-color-blue-filled);
+            }
+        }
+    }
+}
+
+.innerLink {
+    font-weight: 400;
+    width: calc(100% - var(--mantine-spacing-lg));
+    text-decoration: none;
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+    padding-left: var(--mantine-spacing-md);
+    margin-left: var(--mantine-spacing-lg);
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-white);
+    border-left: 1px solid var(--mantine-color-gray-3);
+    border-radius: 0 var(--mantine-radius-md) var(--mantine-radius-md) 0;
+
+    @mixin hover {
+        background-color: var(--mantine-color-blue-filled-hover);
+    }
+}
+
+.chevron {
+    transition: transform 200ms ease;
+}
