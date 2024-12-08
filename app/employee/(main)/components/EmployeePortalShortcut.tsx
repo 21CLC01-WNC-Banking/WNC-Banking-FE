@@ -3,6 +3,8 @@
 import { useDisclosure } from '@mantine/hooks';
 import { Drawer, Button, Group, Flex, Avatar, Text } from '@mantine/core';
 import { IconMenu2 } from '@tabler/icons-react';
+import EmployeePortal from './EmployeePortal';
+
 
 const EmployeePortalShortcut: React.FC = () => {
 
@@ -18,12 +20,12 @@ const EmployeePortalShortcut: React.FC = () => {
                         <Text>Mã số: <strong>2001</strong></Text>
                     </Flex>
                 </Group>
-                <Button variant='subtle' style={{ padding: 5 }} radius="xl" onClick={open}>
+                <Button variant='subtle' p={5} radius="xl" onClick={open}>
                     <IconMenu2 size={25} color='black' />
                 </Button>
             </Flex>
-            <Drawer opened={opened} onClose={close} title="Authentication" position="right">
-                {/* Drawer content */}
+            <Drawer opened={opened} onClose={close} withCloseButton={false} position="right" padding={0}>
+                <EmployeePortal />
             </Drawer>
         </Group>
     );
