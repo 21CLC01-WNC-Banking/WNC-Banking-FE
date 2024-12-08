@@ -2,6 +2,8 @@ import { Group } from "@mantine/core";
 import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 const menuItems = [
     {
@@ -34,7 +36,7 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
     return (
         <Group align="top" preventGrowOverflow={false} grow gap="0">
             <SideMenu forCustomer items={menuItems} />
-            {children}
+            <Suspense fallback={<Loading />}>{children}</Suspense>
         </Group>
     );
 }
