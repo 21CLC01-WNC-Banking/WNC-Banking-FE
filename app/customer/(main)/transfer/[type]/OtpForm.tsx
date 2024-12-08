@@ -3,11 +3,11 @@
 import { Button, Center, TextInput, Title, Stack } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 
-interface ConfirmationFormProps {
+interface OtpFormProps {
     handleNextStep?: () => void;
 }
 
-const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ handleNextStep }) => {
+const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
@@ -53,4 +53,4 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ handleNextStep }) =
     );
 };
 
-export default ConfirmationForm;
+export default OtpForm;
