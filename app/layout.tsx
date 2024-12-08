@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 export const metadata: Metadata = {
     title: "WNC Banking App",
@@ -14,7 +16,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <ColorSchemeScript />
             </head>
             <body>
-                <MantineProvider>{children}</MantineProvider>
+                <MantineProvider>
+                    <Notifications />
+                    {children}
+                </MantineProvider>
             </body>
         </html>
     );

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Steppy from "@/components/Steppy";
 
 import TransferForm from "./TransferForm";
-import ConfirmationForm from "./ConfirmationForm";
+import OtpForm from "./OtpForm";
 import CompletionScreen from "./CompletionScreen";
 
 const Transfer = () => {
@@ -23,7 +23,7 @@ const Transfer = () => {
         },
         {
             label: "Xác nhận",
-            component: (props: { handleNextStep?: () => void }) => <ConfirmationForm {...props} />,
+            component: (props: { handleNextStep?: () => void }) => <OtpForm {...props} />,
         },
         {
             label: "Hoàn tất",

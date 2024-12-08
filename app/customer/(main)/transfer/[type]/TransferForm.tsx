@@ -16,6 +16,7 @@ import {
     Drawer,
     ScrollArea,
     Group,
+    Tooltip,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDebouncedState, useDisclosure } from "@mantine/hooks";
@@ -138,6 +139,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             comboboxProps={{ shadow: "md" }}
                             label="Ngân hàng của người nhận"
                             allowDeselect={false}
+                            withAsterisk
                             placeholder="Chọn ngân hàng"
                             data={["WNC Bank", "Vietcombank", "Techcombank", "Agribank"]}
                             onChange={(value) => {
@@ -148,39 +150,46 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         />
                     )}
 
-                    <TextInput
-                        size="md"
-                        radius="md"
-                        mt="lg"
-                        label="Số tài khoản người nhận"
-                        maxLength={14}
-                        withAsterisk
-                        placeholder="XXXX XXXX XXXX"
-                        rightSection={
-                            <ActionIcon
-                                variant="filled"
-                                radius="md"
-                                aria-label="Saved recipients"
-                                disabled={type === "external" && selectedBank === ""}
-                                onClick={open}
-                            >
-                                <IconAddressBook size={20} />
-                            </ActionIcon>
-                        }
-                        key={form.key("recipientAccNumber")}
-                        error={form.errors.recipientAccNumber}
-                        value={accNum}
-                        disabled={type === "external" && selectedBank === ""}
-                        onChange={(event) =>
-                            setAccNum(
-                                event.currentTarget.value.replace(/(\d{4})(?=\d)/g, "$1 ").trim()
-                            )
-                        }
-                        onBlur={(event) => {
-                            form.setFieldValue("recipientAccNumber", event.currentTarget.value);
-                            form.validateField("recipientAccNumber");
-                        }}
-                    />
+                    <Tooltip
+                        label="Vui lòng chọn ngân hàng trước khi nhập số tài khoản"
+                        disabled={type === "internal" || selectedBank !== ""}
+                    >
+                        <TextInput
+                            size="md"
+                            radius="md"
+                            mt="lg"
+                            label="Số tài khoản người nhận"
+                            maxLength={14}
+                            withAsterisk
+                            placeholder="XXXX XXXX XXXX"
+                            rightSection={
+                                <ActionIcon
+                                    variant="filled"
+                                    radius="md"
+                                    aria-label="Saved recipients"
+                                    disabled={type === "external" && selectedBank === ""}
+                                    onClick={open}
+                                >
+                                    <IconAddressBook size={20} />
+                                </ActionIcon>
+                            }
+                            key={form.key("recipientAccNumber")}
+                            error={form.errors.recipientAccNumber}
+                            value={accNum}
+                            disabled={type === "external" && selectedBank === ""}
+                            onChange={(event) =>
+                                setAccNum(
+                                    event.currentTarget.value
+                                        .replace(/(\d{4})(?=\d)/g, "$1 ")
+                                        .trim()
+                                )
+                            }
+                            onBlur={(event) => {
+                                form.setFieldValue("recipientAccNumber", event.currentTarget.value);
+                                form.validateField("recipientAccNumber");
+                            }}
+                        />
+                    </Tooltip>
 
                     <Drawer.Root
                         offset={8}
