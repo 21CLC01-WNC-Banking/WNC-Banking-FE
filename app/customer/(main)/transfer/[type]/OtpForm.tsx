@@ -1,26 +1,43 @@
 "use client";
 
-import { Button, Center, TextInput, Title, Stack } from "@mantine/core";
-import { useForm, isNotEmpty } from "@mantine/form";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks";
+import { resetTransfer } from "@/lib/slices/TransferSlice";
+
+import { Button, Center, Text, Title, Stack, PinInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
 
 interface OtpFormProps {
     handleNextStep?: () => void;
 }
 
 const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
+    const dispatch = useAppDispatch();
+
+    const transfer = useAppSelector((state) => state.transfer.currentTransfer);
+
     const form = useForm({
         mode: "uncontrolled",
-        validateInputOnBlur: true,
         initialValues: {
             otp: "",
         },
         validate: {
-            otp: isNotEmpty("Vui lòng nhập mã OTP"),
+            otp: (value) =>
+                value.trim().length < 1
+                    ? "Vui lòng nhập mã OTP"
+                    : value.trim().length !== 6
+                    ? "Mã OTP không hợp lệ"
+                    : null,
         },
     });
 
     const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+        // send the otp and await response
+
+        // if good, call the transfer API
+        console.log(transfer);
+
+        // finally, reset the transfer state
+        dispatch(resetTransfer());
 
         if (handleNextStep) {
             handleNextStep();
@@ -28,24 +45,32 @@ const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
     };
 
     return (
-        <Stack mt="xl">
+        <Stack mt="xl" align="center">
             <Center mt="xl">
-                <Title order={2}>Xác nhận chuyển khoản</Title>
+                <Title order={2}>Nhập mã OTP để xác nhận chuyển khoản</Title>
             </Center>
 
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <TextInput
-                    size="md"
+                <PinInput
+                    size="xl"
+                    mt={40}
                     radius="md"
-                    mt="lg"
-                    label="Mã xác thực OTP"
-                    withAsterisk
-                    placeholder="Mã gồm 6 chữ số"
+                    length={6}
+                    type={/^[0-9]*$/}
+                    inputType="tel"
+                    inputMode="text"
+                    oneTimeCode
                     key={form.key("otp")}
                     {...form.getInputProps("otp")}
                 />
 
-                <Button fullWidth type="submit" mt={40} radius="md">
+                {form.errors.otp && (
+                    <Center mt={10}>
+                        <Text c="red">{form.errors.otp}</Text>
+                    </Center>
+                )}
+
+                <Button fullWidth type="submit" mt={60} radius="md">
                     Tiếp tục
                 </Button>
             </form>

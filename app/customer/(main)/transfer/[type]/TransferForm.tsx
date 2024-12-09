@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+import { useAppDispatch } from "@/lib/hooks";
+import { setTransfer } from "@/lib/slices/TransferSlice";
+
 import {
     Button,
     Center,
@@ -17,12 +20,14 @@ import {
     ScrollArea,
     Group,
     Tooltip,
+    UnstyledButton,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDebouncedState, useDisclosure } from "@mantine/hooks";
 import { IconAddressBook, IconSearch } from "@tabler/icons-react";
 
 import ClickableCard from "@/components/ClickableCard";
+import TransferInfoModal from "./TransferInfoModal";
 
 interface TransferFormProps {
     handleNextStep?: () => void;
@@ -32,7 +37,10 @@ interface TransferFormProps {
 const accounts: string[] = ["1234 5678 9012", "2345 6789 0123", "3456 7890 1234", "4567 8901 2345"];
 
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
-    const [opened, { open, close }] = useDisclosure(false);
+    const dispatch = useAppDispatch();
+
+    const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+    const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
 
     const [accNum, setAccNum] = useDebouncedState("", 50, { leading: true });
 
@@ -43,53 +51,63 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            recipientAccNumber: "",
-            amount: 10000,
-            message: "Chuyển tiền cơm gà (?)",
-            recipientHandlesFee: false,
-            recipientNickname: "",
+            receiverAccount: "",
+            amount: 0,
+            message: "NGƯỜI DÙNG chuyển tiền",
         },
         validate: {
-            recipientAccNumber: () =>
+            receiverAccount: () =>
                 accNum.trim().length < 1
                     ? "Vui lòng nhập số tài khoản người nhận"
                     : /[0-9\s]{14}/.test(accNum)
                     ? null
                     : "Số tài khoản người nhận không hợp lệ",
-            amount: (value) => (value < 10000 ? "Số tiền cần chuyển phải lớn hơn 10000 VND" : null),
+            amount: (value) => (value < 10000 ? "Số tiền cần chuyển tối thiểu là 10000 VND" : null),
             message: isNotEmpty("Vui lòng nhập nội dung chuyển khoản"),
         },
         transformValues: (values) => ({
             ...values,
-            recipientAccNumber: values.recipientAccNumber.split(" ").join(""),
+            receiverAccNumber: values.receiverAccount.split(" ").join(""),
             message: values.message.trim(),
         }),
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        const transferForm = document.getElementById("transfer-form");
+    const toggleConfirmModal = () => {
+        const validatedForm = form.validate();
 
-        if (transferForm) {
-            (transferForm as HTMLFieldSetElement).disabled = true;
+        if (!validatedForm.hasErrors) {
+            const newTransfer = {
+                amount: form.getValues().amount,
+                message: form.getValues().message,
+                receiverAccount: form.getValues().receiverAccount,
+                senderAccount: "Mặc định",
+            };
+
+            dispatch(setTransfer(newTransfer));
+
+            openModal();
         }
+    };
 
-        console.log(values);
-
+    const handleSubmit = () => {
         if (handleNextStep) {
             handleNextStep();
         }
     };
 
-    const filtered = accounts.filter((item) => item.toLowerCase().includes(query.toLowerCase()));
+    const filtered = accounts.filter((account) =>
+        account.toLowerCase().includes(query.toLowerCase())
+    );
 
-    const items = filtered.map((item) => (
+    const accountList = filtered.map((account) => (
         <ClickableCard
-            key={item}
-            title={item}
+            key={account}
+            title={account}
             onClick={() => {
-                setAccNum(item);
-                form.setFieldValue("recipientAccNumber", item);
-                close();
+                setAccNum(account);
+                form.setFieldValue("receiverAccNumber", account);
+
+                closeDrawer();
             }}
         />
     ));
@@ -166,15 +184,15 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 <ActionIcon
                                     variant="filled"
                                     radius="md"
-                                    aria-label="Saved recipients"
+                                    aria-label="Saved receivers"
                                     disabled={type === "external" && selectedBank === ""}
-                                    onClick={open}
+                                    onClick={openDrawer}
                                 >
                                     <IconAddressBook size={20} />
                                 </ActionIcon>
                             }
-                            key={form.key("recipientAccNumber")}
-                            error={form.errors.recipientAccNumber}
+                            key={form.key("receiverAccNumber")}
+                            error={form.errors.receiverAccNumber}
                             value={accNum}
                             disabled={type === "external" && selectedBank === ""}
                             onChange={(event) =>
@@ -185,42 +203,45 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 )
                             }
                             onBlur={(event) => {
-                                form.setFieldValue("recipientAccNumber", event.currentTarget.value);
-                                form.validateField("recipientAccNumber");
+                                form.setFieldValue("receiverAccNumber", event.currentTarget.value);
+                                form.validateField("receiverAccNumber");
                             }}
                         />
                     </Tooltip>
 
-                    <Drawer.Root
+                    <Drawer
                         offset={8}
                         radius="md"
-                        opened={opened}
-                        onClose={close}
+                        opened={drawerOpened}
+                        onClose={closeDrawer}
                         position="right"
+                        title="Chọn tài khoản người nhận"
+                        styles={{
+                            title: {
+                                fontWeight: 700,
+                                fontSize: "var(--mantine-font-size-lg)",
+                            },
+                            content: {
+                                paddingLeft: 20,
+                                paddingRight: 20,
+                                paddingTop: 10,
+                            },
+                        }}
                     >
-                        <Drawer.Overlay />
-                        <Drawer.Content p={16}>
-                            <Drawer.Header>
-                                <Drawer.Title>Chọn tài khoản người nhận</Drawer.Title>
-                                <Drawer.CloseButton />
-                            </Drawer.Header>
-                            <Drawer.Body>
-                                <TextInput
-                                    value={query}
-                                    onChange={(event) => {
-                                        setQuery(event.currentTarget.value);
-                                    }}
-                                    leftSection={<IconSearch size={20} />}
-                                    placeholder="Tìm kiếm"
-                                />
-                                <div>
-                                    <ScrollArea.Autosize mah="75vh" type="always" mt="md">
-                                        {items}
-                                    </ScrollArea.Autosize>
-                                </div>
-                            </Drawer.Body>
-                        </Drawer.Content>
-                    </Drawer.Root>
+                        <TextInput
+                            value={query}
+                            onChange={(event) => {
+                                setQuery(event.currentTarget.value);
+                            }}
+                            leftSection={<IconSearch size={20} />}
+                            placeholder="Tìm kiếm"
+                        />
+                        <div>
+                            <ScrollArea.Autosize mah="75vh" type="always" mt="md">
+                                {accountList}
+                            </ScrollArea.Autosize>
+                        </div>
+                    </Drawer>
 
                     <NumberInput
                         size="md"
@@ -256,15 +277,20 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         mt="lg"
                         label="Người nhận chịu phí"
                         description="Nếu không chọn, người gửi tiền sẽ thanh toán phí chuyển khoản"
-                        key={form.key("recipientHandlesFee")}
-                        {...form.getInputProps("recipientHandlesFee")}
+                        key={form.key("receiverHandlesFee")}
+                        {...form.getInputProps("receiverHandlesFee")}
                     />
 
-                    <Button fullWidth type="submit" mt={40} radius="md">
+                    {/*Invisible button for form submission*/}
+                    <UnstyledButton type="submit" id="submit-form"></UnstyledButton>
+
+                    <Button fullWidth onClick={toggleConfirmModal} mt={40} radius="md">
                         Tiếp tục
                     </Button>
                 </form>
             </Fieldset>
+
+            <TransferInfoModal isOpen={modalOpened} onClose={closeModal} />
         </>
     );
 };

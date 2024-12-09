@@ -28,9 +28,10 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
     });
 
     const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
-
         if (displayNickname) {
+            // send the nickname to be set by the server and await response
+
+            // if good, pop this notification
             notifications.show({
                 withBorder: true,
                 radius: "md",
