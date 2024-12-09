@@ -1,7 +1,4 @@
-"use client";
-
-import { Flex, Group, Avatar, Text, Button, Paper, Box } from "@mantine/core";
-import { IconBell, IconCalendar } from "@tabler/icons-react";
+import { Flex, Group, Avatar, Text, Button, Paper, Box } from "@mantine/core"; import { IconBell, IconCalendar } from "@tabler/icons-react";
 import Timetable from "./Timetable";
 import Notification from "./Notification";
 import { useState } from "react";

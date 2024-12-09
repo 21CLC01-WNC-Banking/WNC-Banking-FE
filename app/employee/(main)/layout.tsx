@@ -3,7 +3,7 @@ import {
     IconKey,
     IconUserPlus,
     IconHistory,
-    IconCashBanknote
+    IconCreditCardPay
 } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
@@ -20,7 +20,7 @@ const menuItems = [
     {
         link: "/employee/deposit",
         label: "Nạp tiền vào tài khoản",
-        icon: <IconCashBanknote />,
+        icon: <IconCreditCardPay />,
         top: true,
     },
     {

@@ -1,11 +1,13 @@
-import { Flex } from "@mantine/core";
+import { Flex, Title, Center } from "@mantine/core";
+import DepositForm from "../components/DepositForm";
 
 const Deposit: React.FC = () => {
     return (
         <Flex direction="column">
-            <Flex>
-                <h1>Nạp tiền vào tài khoản</h1>
-            </Flex>
+            <Center>
+                <Title my={10}>NẠP TIỀN VÀO TÀI KHOẢN</Title>
+            </Center>
+            <DepositForm />
         </Flex>
     );
 }

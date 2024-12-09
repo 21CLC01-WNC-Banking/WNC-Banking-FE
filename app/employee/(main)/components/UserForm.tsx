@@ -4,8 +4,6 @@ import {
     Button,
     Paper,
     TextInput,
-    Flex,
-    Text,
     Title,
 } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
@@ -38,24 +36,16 @@ const UserForm: React.FC = () => {
                 <form onSubmit={form.onSubmit(handleSubmit)}>
 
                     <TextInput
-                        label={
-                            <Flex align="center">
-                                <Text>Họ tên</Text>
-                                <Text ml={4} c="red">*</Text>
-                            </Flex>
-                        }
+                        label="Họ tên"
+                        required
                         placeholder="Nguyễn Văn A"
                         key={form.key("name")}
                         {...form.getInputProps("name")}
                     />
 
                     <TextInput
-                        label={
-                            <Flex align="center">
-                                <Text>Địa chỉ email</Text>
-                                <Text ml={4} c="red">*</Text>
-                            </Flex>
-                        }
+                        label="Địa chỉ email"
+                        required
                         placeholder="you@wnc.bank"
                         mt="md"
                         key={form.key("email")}
@@ -63,12 +53,8 @@ const UserForm: React.FC = () => {
                     />
 
                     <TextInput
-                        label={
-                            <Flex align="center">
-                                <Text>Số điện thoại</Text>
-                                <Text ml={4} c="red">*</Text>
-                            </Flex>
-                        }
+                        label="Số điện thoại"
+                        required
                         placeholder="0123456789"
                         mt="md"
                         key={form.key("phone")}

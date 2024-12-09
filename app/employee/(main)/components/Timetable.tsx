@@ -41,7 +41,7 @@ const Timetable: React.FC = () => {
         <Flex direction="column">
             <Center>
                 <Title order={2} p={10}>
-                    Hộp thư
+                    Thời gian biểu
                 </Title>
             </Center>
             <Divider size={5} color="blue.2" />
