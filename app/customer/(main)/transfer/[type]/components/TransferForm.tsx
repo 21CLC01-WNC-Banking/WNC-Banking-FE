@@ -120,7 +120,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                 </Title>
             </Center>
 
-            <Fieldset id="transfer-form" variant="unstyled" mt="xl">
+            <Fieldset radius="md" p={30} mt="xl">
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Group grow gap="xl">
                         <Select

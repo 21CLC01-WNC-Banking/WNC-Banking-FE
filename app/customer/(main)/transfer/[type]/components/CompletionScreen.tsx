@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button, Center, Title, Stack, Checkbox, Group, TextInput, rem } from "@mantine/core";
+import {
+    Button,
+    Center,
+    Title,
+    Stack,
+    Checkbox,
+    Group,
+    TextInput,
+    rem,
+    Fieldset,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconCheck } from "@tabler/icons-react";
@@ -52,34 +62,36 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
                 <Title order={2}>Chuyển khoản thành công</Title>
             </Center>
 
-            <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Group grow gap="xl" mt="lg">
-                    <Checkbox
-                        size="md"
-                        radius="md"
-                        mt="lg"
-                        label="Lưu thông tin người nhận"
-                        checked={displayNickname}
-                        onChange={(event) => {
-                            setDisplayNickname(event.currentTarget.checked);
-                        }}
-                    />
-
-                    {displayNickname && (
-                        <TextInput
+            <Fieldset radius="md" p={30} mt="xl">
+                <form onSubmit={form.onSubmit(handleSubmit)}>
+                    <Group grow gap="xl" mt="lg">
+                        <Checkbox
                             size="md"
                             radius="md"
-                            placeholder="Nhập tên gợi nhớ (tùy chọn)"
-                            key={form.key("nickname")}
-                            {...form.getInputProps("nickname")}
+                            mt="lg"
+                            label="Lưu thông tin người nhận"
+                            checked={displayNickname}
+                            onChange={(event) => {
+                                setDisplayNickname(event.currentTarget.checked);
+                            }}
                         />
-                    )}
-                </Group>
 
-                <Button fullWidth type="submit" mt={40} radius="md">
-                    Xác nhận
-                </Button>
-            </form>
+                        {displayNickname && (
+                            <TextInput
+                                size="md"
+                                radius="md"
+                                placeholder="Nhập tên gợi nhớ (tùy chọn)"
+                                key={form.key("nickname")}
+                                {...form.getInputProps("nickname")}
+                            />
+                        )}
+                    </Group>
+
+                    <Button fullWidth type="submit" mt={40} radius="md">
+                        Xác nhận
+                    </Button>
+                </form>
+            </Fieldset>
         </Stack>
     );
 };

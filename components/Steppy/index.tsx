@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { Stepper, Stack } from "@mantine/core";
 
+import classes from "./Steppy.module.css";
+
 interface SteppyProps {
     steps: {
         label: string;
@@ -24,7 +26,15 @@ const Steppy: React.FC<SteppyProps> = ({ steps }) => {
 
     return (
         <Stack gap="xl" justify="flex-start" my={40} mx={120}>
-            <Stepper active={active} onStepClick={setActive} radius="md">
+            <Stepper
+                active={active}
+                onStepClick={setActive}
+                radius="md"
+                classNames={{
+                    separator: classes.separator,
+                    stepIcon: classes.stepIcon,
+                }}
+            >
                 {steps.map((step, index) => (
                     <Stepper.Step key={index} label={step.label} allowStepSelect={false}>
                         {index < steps.length - 1 ? (

@@ -4,9 +4,9 @@ import { useParams } from "next/navigation";
 
 import Steppy from "@/components/Steppy";
 
-import TransferForm from "./TransferForm";
-import OtpForm from "./OtpForm";
-import CompletionScreen from "./CompletionScreen";
+import TransferForm from "./components/TransferForm";
+import OtpForm from "./components/OtpForm";
+import CompletionScreen from "./components/CompletionScreen";
 
 const Transfer = () => {
     const params = useParams();

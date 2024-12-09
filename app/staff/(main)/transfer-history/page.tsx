@@ -1,14 +1,14 @@
-import { Flex, Center, Title } from "@mantine/core";
+import { Stack, Center, Title } from "@mantine/core";
 import TransferHistoryTable from "../components/TransferHistoryTable";
 
 const TransferHistory: React.FC = () => {
     return (
-        <Flex direction="column">
+        <Stack mx={120}>
             <Center>
-                <Title my={10}>LỊCH SỬ GIAO DỊCH</Title>
+                <Title order={2}>Lịch sử giao dịch</Title>
             </Center>
             <TransferHistoryTable />
-        </Flex>
+        </Stack>
     );
-}
+};
 export default TransferHistory;

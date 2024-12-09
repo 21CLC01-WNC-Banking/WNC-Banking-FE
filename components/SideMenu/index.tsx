@@ -7,6 +7,7 @@ import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
 
 import LinkGroup from "@/components/LinkGroup";
+import CurrentTime from "@/components/CurrentTime";
 
 import classes from "./SideMenu.module.css";
 
@@ -64,6 +65,8 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                 </Text>
                 {links}
             </div>
+
+            <CurrentTime />
 
             <div className={classes.footer}>
                 {items.map(

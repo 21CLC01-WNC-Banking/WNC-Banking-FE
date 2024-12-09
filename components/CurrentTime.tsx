@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Text, Box } from "@mantine/core";
 
 const CurrentTime: React.FC = () => {
-
     const [currentTime, setCurrentTime] = useState<string>("");
     const [currentDate, setCurrentDate] = useState<string>("");
 
@@ -39,10 +38,14 @@ const CurrentTime: React.FC = () => {
     }, []);
 
     return (
-        <Box>
-            <Text size="xl" fw={700} c="gray">{currentTime}</Text>
-            <Text size="lg" c="gray">{currentDate}</Text>
+        <Box mx="md">
+            <Text size="lg" fw={700} c="white">
+                {currentTime}
+            </Text>
+            <Text size="md" c="white">
+                {currentDate}
+            </Text>
         </Box>
     );
-}
+};
 export default CurrentTime;

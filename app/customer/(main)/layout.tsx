@@ -7,7 +7,7 @@ import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler
 
 import SideMenu from "@/components/SideMenu";
 
-import Loading from "./loading";
+import Loading from "../../../components/Loading";
 
 const menuItems = [
     {
@@ -48,7 +48,7 @@ const menuItems = [
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <StoreProvider>
-            <Group align="top" preventGrowOverflow={false} grow gap="0">
+            <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
                 <SideMenu forCustomer items={menuItems} />
                 <Suspense fallback={<Loading />}>{children}</Suspense>
             </Group>

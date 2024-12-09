@@ -22,6 +22,16 @@ const nextConfig = {
                 destination: "/customer/login",
                 permanent: true,
             },
+            {
+                source: "/staff",
+                destination: "/staff/create-account",
+                permanent: true,
+            },
+            {
+                source: "/staff/logout",
+                destination: "/staff/login",
+                permanent: true,
+            },
         ];
     },
 };
