@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
