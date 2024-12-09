@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 
+import StoreProvider from "./StoreProvider";
+
 import { Group } from "@mantine/core";
 import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
 
@@ -45,9 +47,11 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <Group align="top" preventGrowOverflow={false} grow gap="0">
-            <SideMenu forCustomer items={menuItems} />
-            <Suspense fallback={<Loading />}>{children}</Suspense>
-        </Group>
+        <StoreProvider>
+            <Group align="top" preventGrowOverflow={false} grow gap="0">
+                <SideMenu forCustomer items={menuItems} />
+                <Suspense fallback={<Loading />}>{children}</Suspense>
+            </Group>
+        </StoreProvider>
     );
 }

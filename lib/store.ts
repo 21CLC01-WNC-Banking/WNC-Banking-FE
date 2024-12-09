@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { transferStepperReducer } from "./slices/transferStepperSlice";
+import { transferReducer } from "./slices/TransferSlice";
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
-            transferStepper: transferStepperReducer,
+            transfer: transferReducer,
         },
     });
 };
