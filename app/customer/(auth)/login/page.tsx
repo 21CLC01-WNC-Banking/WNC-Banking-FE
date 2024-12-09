@@ -21,7 +21,7 @@ const Login = () => {
 
     const form = useForm({
         mode: "uncontrolled",
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         initialValues: { email: "", password: "" },
 
         validate: {
@@ -43,22 +43,26 @@ const Login = () => {
                 <Paper withBorder shadow="md" p={30} mt={30} radius="md">
                     <form onSubmit={form.onSubmit(handleSubmit)}>
                         <TextInput
+                            radius="md"
                             label="Địa chỉ email"
                             placeholder="you@wnc.bank"
+                            withAsterisk
                             key={form.key("email")}
                             {...form.getInputProps("email")}
                         />
 
                         <PasswordInput
+                            radius="md"
                             label="Mật khẩu"
                             placeholder="Mật khẩu"
                             mt="md"
+                            withAsterisk
                             key={form.key("password")}
                             {...form.getInputProps("password")}
                         />
 
                         <Group justify="center">
-                            <Button fullWidth type="submit" mt="xl">
+                            <Button fullWidth type="submit" mt="xl" radius="md">
                                 Đăng nhập
                             </Button>
 

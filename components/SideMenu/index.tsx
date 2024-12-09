@@ -1,22 +1,30 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
 
+import LinkGroup from "@/components/LinkGroup";
+import CurrentTime from "@/components/CurrentTime";
+
 import classes from "./SideMenu.module.css";
 
-export interface SideMenuProps {
+interface SideMenuProps {
     forCustomer: boolean;
-    items: { link: string; label: string; icon: JSX.Element; top: boolean }[];
+    items: {
+        link?: string;
+        label: string;
+        icon: JSX.Element;
+        top: boolean;
+        innerLinks?: { link: string; label: string }[];
+    }[];
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
-    const [active, setActive] = useState(0);
     const router = useRouter();
+    const pathname = usePathname();
 
     const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -28,20 +36,25 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
         }
     };
 
-    const links = items.map(
-        (item, index) =>
-            item.top && (
-                <NavLink
-                    component={Link}
-                    className={classes.link}
-                    active={index === active}
-                    href={item.link}
-                    key={item.label}
-                    label={item.label}
-                    leftSection={item.icon}
-                    onClick={() => setActive(index)}
-                />
-            )
+    const links = items.map((item) =>
+        item.top && item.innerLinks ? (
+            <LinkGroup
+                icon={item.icon}
+                label={item.label}
+                links={item.innerLinks}
+                key={item.label}
+            />
+        ) : item.top ? (
+            <NavLink
+                component={Link}
+                className={classes.link}
+                active={pathname === item.link}
+                href={item.link ? item.link : "#"}
+                key={item.label}
+                label={item.label}
+                leftSection={item.icon}
+            />
+        ) : null
     );
 
     return (
@@ -53,19 +66,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                 {links}
             </div>
 
+            <CurrentTime />
+
             <div className={classes.footer}>
                 {items.map(
-                    (item, index) =>
+                    (item) =>
                         !item.top && (
                             <NavLink
                                 component={Link}
                                 className={classes.link}
-                                active={index === active}
-                                href={item.link}
+                                active={pathname === item.link}
+                                href={item.link ? item.link : "#"}
                                 key={item.label}
                                 label={item.label}
                                 leftSection={item.icon}
-                                onClick={() => setActive(index)}
                             />
                         )
                 )}
@@ -76,7 +90,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                     onClick={handleLogout}
                 >
                     <IconLogout className={classes.linkIcon} />
-                    <span>Đăng xuất</span>
+                    <span style={{ marginLeft: "25" }}>Đăng xuất</span>
                 </Link>
             </div>
         </nav>

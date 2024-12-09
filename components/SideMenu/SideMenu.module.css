@@ -1,6 +1,9 @@
 .navbar {
     height: 100vh;
-    width: 20%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    max-width: 20%;
     padding: var(--mantine-spacing-md);
     display: flex;
     flex-direction: column;
@@ -25,6 +28,8 @@
 
 .title {
     color: var(--mantine-color-white);
+    font-weight: var(--mantine-h2-font-weight);
+    font-size: var(--mantine-h2-font-size);
 }
 
 .link {
@@ -34,7 +39,7 @@
     font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-white);
     padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-    border-radius: var(--mantine-radius-sm);
+    border-radius: var(--mantine-radius-md);
     font-weight: 500;
 
     @mixin hover {
@@ -61,7 +66,7 @@
 }
 
 .linkIcon {
-    color: var(--mantine-color-blue-1);
+    color: var(--mantine-color-white);
     margin-right: var(--mantine-spacing-sm);
     width: 25px;
     height: 25px;

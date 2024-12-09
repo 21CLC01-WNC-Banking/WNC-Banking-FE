@@ -1,32 +1,35 @@
+import { Suspense } from "react";
+
+import StoreProvider from "./StoreProvider";
+
 import { Group } from "@mantine/core";
-import {
-    IconCreditCard,
-    IconUsers,
-    IconCreditCardPay,
-    IconMessageDollar,
-    IconKey,
-} from "@tabler/icons-react";
+import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
 
+import Loading from "../../../components/Loading";
+
 const menuItems = [
     {
-        link: "/customer/accounts",
-        label: "Danh sách tài khoản",
-        icon: <IconCreditCard />,
+        link: "/customer/home",
+        label: "Trang chủ",
+        icon: <IconHome />,
         top: true,
     },
     {
-        link: "/customer/recipients",
-        label: "Danh sách người nhận",
-        icon: <IconUsers />,
-        top: true,
-    },
-    {
-        link: "/customer/transfer",
         label: "Chuyển khoản",
         icon: <IconCreditCardPay />,
         top: true,
+        innerLinks: [
+            {
+                link: "/customer/transfer/internal",
+                label: "Nội bộ",
+            },
+            {
+                link: "/customer/transfer/external",
+                label: "Liên ngân hàng",
+            },
+        ],
     },
     {
         link: "/customer/request-payment",
@@ -44,9 +47,11 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <Group align="top">
-            <SideMenu forCustomer items={menuItems} />
-            {children}
-        </Group>
+        <StoreProvider>
+            <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
+                <SideMenu forCustomer items={menuItems} />
+                <Suspense fallback={<Loading />}>{children}</Suspense>
+            </Group>
+        </StoreProvider>
     );
 }
