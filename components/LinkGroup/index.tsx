@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Box, Collapse, Group, UnstyledButton, NavLink } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
@@ -14,13 +15,15 @@ interface LinkGroupProps {
 }
 
 const LinkGroup: React.FC<LinkGroupProps> = ({ icon, label, initiallyOpened, links }) => {
+    const pathname = usePathname();
+
     const [opened, setOpened] = useState(initiallyOpened || false);
 
     const items = links.map((link) => (
         <NavLink
             component={Link}
             className={classes.innerLink}
-            // active={pathname === link.link}
+            active={pathname === link.link}
             href={link.link}
             key={link.label}
             label={link.label}
