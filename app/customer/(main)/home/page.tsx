@@ -1,5 +1,5 @@
 const Home = () => {
-    return <div>Account & recipients page.</div>;
+    return <div>Account & receivers page.</div>;
 };
 
 export default Home;
