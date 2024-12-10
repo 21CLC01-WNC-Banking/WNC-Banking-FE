@@ -4,7 +4,7 @@ import classes from "./ClickableCard.module.css";
 
 interface ClickableCardProps {
     title?: string;
-    subtitle?: string;
+    subtitle?: string[];
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -18,11 +18,12 @@ const ClickableCard: React.FC<ClickableCardProps> = ({ title, subtitle, onClick 
                     </Text>
                 )}
 
-                {subtitle && (
-                    <Text fz="sm" c="dimmed">
-                        {subtitle}
-                    </Text>
-                )}
+                {subtitle &&
+                    subtitle.map((item) => (
+                        <Text key={item} fz="sm" c="dimmed">
+                            {item}
+                        </Text>
+                    ))}
             </div>
         </UnstyledButton>
     );
