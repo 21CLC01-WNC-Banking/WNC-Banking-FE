@@ -48,7 +48,7 @@ const menuItems = [
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <StoreProvider>
-            <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
+            <Group align="top" preventGrowOverflow={false} grow gap="0" wrap="nowrap">
                 <SideMenu forCustomer items={menuItems} />
                 <Suspense fallback={<Loading />}>{children}</Suspense>
             </Group>

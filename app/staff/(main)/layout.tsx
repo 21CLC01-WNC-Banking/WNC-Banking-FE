@@ -30,7 +30,7 @@ const menuItems = [
 
 export default function StaffLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
+        <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#ebf4fc">
             <SideMenu forCustomer={false} items={menuItems} />
             <Stack my={40}>
                 <Group justify="flex-end" mx={40}>
