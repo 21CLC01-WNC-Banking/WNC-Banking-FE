@@ -46,30 +46,28 @@ const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
 
     return (
         <Stack mt="xl" align="center">
-            <Center mt="xl">
-                <Title order={2}>Nhập mã OTP để xác nhận chuyển khoản</Title>
-            </Center>
-
             <Fieldset radius="md" p={30} mt="xl">
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                    <PinInput
-                        size="xl"
-                        mt={40}
-                        radius="md"
-                        length={6}
-                        type={/^[0-9]*$/}
-                        inputType="tel"
-                        inputMode="text"
-                        oneTimeCode
-                        key={form.key("otp")}
-                        {...form.getInputProps("otp")}
-                    />
+                <Center mb="xl">
+                    <Title order={2}>Nhập mã OTP để xác nhận chuyển khoản</Title>
+                </Center>
 
-                    {form.errors.otp && (
-                        <Center mt={10}>
-                            <Text c="red">{form.errors.otp}</Text>
-                        </Center>
-                    )}
+                <form onSubmit={form.onSubmit(handleSubmit)}>
+                    <Stack align="center">
+                        <PinInput
+                            size="xl"
+                            mt="xl"
+                            radius="md"
+                            length={6}
+                            type={/^[0-9]*$/}
+                            inputType="tel"
+                            inputMode="text"
+                            oneTimeCode
+                            key={form.key("otp")}
+                            {...form.getInputProps("otp")}
+                        />
+
+                        {form.errors.otp && <Text c="red">{form.errors.otp}</Text>}
+                    </Stack>
 
                     <Button fullWidth type="submit" mt={60} radius="md">
                         Tiếp tục
