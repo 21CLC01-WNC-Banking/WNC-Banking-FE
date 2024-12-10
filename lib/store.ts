@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { transferReducer } from "./slices/TransferSlice";
+import { receiversReducer } from "./slices/ReceiversSlice";
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             transfer: transferReducer,
+            receivers: receiversReducer,
         },
     });
 };
