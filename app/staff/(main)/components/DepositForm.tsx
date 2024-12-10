@@ -2,6 +2,7 @@
 
 import { TextInput, Fieldset, Button, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import toVietnamese from './ToVietnamese.js';
 
 const DepositForm = () => {
     // Dữ liệu số tài khoản và tên chủ tài khoản
@@ -30,8 +31,8 @@ const DepositForm = () => {
                 value < 1000
                     ? "Hạn mức không được ít hơn 1 ngàn đồng"
                     : value > 1000000000
-                    ? "Hạn mức không được lớn hơn 1 tỷ đồng"
-                    : null,
+                        ? "Hạn mức không được lớn hơn 1 tỷ đồng"
+                        : null,
             message: (value) =>
                 value.length > 100 ? "Nội dung không được vượt quá 100 ký tự" : null,
         },
@@ -53,14 +54,16 @@ const DepositForm = () => {
     };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target.value;
-
+        const input = e.target.value.replace(/\./g, "");
         //Chỉ cho phép nhập số
         if (/^\d*$/.test(input)) {
             if (!input) {
                 form.setFieldValue("amount", 0);
+                form.setFieldValue("amountInWords", "KHÔNG ĐỒNG");
             } else {
-                form.setFieldValue("amount", parseFloat(input));
+                const numericValue = parseFloat(input);
+                form.setFieldValue("amount", numericValue);
+                form.setFieldValue("amountInWords", `${toVietnamese(numericValue).toUpperCase()} ĐỒNG`);
             }
         }
     };
@@ -104,7 +107,7 @@ const DepositForm = () => {
                     mt="lg"
                     label="Số tiền"
                     required
-                    value={form.values.amount}
+                    value={form.values.amount.toLocaleString("vi-VN")}
                     onChange={handleAmountChange}
                     placeholder="Nhập số tiền"
                     error={form.errors.amount}
@@ -112,7 +115,7 @@ const DepositForm = () => {
 
                 {/* Viết thành chữ */}
                 {form.values.amountInWords && (
-                    <Text mt="md" size="sm" c="gray">
+                    <Text mt="xs" size="sm" c="gray">
                         {form.values.amountInWords}
                     </Text>
                 )}

@@ -143,8 +143,8 @@ const TransferHistoryTable: React.FC = () => {
                 transaction.transactionType === "Chuyển khoản"
                     ? "yellow.1"
                     : transaction.transactionType === "Nhận tiền"
-                    ? "green.1"
-                    : "red.2"
+                        ? "green.1"
+                        : "red.2"
             }
         >
             <Table.Td>{transaction.dateTime}</Table.Td>
@@ -200,7 +200,7 @@ const TransferHistoryTable: React.FC = () => {
                         <Group justify="center">
                             <Chip value="Tất cả">Tất cả</Chip>
                             <Chip value="Thanh toán" color="red">
-                                Cũ nhất
+                                Thanh toán
                             </Chip>
                             <Chip value="Nhận tiền" color="green">
                                 Nhận tiền
