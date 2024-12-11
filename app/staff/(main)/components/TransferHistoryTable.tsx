@@ -179,7 +179,7 @@ const TransferHistoryTable: React.FC = () => {
             </Group>
 
             {/* Filter Section */}
-            <Group justify="space-between" align="center" mb="md">
+            <Group justify="space-between" align="center">
                 <Group justify="flex-start" gap="md">
                     <Text>Thời gian:</Text>
                     <Chip.Group multiple={false} value={timeFilter} onChange={setTimeFilter}>
@@ -214,7 +214,7 @@ const TransferHistoryTable: React.FC = () => {
             </Group>
 
             {/* Table */}
-            <Table verticalSpacing="sm" mt="xl">
+            <Table verticalSpacing="sm" mt="sm">
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Thời gian</Table.Th>
