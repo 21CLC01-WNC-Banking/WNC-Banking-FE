@@ -21,7 +21,7 @@ const menuItems = [
         top: true,
     },
     {
-        link: "/staff/transfer-history",
+        link: "/staff/transaction-history",
         label: "Lịch sử giao dịch",
         icon: <IconHistory />,
         top: true,
