@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { transferReducer } from "./slices/TransferSlice";
 import { receiversReducer } from "./slices/ReceiversSlice";
+import { authReducer } from "./slices/AuthSlice";
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             transfer: transferReducer,
             receivers: receiversReducer,
+            auth: authReducer,
         },
     });
 };
