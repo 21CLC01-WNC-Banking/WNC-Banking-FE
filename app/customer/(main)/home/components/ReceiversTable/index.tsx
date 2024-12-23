@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import {
     ActionIcon,
+    Button,
     Center,
     Group,
     keys,
@@ -19,18 +20,18 @@ import {
 import {
     IconChevronDown,
     IconChevronUp,
-    IconPencil,
     IconSearch,
     IconSelector,
-    IconTrash,
     IconCreditCardPay,
-    IconMessageDollar,
 } from "@tabler/icons-react";
 
 import classes from "./ReceiversTable.module.css";
 
 import accounts from "@/lib/mock_data/accounts.json";
 import { Account } from "@/lib/types";
+import DeleteReceiverModal from "./DeleteReceiverModal";
+import EditReceiverModal from "./EditReceiverModal";
+import CreateRequestModal from "@/components/CreateRequestModal";
 
 interface SortableTableHeaderProps {
     children: React.ReactNode;
@@ -135,6 +136,13 @@ const ReceiversTable = () => {
 
             <Table.Td>
                 <Group gap="md" justify="flex-end">
+                    {row.bank === "WNC Bank" && (
+                        <CreateRequestModal
+                            target={row.accountNumber.replace(/(\d{4})/g, "$1 ").trim()}
+                            isFromReceiversList={true}
+                        />
+                    )}
+
                     <Tooltip label="Chuyển khoản">
                         <ActionIcon
                             variant="subtle"
@@ -145,23 +153,9 @@ const ReceiversTable = () => {
                         </ActionIcon>
                     </Tooltip>
 
-                    <Tooltip label="Nhắc nợ">
-                        <ActionIcon variant="subtle" color="blue">
-                            <IconMessageDollar size={20} />
-                        </ActionIcon>
-                    </Tooltip>
+                    <EditReceiverModal />
 
-                    <Tooltip label="Chỉnh sửa tên gợi nhớ">
-                        <ActionIcon variant="subtle" color="gray">
-                            <IconPencil size={20} />
-                        </ActionIcon>
-                    </Tooltip>
-
-                    <Tooltip label="Xóa">
-                        <ActionIcon variant="subtle" color="red">
-                            <IconTrash size={20} />
-                        </ActionIcon>
-                    </Tooltip>
+                    <DeleteReceiverModal />
                 </Group>
             </Table.Td>
         </Table.Tr>
@@ -169,15 +163,20 @@ const ReceiversTable = () => {
 
     return (
         <Stack>
-            <TextInput
-                placeholder="Tìm kiếm"
-                radius="md"
-                mb="md"
-                size="md"
-                leftSection={<IconSearch size={20} />}
-                value={search}
-                onChange={handleSearchChange}
-            />
+            <Group mb="md" grow justify="space-between" align="center">
+                <TextInput
+                    placeholder="Tìm kiếm"
+                    radius="md"
+                    size="md"
+                    leftSection={<IconSearch size={20} />}
+                    value={search}
+                    onChange={handleSearchChange}
+                />
+
+                <Button size="md" radius="md" maw={200}>
+                    Thêm người nhận
+                </Button>
+            </Group>
 
             <ScrollArea h={450}>
                 <Table horizontalSpacing="sm" verticalSpacing="xs" layout="auto" highlightOnHover>

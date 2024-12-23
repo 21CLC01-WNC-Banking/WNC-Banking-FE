@@ -6,11 +6,12 @@ import React from "react";
 interface TabHeaderProps {
     tabs: { label: string; content: JSX.Element }[];
     mt: string | number;
+    mb: string | number;
 }
 
-const TabHeader: React.FC<TabHeaderProps> = ({ tabs, mt }) => {
+const TabHeader: React.FC<TabHeaderProps> = ({ tabs, mt, mb }) => {
     return (
-        <Tabs mt={mt} variant="default" radius="md" defaultValue={tabs[0].label}>
+        <Tabs mt={mt} mb={mb} variant="default" radius="md" defaultValue={tabs[0].label}>
             <Tabs.List justify="flex-end">
                 {tabs.map((tab, index) => (
                     <Tabs.Tab key={index} value={tab.label}>
