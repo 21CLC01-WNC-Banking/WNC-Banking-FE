@@ -1,11 +1,10 @@
 "use client";
 
-import { Button, Fieldset, TextInput, Notification } from "@mantine/core";
+import { Button, Fieldset, TextInput } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
-import { useState } from "react";
+import { showNotification } from "@mantine/notifications";
 
 const UserForm: React.FC = () => {
-    const [error, setError] = useState("");
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
@@ -27,7 +26,7 @@ const UserForm: React.FC = () => {
                 email: values.email,
                 name: values.name,
                 phoneNumber: values.phone,
-                password: "khongnhopassword"
+                password: "khongnhopassword",
             };
 
             const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {
@@ -40,17 +39,29 @@ const UserForm: React.FC = () => {
             });
 
             if (response.ok) {
-                setError("");
-                console.log("Tạo tài khoản thành công");
-            }
-            else {
+                showNotification({
+                    title: "Thành công",
+                    message: "Tạo tài khoản thành công!",
+                    color: "green",
+                    position: "bottom-right",
+                });
+                form.reset();
+            } else {
                 const data = await response.json();
-                throw new Error(data.message || "Tạo tài khoản thất bại");
+                showNotification({
+                    title: "Lỗi",
+                    message: data.errors.message,
+                    color: "red",
+                    position: "bottom-right"
+                })
             }
         } catch (err: any) {
-            setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
-        } finally {
-            //setLoading(false);
+            showNotification({
+                title: "Lỗi",
+                message: err.message || "Có lỗi xảy ra, vui lòng thử lại",
+                color: "red",
+                position: "bottom-right",
+            });
         }
     };
 
@@ -90,12 +101,6 @@ const UserForm: React.FC = () => {
                         {...form.getInputProps("phone")}
                     />
 
-                    {error && (
-                        <Notification color="red" onClose={() => setError("")}>
-                            {error}
-                        </Notification>
-                    )}
-
                     <Button fullWidth type="submit" radius="md" mt={40}>
                         Tạo tài khoản
                     </Button>
@@ -104,4 +109,5 @@ const UserForm: React.FC = () => {
         </>
     );
 };
+
 export default UserForm;
