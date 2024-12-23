@@ -1,11 +1,7 @@
-import { Suspense } from "react";
-
 import { Stack, Group, Center } from "@mantine/core";
 import { IconUserPlus, IconHistory, IconCreditCardPay } from "@tabler/icons-react";
-
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "./components/StaffPortalShortcut";
-import Loading from "@/components/Loading";
 
 const menuItems = [
     {
@@ -38,7 +34,7 @@ export default function StaffLayout({ children }: Readonly<{ children: React.Rea
                 </Group>
 
                 <Center>
-                    <Suspense fallback={<Loading />}>{children}</Suspense>
+                    {children}
                 </Center>
             </Stack>
         </Group>

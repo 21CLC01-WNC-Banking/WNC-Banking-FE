@@ -1,9 +1,11 @@
 "use client";
 
-import { Button, Fieldset, TextInput } from "@mantine/core";
+import { Button, Fieldset, TextInput, Notification } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
+import { useState } from "react";
 
 const UserForm: React.FC = () => {
+    const [error, setError] = useState("");
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
@@ -19,8 +21,37 @@ const UserForm: React.FC = () => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            const payload = {
+                email: values.email,
+                name: values.name,
+                phoneNumber: values.phone,
+                password: "khongnhopassword"
+            };
+
+            const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                setError("");
+                console.log("Tạo tài khoản thành công");
+            }
+            else {
+                const data = await response.json();
+                throw new Error(data.message || "Tạo tài khoản thất bại");
+            }
+        } catch (err: any) {
+            setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+        } finally {
+            //setLoading(false);
+        }
     };
 
     return (
@@ -58,6 +89,12 @@ const UserForm: React.FC = () => {
                         key={form.key("phone")}
                         {...form.getInputProps("phone")}
                     />
+
+                    {error && (
+                        <Notification color="red" onClose={() => setError("")}>
+                            {error}
+                        </Notification>
+                    )}
 
                     <Button fullWidth type="submit" radius="md" mt={40}>
                         Tạo tài khoản
