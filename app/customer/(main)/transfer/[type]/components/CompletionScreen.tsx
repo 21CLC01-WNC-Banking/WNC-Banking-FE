@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import { Button, Center, Title, Checkbox, Group, TextInput, rem, Fieldset } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -16,8 +16,6 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
     const router = useRouter();
 
     const [displayNickname, setDisplayNickname] = useState(false);
-
-    const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
 
     const form = useForm({
         mode: "uncontrolled",
@@ -35,7 +33,7 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
             notifications.show({
                 withBorder: true,
                 radius: "md",
-                icon: checkIcon,
+                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
                 color: "teal",
                 title: "Lưu người nhận thành công",
                 message: "Bạn có thể kiểm tra lại thông tin người nhận tại Trang chủ.",

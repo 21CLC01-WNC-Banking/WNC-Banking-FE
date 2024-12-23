@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setTransfer } from "@/lib/slices/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/ReceiversSlice";
 

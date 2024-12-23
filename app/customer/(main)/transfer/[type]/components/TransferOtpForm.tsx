@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppSelector, useAppDispatch } from "@/lib/hooks";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
 import { resetTransfer } from "@/lib/slices/TransferSlice";
 
 import { Button, Center, Text, Title, Stack, PinInput, Fieldset } from "@mantine/core";
@@ -10,7 +10,7 @@ interface OtpFormProps {
     handleNextStep?: () => void;
 }
 
-const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
+const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
     const dispatch = useAppDispatch();
 
     const transfer = useAppSelector((state) => state.transfer.currentTransfer);
@@ -78,4 +78,4 @@ const OtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
     );
 };
 
-export default OtpForm;
+export default TransferOtpForm;

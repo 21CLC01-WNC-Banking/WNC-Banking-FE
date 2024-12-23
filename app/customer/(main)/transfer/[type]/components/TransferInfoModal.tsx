@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 

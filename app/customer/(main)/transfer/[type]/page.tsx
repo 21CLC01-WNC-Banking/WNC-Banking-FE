@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { Stepper, Stack } from "@mantine/core";
 
 import TransferForm from "./components/TransferForm";
-import OtpForm from "./components/OtpForm";
+import TransferOtpForm from "./components/TransferOtpForm";
 import CompletionScreen from "./components/CompletionScreen";
 
 import classes from "./Transfer.module.css";
@@ -43,7 +43,7 @@ const Transfer = () => {
                 </Stepper.Step>
 
                 <Stepper.Step label="Xác thực OTP" allowStepSelect={false}>
-                    <OtpForm handleNextStep={handleNextStep} />
+                    <TransferOtpForm handleNextStep={handleNextStep} />
                 </Stepper.Step>
 
                 <Stepper.Step label="Hoàn tất" allowStepSelect={false}>
