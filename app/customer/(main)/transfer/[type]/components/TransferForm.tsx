@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setTransfer } from "@/lib/slices/TransferSlice";
+import { setFilteredReceivers } from "@/lib/slices/ReceiversSlice";
 
 import {
     Button,
@@ -21,9 +23,11 @@ import {
     Group,
     Tooltip,
     UnstyledButton,
+    Input,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
-import { useDebouncedState, useDisclosure } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
+import { IMaskInput } from "react-imask";
 import { IconAddressBook, IconSearch } from "@tabler/icons-react";
 
 import ClickableCard from "@/components/ClickableCard";
@@ -34,32 +38,34 @@ interface TransferFormProps {
     type: string;
 }
 
-const accounts: string[] = ["1234 5678 9012", "2345 6789 0123", "3456 7890 1234", "4567 8901 2345"];
-
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
+    const searchParams = useSearchParams();
 
     const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
     const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
 
-    const [accNum, setAccNum] = useDebouncedState("", 50, { leading: true });
-
     const [query, setQuery] = useState("");
-    const [selectedBank, setSelectedBank] = useState("");
+    const [selectedBank, setSelectedBank] = useState(
+        type === "internal" ? "WNC Bank" : searchParams.get("at") || ""
+    );
+
+    const accounts = useAppSelector((state) => state.receivers.filteredReceivers);
 
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            receiverAccount: "",
+            receiverAccount: searchParams.get("to") || "",
             amount: 0,
             message: "NGƯỜI DÙNG chuyển tiền",
+            receiverHandlesFee: false,
         },
         validate: {
-            receiverAccount: () =>
-                accNum.trim().length < 1
+            receiverAccount: (value) =>
+                value.length < 1
                     ? "Vui lòng nhập số tài khoản người nhận"
-                    : /[0-9\s]{14}/.test(accNum)
+                    : /[0-9\s]{14}/.test(value)
                     ? null
                     : "Số tài khoản người nhận không hợp lệ",
             amount: (value) => (value < 10000 ? "Số tiền cần chuyển tối thiểu là 10000 VND" : null),
@@ -67,7 +73,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         },
         transformValues: (values) => ({
             ...values,
-            receiverAccNumber: values.receiverAccount.split(" ").join(""),
+            receiverAccount: values.receiverAccount.split(" ").join(""),
             message: values.message.trim(),
         }),
     });
@@ -80,7 +86,9 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                 amount: form.getValues().amount,
                 message: form.getValues().message,
                 receiverAccount: form.getValues().receiverAccount,
+                receiverBank: type === "internal" ? "WNC Bank" : selectedBank,
                 senderAccount: "Mặc định",
+                senderHandlesFee: !form.getValues().receiverHandlesFee,
             };
 
             dispatch(setTransfer(newTransfer));
@@ -89,39 +97,51 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         }
     };
 
-    const handleSubmit = () => {
-        if (handleNextStep) {
-            handleNextStep();
-        }
-    };
-
     const filtered = accounts.filter((account) =>
-        account.toLowerCase().includes(query.toLowerCase())
+        Object.values(account).some((value) =>
+            String(value).toLowerCase().includes(query.toLowerCase().trim())
+        )
     );
 
     const accountList = filtered.map((account) => (
         <ClickableCard
-            key={account}
-            title={account}
+            key={account.name}
+            title={account.nickname}
+            subtitle={
+                type === "internal"
+                    ? [account.name, account.accountNumber]
+                    : [account.name, account.bank, account.accountNumber]
+            }
             onClick={() => {
-                setAccNum(account);
-                form.setFieldValue("receiverAccNumber", account);
-
+                form.setFieldValue(
+                    "receiverAccount",
+                    account.accountNumber.replace(/(\d{4})/g, "$1 ").trim()
+                );
                 closeDrawer();
             }}
         />
     ));
 
+    useEffect(() => {
+        dispatch(setFilteredReceivers(selectedBank));
+    }, [dispatch, selectedBank]);
+
     return (
         <>
-            <Center mt="xl">
-                <Title order={2}>
-                    Chuyển khoản {type === "internal" ? "nội bộ" : "liên ngân hàng"}
-                </Title>
-            </Center>
-
             <Fieldset radius="md" p={30} mt="xl">
-                <form onSubmit={form.onSubmit(handleSubmit)}>
+                <Center mb="xl">
+                    <Title order={2}>
+                        Chuyển khoản {type === "internal" ? "nội bộ" : "liên ngân hàng"}
+                    </Title>
+                </Center>
+
+                <form
+                    onSubmit={form.onSubmit(() => {
+                        if (handleNextStep) {
+                            handleNextStep();
+                        }
+                    })}
+                >
                     <Group grow gap="xl">
                         <Select
                             size="md"
@@ -142,7 +162,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             styles={{
                                 input: {
                                     color: "var(--mantine-color-blue-filled)",
-                                    "background-color": "var(--mantine-color-blue-light)",
+                                    backgroundColor: "var(--mantine-color-blue-light)",
                                 },
                             }}
                             readOnly
@@ -159,7 +179,8 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             allowDeselect={false}
                             withAsterisk
                             placeholder="Chọn ngân hàng"
-                            data={["WNC Bank", "Vietcombank", "Techcombank", "Agribank"]}
+                            data={["Vietcombank", "Techcombank", "Agribank"]}
+                            value={selectedBank}
                             onChange={(value) => {
                                 if (value) {
                                     setSelectedBank(value);
@@ -172,41 +193,39 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         label="Vui lòng chọn ngân hàng trước khi nhập số tài khoản"
                         disabled={type === "internal" || selectedBank !== ""}
                     >
-                        <TextInput
+                        <Input.Wrapper
                             size="md"
-                            radius="md"
                             mt="lg"
                             label="Số tài khoản người nhận"
-                            maxLength={14}
+                            description="Để xem danh sách người nhận không thuộc ngân hàng đã chọn, hãy chọn ngân hàng khác ở danh sách bên trên"
                             withAsterisk
-                            placeholder="XXXX XXXX XXXX"
-                            rightSection={
-                                <ActionIcon
-                                    variant="filled"
-                                    radius="md"
-                                    aria-label="Saved receivers"
-                                    disabled={type === "external" && selectedBank === ""}
-                                    onClick={openDrawer}
-                                >
-                                    <IconAddressBook size={20} />
-                                </ActionIcon>
-                            }
-                            key={form.key("receiverAccNumber")}
-                            error={form.errors.receiverAccNumber}
-                            value={accNum}
-                            disabled={type === "external" && selectedBank === ""}
-                            onChange={(event) =>
-                                setAccNum(
-                                    event.currentTarget.value
-                                        .replace(/(\d{4})(?=\d)/g, "$1 ")
-                                        .trim()
-                                )
-                            }
-                            onBlur={(event) => {
-                                form.setFieldValue("receiverAccNumber", event.currentTarget.value);
-                                form.validateField("receiverAccNumber");
-                            }}
-                        />
+                        >
+                            <Input
+                                component={IMaskInput}
+                                size="md"
+                                radius="md"
+                                mask="0000 0000 0000"
+                                placeholder="XXXX XXXX XXXX"
+                                rightSectionPointerEvents="all"
+                                error={form.errors.receiverAccount}
+                                key={form.key("receiverAccount")}
+                                {...form.getInputProps("receiverAccount")}
+                                disabled={type === "external" && selectedBank === ""}
+                                rightSection={
+                                    <ActionIcon
+                                        variant="subtle"
+                                        color="gray"
+                                        radius="md"
+                                        aria-label="Saved receivers"
+                                        disabled={type === "external" && selectedBank === ""}
+                                        onClick={openDrawer}
+                                    >
+                                        <IconAddressBook size={20} />
+                                    </ActionIcon>
+                                }
+                                onChange={(event) => console.log(event.currentTarget.value)}
+                            />
+                        </Input.Wrapper>
                     </Tooltip>
 
                     <Drawer

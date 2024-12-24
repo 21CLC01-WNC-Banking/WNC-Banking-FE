@@ -1,0 +1,18 @@
+.separator {
+    background: #d6d6d6;
+}
+
+.stepIcon {
+    background: #d6d6d6;
+    outline: 2px solid #bdbdbd;
+    outline-offset: -2px;
+
+    &[data-progress] {
+        outline: 2px solid var(--mantine-color-blue-filled);
+    }
+
+    &[data-completed] {
+        background: var(--mantine-color-blue-filled);
+        outline: 2px solid var(--mantine-color-blue-filled);
+    }
+}

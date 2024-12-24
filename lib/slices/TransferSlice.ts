@@ -13,6 +13,7 @@ const initialState: TransferState = {
         receiverAccount: "",
         amount: 0,
         message: "",
+        senderHandlesFee: false,
     },
 };
 

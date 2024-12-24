@@ -1,4 +1,4 @@
-import { Stack, Center, Title, Divider, Box, Text } from "@mantine/core";
+import { Stack, Divider, Box, Text } from "@mantine/core";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 

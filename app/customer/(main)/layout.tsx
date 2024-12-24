@@ -1,13 +1,22 @@
-import { Suspense } from "react";
+"use client";
 
-import StoreProvider from "./StoreProvider";
+import { useEffect, Suspense } from "react";
+import { useRouter } from "nextjs-toploader/app";
 
 import { Group } from "@mantine/core";
-import { IconHome, IconCreditCardPay, IconMessageDollar, IconKey } from "@tabler/icons-react";
+import {
+    IconHome,
+    IconCreditCardPay,
+    IconMessageDollar,
+    IconKey,
+    IconBell,
+} from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
+import Loading from "@/components/Loading";
+import ScrollToTop from "@/components/ScrollToTop";
 
-import Loading from "../../../components/Loading";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 
 const menuItems = [
     {
@@ -32,10 +41,16 @@ const menuItems = [
         ],
     },
     {
-        link: "/customer/request-payment",
+        link: "/customer/payment-requests",
         label: "Nhắc nợ",
         icon: <IconMessageDollar />,
         top: true,
+    },
+    {
+        link: "/customer/notifications",
+        label: "Thông báo",
+        icon: <IconBell />,
+        top: false,
     },
     {
         link: "/customer/change-password",
@@ -46,12 +61,25 @@ const menuItems = [
 ];
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+    const router = useRouter();
+    const user = useAppSelector((state) => state.auth.currentUser);
+    const email = user?.email;
+
+    useEffect(() => {
+        if (!email) {
+            router.push("/customer/login");
+        }
+    }, [email, router]);
+
+    if (!email) {
+        return <Loading />;
+    }
+
     return (
-        <StoreProvider>
-            <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
-                <SideMenu forCustomer items={menuItems} />
-                <Suspense fallback={<Loading />}>{children}</Suspense>
-            </Group>
-        </StoreProvider>
+        <Group align="top" preventGrowOverflow={false} grow gap="0" wrap="nowrap">
+            <SideMenu forCustomer items={menuItems} />
+            <ScrollToTop />
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+        </Group>
     );
 }

@@ -1,11 +1,7 @@
-import { Suspense } from "react";
-
-import { Stack, Group } from "@mantine/core";
+import { Stack, Group, Center } from "@mantine/core";
 import { IconUserPlus, IconHistory, IconCreditCardPay } from "@tabler/icons-react";
-
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "./components/StaffPortalShortcut";
-import Loading from "@/components/Loading";
 
 const menuItems = [
     {
@@ -21,7 +17,7 @@ const menuItems = [
         top: true,
     },
     {
-        link: "/staff/transfer-history",
+        link: "/staff/transaction-history",
         label: "Lịch sử giao dịch",
         icon: <IconHistory />,
         top: true,
@@ -30,14 +26,16 @@ const menuItems = [
 
 export default function StaffLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#E6EDF4">
+        <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#ebf4fc">
             <SideMenu forCustomer={false} items={menuItems} />
             <Stack my={40}>
                 <Group justify="flex-end" mx={40}>
                     <StaffPortalShortcut />
                 </Group>
 
-                <Suspense fallback={<Loading />}>{children}</Suspense>
+                <Center>
+                    {children}
+                </Center>
             </Stack>
         </Group>
     );

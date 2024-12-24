@@ -1,5 +1,5 @@
 import { Stack, Center, Title } from "@mantine/core";
-import TransferHistoryTable from "../components/TransferHistoryTable";
+import TransactionHistoryTable from "../components/TransactionHistoryTable";
 
 const TransferHistory: React.FC = () => {
     return (
@@ -7,7 +7,7 @@ const TransferHistory: React.FC = () => {
             <Center>
                 <Title order={2}>Lịch sử giao dịch</Title>
             </Center>
-            <TransferHistoryTable />
+            <TransactionHistoryTable />
         </Stack>
     );
 };

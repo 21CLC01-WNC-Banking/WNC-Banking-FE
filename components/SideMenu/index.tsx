@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
@@ -32,6 +33,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
         if (forCustomer) {
             router.push("/customer/login");
         } else {
+            localStorage.removeItem("email");
             router.push("/staff/login");
         }
     };

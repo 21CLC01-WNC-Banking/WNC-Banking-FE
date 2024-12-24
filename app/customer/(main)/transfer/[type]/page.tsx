@@ -1,37 +1,57 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 
-import Steppy from "@/components/Steppy";
+import { Stepper, Stack } from "@mantine/core";
 
 import TransferForm from "./components/TransferForm";
-import OtpForm from "./components/OtpForm";
+import TransferOtpForm from "./components/TransferOtpForm";
 import CompletionScreen from "./components/CompletionScreen";
+
+import classes from "./Transfer.module.css";
 
 const Transfer = () => {
     const params = useParams();
 
-    const steps = [
-        {
-            label: "Nhập thông tin",
-            component: (props: { handleNextStep?: () => void }) => (
-                <TransferForm
-                    {...props}
-                    type={Array.isArray(params.type) ? params.type[0] : params.type}
-                />
-            ),
-        },
-        {
-            label: "Xác nhận",
-            component: (props: { handleNextStep?: () => void }) => <OtpForm {...props} />,
-        },
-        {
-            label: "Hoàn tất",
-            component: (props: { handleNextStep?: () => void }) => <CompletionScreen {...props} />,
-        },
-    ];
+    const [active, setActive] = useState(0);
 
-    return <Steppy steps={steps} />;
+    const handleNextStep = () => {
+        if (active >= 3) {
+            return;
+        }
+
+        setActive(active + 1);
+    };
+
+    return (
+        <Stack gap="xl" justify="flex-start" my={40} mx={120}>
+            <Stepper
+                active={active}
+                onStepClick={setActive}
+                radius="md"
+                classNames={{
+                    separator: classes.separator,
+                    stepIcon: classes.stepIcon,
+                }}
+            >
+                <Stepper.Step label="Nhập thông tin" allowStepSelect={false}>
+                    <TransferForm
+                        handleNextStep={handleNextStep}
+                        type={Array.isArray(params.type) ? params.type[0] : params.type}
+                    />
+                </Stepper.Step>
+
+                <Stepper.Step label="Xác thực OTP" allowStepSelect={false}>
+                    <TransferOtpForm handleNextStep={handleNextStep} />
+                </Stepper.Step>
+
+                <Stepper.Step label="Hoàn tất" allowStepSelect={false}>
+                    <CompletionScreen />
+                </Stepper.Step>
+            </Stepper>
+        </Stack>
+    );
 };
 
 export default Transfer;
