@@ -5,8 +5,6 @@ import { createAppAsyncThunk } from "../hooks/withTypes";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const loginThunk = createAppAsyncThunk("auth/login", async (data: object, { dispatch }) => {
-    console.log(data);
-
     const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -21,21 +19,17 @@ export const loginThunk = createAppAsyncThunk("auth/login", async (data: object,
 
     const responseData = await response.json();
 
+    console.log(responseData);
+
     dispatch(
         setAuthUser({
-            id: responseData.data.id,
             email: responseData.data.email,
-            name: responseData.data.name,
-            phoneNumber: responseData.data.phoneNumber,
         })
     );
 });
 
 interface AuthUser {
-    id: number;
     email: string;
-    name: string;
-    phoneNumber: string;
 }
 
 interface AuthState {
