@@ -33,6 +33,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
         if (forCustomer) {
             router.push("/customer/login");
         } else {
+            localStorage.removeItem("email");
             router.push("/staff/login");
         }
     };

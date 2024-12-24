@@ -2,6 +2,7 @@
 
 import { Button, Fieldset, TextInput } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
+import { showNotification } from "@mantine/notifications";
 
 const UserForm: React.FC = () => {
     const form = useForm({
@@ -19,8 +20,49 @@ const UserForm: React.FC = () => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            const payload = {
+                email: values.email,
+                name: values.name,
+                phoneNumber: values.phone,
+                password: "khongnhopassword",
+            };
+
+            const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                showNotification({
+                    title: "Thành công",
+                    message: "Tạo tài khoản thành công!",
+                    color: "green",
+                    position: "bottom-right",
+                });
+                form.reset();
+            } else {
+                const data = await response.json();
+                showNotification({
+                    title: "Lỗi",
+                    message: data.errors.message,
+                    color: "red",
+                    position: "bottom-right"
+                })
+            }
+        } catch (err: any) {
+            showNotification({
+                title: "Lỗi",
+                message: err.message || "Có lỗi xảy ra, vui lòng thử lại",
+                color: "red",
+                position: "bottom-right",
+            });
+        }
     };
 
     return (
@@ -67,4 +109,5 @@ const UserForm: React.FC = () => {
         </>
     );
 };
+
 export default UserForm;

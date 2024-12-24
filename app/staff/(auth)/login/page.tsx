@@ -11,12 +11,15 @@ import {
     PasswordInput,
     TextInput,
     Title,
+    Notification
 } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import Link from "next/link";
+import { useState } from "react";
 
 const Login = () => {
     const router = useRouter();
+    const [error, setError] = useState("");
 
     const form = useForm({
         mode: "uncontrolled",
@@ -29,9 +32,38 @@ const Login = () => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
-        router.push("/staff");
+    const handleSubmit = async (values: typeof form.values) => {
+        setError("");
+        try {
+            const payload = {
+                email: values.email,
+                password: values.password,
+                recaptchaToken: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+            };
+
+            const response = await fetch("http://localhost:3001/api/v1/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem("email", data.data.email);
+                router.push("/staff");
+            }
+            else {
+                const data = await response.json();
+                throw new Error(data.message || "Đăng nhập thất bại");
+            }
+        } catch (err: any) {
+            setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+        } finally {
+            //setLoading(false);
+        }
     };
 
     return (
@@ -55,6 +87,13 @@ const Login = () => {
                             key={form.key("password")}
                             {...form.getInputProps("password")}
                         />
+
+                        {error && (
+                            <Notification color="red" onClose={() => setError("")}>
+                                {error}
+                            </Notification>
+                        )}
+
 
                         <Button fullWidth type="submit" mt="xl">
                             Đăng nhập
