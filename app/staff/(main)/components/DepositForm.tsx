@@ -6,15 +6,7 @@ import toVietnamese from './ToVietnamese.js';
 import { useState, useRef, useEffect } from "react";
 
 const DepositForm = () => {
-    const accountData: { [key: string]: string } = {
-        "1098462947": "Hồ Hữu Tâm",
-        "2001234567": "Đỗ Minh Triết",
-        "3009876543": "Vũ Anh Khoa",
-        "4095480548": "Đặng Nhật Hòa",
-        "5287329873": "Nguyễn Quỳnh Hương",
-    };
-
-    const [transactionState, setTransactionState] = useState<'idle' | 'submitting' | 'success'>('idle');
+    const [transactionState, setTransactionState] = useState<'idle' | 'submitting' | 'success' | 'failure'>('idle');
     const invoiceRef = useRef<HTMLDivElement>(null);
 
     const form = useForm({
@@ -41,11 +33,32 @@ const DepositForm = () => {
         },
     });
 
-    const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const handleAccountNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
         if (/^\d*$/.test(input)) {
             form.setFieldValue("accountNumber", input);
-            form.setFieldValue("accountName", accountData[input] || "");
+
+            // Nếu đủ 12 ký tự, gọi API để lấy tên tài khoản
+            if (input.length === 12) {
+                try {
+                    const response = await fetch(`${apiUrl}/account/customer-name?accountNumber=${input}`, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                    });
+                    if (!response.ok) {
+                        throw new Error("Không thể lấy thông tin tài khoản");
+                    }
+                    const data = await response.json();
+                    form.setFieldValue("accountName", data.data.name || "");
+                } catch (error) {
+                    console.error(error);
+                    form.setFieldValue("accountName", "");
+                }
+            } else {
+                form.setFieldValue("accountName", "");
+            }
         }
     };
 
@@ -64,18 +77,31 @@ const DepositForm = () => {
         }
     }, [transactionState])
 
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async (values: typeof form.values) => {
         setTransactionState('submitting');
 
         try {
-            await new Promise((resolve) => setTimeout(resolve, 4000));
-            setTransactionState('success');
+            const response = await fetch(`${apiUrl}/staff/add-amount`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    accountNumber: values.accountNumber,
+                    amount: values.amount,
+                }),
+            });
 
+            if (response.ok) {
+                setTransactionState('success');
+            } else {
+                setTransactionState('failure');
+            }
         } catch (error) {
-            setTransactionState('idle');
-            console.error("Transaction Failed:", error);
+            // Xử lý khi giao dịch thất bại
+            setTransactionState('failure');
         }
     };
+
 
     return (
         <>
@@ -164,16 +190,24 @@ const DepositForm = () => {
                         gap="md"
                         align="center"
                         style={{
-                            backgroundColor: transactionState === "submitting" ? '#FFFBE6' : '#E6F9E6',
+                            backgroundColor: transactionState === "submitting" ? "#FFFBE6" : transactionState === "success" ? "#E6F9E6" : "#FDEDEE",
                             borderRadius: '8px',
                             padding: '10px',
                         }}
                     >
                         <Text
-                            c={transactionState === 'submitting' ? "#FFC107" : "green"}
+                            c={
+                                transactionState === "submitting"
+                                    ? "#FFC107"
+                                    : transactionState === "success"
+                                        ? "green"
+                                        : "red"
+                            }
                             fw={700}
                         >
-                            {transactionState === 'submitting' ? 'Đang thực hiện giao dịch...' : "Chuyển tiền thành công!"}
+                            {transactionState === 'submitting' ? 'Đang thực hiện giao dịch...' :
+                                transactionState === 'success' ? "Giao dịch thành công!" :
+                                    "Giao dịch thất bại, vui lòng thử lại sau!"}
                         </Text>
                         {transactionState === 'submitting' && <Loader size={30} color="#FFC107" />}
                     </Flex>
