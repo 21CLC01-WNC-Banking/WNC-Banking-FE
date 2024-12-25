@@ -1,10 +1,11 @@
 "use client";
 import { IconSearch, IconEye } from "@tabler/icons-react";
-import { Paper, Table, Text, Pagination, Center, TextInput, Group, Chip, Button, Modal, Title } from "@mantine/core";
+import { Paper, Table, Text, Pagination, Center, TextInput, Group, Chip, Button, Modal } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useDisclosure } from '@mantine/hooks';
 import { Transaction } from "@/lib/types";
 import TransactionDetail from "./TransactionDetail";
+import { useForm } from "@mantine/form";
 
 // Hàm hỗ trợ phân trang
 function chunk<T>(array: T[], size: number): T[][] {
@@ -18,6 +19,47 @@ const TransactionHistoryTable: React.FC = () => {
 
     // State for modal control
     const [opened, { open, close }] = useDisclosure(false);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [accountInfo, setAccountInfo] = useState<{ owner: string; accountNumber: string }>({
+        owner: "",
+        accountNumber: "",
+    });
+
+    const form = useForm({
+        initialValues: {
+            accountNumber: "",
+        },
+        validate: {
+            accountNumber: (value) =>
+                value.trim() === "" ? "Số tài khoản không được để trống" :
+                    value.length !== 12 ? "Số tài khoản không hợp lệ" : null,
+        },
+    });
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            const response = await fetch(`${apiUrl}/staff/transactions-by-account?accountNumber=${values.accountNumber}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setAccountInfo({
+                    owner: "Hồ Hữu Tâm",
+                    accountNumber: values.accountNumber
+                });
+                setTransactions(data.data);
+            } else {
+                console.log("lỗi rồi");
+                setTransactions([]);
+            }
+        } catch (error) {
+            console.log("Đã xảy ra lỗi kết nối với máy chủ");
+            setTransactions([]);
+        }
+    }
 
     // State for filters and pagination
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả");
@@ -28,109 +70,14 @@ const TransactionHistoryTable: React.FC = () => {
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
     // Sample transaction data
-    const transactions: Transaction[] = [
-        {
-            id: 1,
-            dateTime: "05/12/2024 10:00",
-            amount: "+800,000 VND",
-            transactionType: "Nhận tiền",
-            balance: "5,800,000 VND",
-            sender_account_number: "123456789012",
-            receiver_account_number: "109846294723",
-            message: "Nhận tiền từ tài khoản 123456789012",
-        },
-        {
-            id: 2,
-            dateTime: "05/12/2024 13:30",
-            amount: "-500,000 VND",
-            transactionType: "Thanh toán",
-            balance: "5,300,000 VND",
-            sender_account_number: "109846294723",
-            receiver_account_number: "987654321098",
-            message: "Thanh toán hóa đơn mua sắm",
-        },
-        {
-            id: 3,
-            dateTime: "04/12/2024 15:15",
-            amount: "-1,000,000 VND",
-            transactionType: "Chuyển khoản",
-            balance: "4,300,000 VND",
-            sender_account_number: "109846294723",
-            receiver_account_number: "135792468024",
-            message: "Chuyển khoản cho đối tác",
-        },
-        {
-            id: 4,
-            dateTime: "04/12/2024 18:45",
-            amount: "+2,000,000 VND",
-            transactionType: "Nhận tiền",
-            balance: "6,300,000 VND",
-            sender_account_number: "246813579135",
-            receiver_account_number: "109846294723",
-            message: "Nhận tiền từ tài khoản 246813579135",
-        },
-        {
-            id: 5,
-            dateTime: "03/12/2024 09:00",
-            amount: "-300,000 VND",
-            transactionType: "Thanh toán",
-            balance: "6,000,000 VND",
-            sender_account_number: "109846294723",
-            receiver_account_number: "112233445566",
-            message: "Thanh toán tiền điện",
-        },
-        {
-            id: 6,
-            dateTime: "03/12/2024 11:20",
-            amount: "+1,500,000 VND",
-            transactionType: "Nhận tiền",
-            balance: "7,500,000 VND",
-            sender_account_number: "998877665544",
-            receiver_account_number: "109846294723",
-            message: "Nhận tiền từ tài khoản 998877665544",
-        },
-        {
-            id: 7,
-            dateTime: "02/12/2024 20:45",
-            amount: "-2,000,000 VND",
-            transactionType: "Chuyển khoản",
-            balance: "5,500,000 VND",
-            sender_account_number: "109846294723",
-            receiver_account_number: "778899001122",
-            message: "Chuyển khoản cho người thân",
-        },
-        {
-            id: 8,
-            dateTime: "02/12/2024 10:10",
-            amount: "+3,000,000 VND",
-            transactionType: "Nhận tiền",
-            balance: "8,500,000 VND",
-            sender_account_number: "556677889900",
-            receiver_account_number: "109846294723",
-            message: "Nhận tiền từ tài khoản 556677889900",
-        },
-        {
-            id: 9,
-            dateTime: "01/12/2024 14:30",
-            amount: "-800,000 VND",
-            transactionType: "Thanh toán",
-            balance: "7,700,000 VND",
-            sender_account_number: "109846294723",
-            receiver_account_number: "443322110099",
-            message: "Thanh toán tiền hàng hóa",
-        },
-        {
-            id: 10,
-            dateTime: "01/12/2024 18:50",
-            amount: "+5,000,000 VND",
-            transactionType: "Nhận tiền",
-            balance: "12,700,000 VND",
-            sender_account_number: "334455667788",
-            receiver_account_number: "109846294723",
-            message: "Nhận tiền từ tài khoản 334455667788",
-        },
-    ];
 
+
+    const handleAccountNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
+        if (/^\d*$/.test(input)) {
+            form.setFieldValue("accountNumber", input);
+        }
+    };
 
     // Sort transactions by time
     const sortByTime = (elements: Transaction[], filter: string) => {
@@ -208,19 +155,42 @@ const TransactionHistoryTable: React.FC = () => {
     return (
         <Paper radius="md" mt="lg" p="xl">
             <Group align="center" justify="space-between" gap="md" pb={16}>
-                {/* Search Bar */}
-                <TextInput
-                    leftSection={<IconSearch size={20} />}
-                    placeholder="Tìm kiếm"
-                    radius="md"
-                />
+                <form onSubmit={form.onSubmit(handleSubmit)}>
+                    {/* Search Bar */}
+                    <TextInput
+                        size="md"
+                        radius="md"
+                        required
+                        value={form.values.accountNumber}
+                        onChange={handleAccountNumberChange}
+                        placeholder="Nhập số tài khoản"
+                        error={form.errors.accountNumber}
+                        styles={{
+                            input: { paddingLeft: "50px" },
+                        }}
+                        leftSection={
+                            <Button
+                                p={0}
+                                type="submit"
+                                variant="light"
+                                size="xs"
+                                style={{
+                                    backgroundColor: "transparent"
+                                }}
+                            >
+                                <IconSearch size={24} />
+                            </Button>
+                        }
+                    />
+                </form>
+
                 {/* Account Info */}
                 <Group justify="space-between">
                     <Text mt={5}>
-                        Chủ tài khoản: <strong>Hồ Hữu Tâm</strong>
+                        Chủ tài khoản: <strong>{accountInfo.owner ? accountInfo.owner : ""}</strong>
                     </Text>
                     <Text mt={5}>
-                        Số tài khoản: <strong>1098462947</strong>
+                        Số tài khoản: <strong>{accountInfo.accountNumber ? accountInfo.accountNumber : ""}</strong>
                     </Text>
                     <Text mt={5}>
                         Tổng số giao dịch: <strong>{filteredTransactions.length}</strong>
@@ -264,28 +234,38 @@ const TransactionHistoryTable: React.FC = () => {
             </Group>
 
             {/* Table */}
-            <Table verticalSpacing="sm" mt="sm">
-                <Table.Thead>
-                    <Table.Tr>
-                        <Table.Th>Thời gian</Table.Th>
-                        <Table.Th>Giao dịch</Table.Th>
-                        <Table.Th>Loại giao dịch</Table.Th>
-                        <Table.Th>Số dư hiện tại</Table.Th>
-                        <Table.Th>Xem chi tiết</Table.Th>
-                    </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
+            {/* Table */}
+            {filteredTransactions.length === 0 ? (
+                <Center mt="xl">
+                    <Text size="sm" color="dimmed">Chưa có lịch sử giao dịch nào!</Text>
+                </Center>
+            ) : (
+                <>
+                    <Table verticalSpacing="sm" mt="sm">
+                        <Table.Thead>
+                            <Table.Tr>
+                                <Table.Th>Thời gian</Table.Th>
+                                <Table.Th>Giao dịch</Table.Th>
+                                <Table.Th>Loại giao dịch</Table.Th>
+                                <Table.Th>Số dư hiện tại</Table.Th>
+                                <Table.Th>Xem chi tiết</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
 
-            {/* Pagination */}
-            <Center>
-                <Pagination
-                    total={paginatedTransactions.length}
-                    value={activePage}
-                    onChange={setActivePage}
-                    mt="xl"
-                />
-            </Center>
+                    {/* Pagination */}
+                    <Center>
+                        <Pagination
+                            total={paginatedTransactions.length}
+                            value={activePage}
+                            onChange={setActivePage}
+                            mt="xl"
+                        />
+                    </Center>
+                </>
+            )}
+
 
             <Modal
                 opened={opened}

@@ -14,13 +14,13 @@ export interface Account {
     nickname: string;
 }
 
-export interface Transaction {
-    dateTime: string;
-    accountType: string;
-    amount: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-    balance: string;
-}
+// export interface Transaction {
+//     dateTime: string;
+//     accountType: string;
+//     amount: string;
+//     transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
+//     balance: string;
+// }
 
 export interface PaymentRequest {
     requestor?: string;
