@@ -1,11 +1,12 @@
 "use client";
 import { IconSearch, IconEye } from "@tabler/icons-react";
-import { Paper, Table, Text, Pagination, Center, TextInput, Group, Chip, Button, Modal } from "@mantine/core";
+import { Paper, Table, Text, Pagination, Center, TextInput, Group, SegmentedControl, Button, Modal } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useDisclosure } from '@mantine/hooks';
 import { Transaction } from "@/lib/types";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
+import classes from "./AccountCard.module.css";
 
 // Hàm hỗ trợ phân trang
 function chunk<T>(array: T[], size: number): T[][] {
@@ -20,11 +21,17 @@ const TransactionHistoryTable: React.FC = () => {
     // State for modal control
     const [opened, { open, close }] = useDisclosure(false);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [accountInfo, setAccountInfo] = useState<{ owner: string; accountNumber: string }>({
-        owner: "",
-        accountNumber: "",
-    });
+    // const [accountInfo, setAccountInfo] = useState<{ owner: string; accountNumber: string }>({
+    //     owner: "",
+    //     accountNumber: "",
+    // });
 
+    // State for statistics data
+    const [accountInfo, setAccountInfo] = useState<{ title: string; stats: string }[]>([
+        { title: "Chủ tài khoản", stats: "" },
+        { title: "Số tài khoản", stats: "" },
+        { title: "Tổng số giao dịch", stats: "0" },
+    ]);
     const form = useForm({
         initialValues: {
             accountNumber: "",
@@ -46,10 +53,11 @@ const TransactionHistoryTable: React.FC = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setAccountInfo({
-                    owner: "Hồ Hữu Tâm",
-                    accountNumber: values.accountNumber
-                });
+                setAccountInfo([
+                    { title: "Chủ tài khoản", stats: "Hồ Hữu Tâm" }, // Thay bằng `data.owner`
+                    { title: "Số tài khoản", stats: values.accountNumber },
+                    { title: "Tổng số giao dịch", stats: `${data.data.length}` },
+                ]);
                 setTransactions(data.data);
             } else {
                 console.log("lỗi rồi");
@@ -114,6 +122,14 @@ const TransactionHistoryTable: React.FC = () => {
     // Get current page transactions
     const currentPageTransactions = paginatedTransactions[activePage - 1] || [];
 
+    // Create account info
+    const stats = accountInfo.map((stat) => (
+        <div key={stat.title} className={classes.stat}>
+            <Text className={classes.title}>{stat.title}</Text>
+            <Text className={classes.count}>{stat.stats}</Text>
+        </div>
+    ));
+
     // Create table rows for current page
     const rows = currentPageTransactions.map((transaction, index) => (
         <Table.Tr
@@ -153,95 +169,73 @@ const TransactionHistoryTable: React.FC = () => {
     ));
 
     return (
-        <Paper radius="md" mt="lg" p="xl">
-            <Group align="center" justify="space-between" gap="md" pb={16}>
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                    {/* Search Bar */}
-                    <TextInput
-                        size="md"
-                        radius="md"
-                        required
-                        value={form.values.accountNumber}
-                        onChange={handleAccountNumberChange}
-                        placeholder="Nhập số tài khoản"
-                        error={form.errors.accountNumber}
-                        styles={{
-                            input: { paddingLeft: "50px" },
-                        }}
-                        leftSection={
-                            <Button
-                                p={0}
-                                type="submit"
-                                variant="light"
-                                size="xs"
-                                style={{
-                                    backgroundColor: "transparent"
-                                }}
-                            >
-                                <IconSearch size={24} />
-                            </Button>
-                        }
-                    />
-                </form>
+        <Paper radius="md" mt="lg" p="lg">
 
-                {/* Account Info */}
-                <Group justify="space-between">
-                    <Text mt={5}>
-                        Chủ tài khoản: <strong>{accountInfo.owner ? accountInfo.owner : ""}</strong>
-                    </Text>
-                    <Text mt={5}>
-                        Số tài khoản: <strong>{accountInfo.accountNumber ? accountInfo.accountNumber : ""}</strong>
-                    </Text>
-                    <Text mt={5}>
-                        Tổng số giao dịch: <strong>{filteredTransactions.length}</strong>
-                    </Text>
-                </Group>
-            </Group>
+            <div className={classes.root}>{stats}</div>
+
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                {/* Search Bar */}
+                <TextInput
+                    size="md"
+                    radius="md"
+                    required
+                    mt="lg"
+                    value={form.values.accountNumber}
+                    onChange={handleAccountNumberChange}
+                    placeholder="Nhập số tài khoản"
+                    error={form.errors.accountNumber}
+                    styles={{
+                        input: { paddingLeft: "50px" },
+                    }}
+                    leftSection={
+                        <Button
+                            p={0}
+                            type="submit"
+                            variant="light"
+                            size="xs"
+                            style={{
+                                backgroundColor: "transparent"
+                            }}
+                        >
+                            <IconSearch size={24} />
+                        </Button>
+                    }
+                />
+            </form>
 
             {/* Filter Section */}
-            <Group justify="space-between" align="center">
+            <Group justify="space-between" align="center" mb="md" mt="lg">
                 <Group justify="flex-start" gap="md">
                     <Text>Thời gian:</Text>
-                    <Chip.Group multiple={false} value={timeFilter} onChange={setTimeFilter}>
-                        <Group justify="center">
-                            <Chip value="Mới nhất">Mới nhất</Chip>
-                            <Chip value="Cũ nhất">Cũ nhất</Chip>
-                        </Group>
-                    </Chip.Group>
+
+                    <SegmentedControl
+                        color="blue"
+                        value={timeFilter}
+                        onChange={setTimeFilter}
+                        data={["Mới nhất", "Cũ nhất"]}
+                    />
                 </Group>
 
                 <Group justify="flex-end" gap="md">
                     <Text>Loại giao dịch:</Text>
-                    <Chip.Group
-                        multiple={false}
+
+                    <SegmentedControl
+                        color="blue"
                         value={transactionTypeFilter}
                         onChange={setTransactionTypeFilter}
-                    >
-                        <Group justify="center">
-                            <Chip value="Tất cả">Tất cả</Chip>
-                            <Chip value="Thanh toán" color="red">
-                                Thanh toán
-                            </Chip>
-                            <Chip value="Nhận tiền" color="green">
-                                Nhận tiền
-                            </Chip>
-                            <Chip value="Chuyển khoản" color="yellow">
-                                Chuyển khoản
-                            </Chip>
-                        </Group>
-                    </Chip.Group>
+                        data={["Tất cả", "Thanh toán", "Nhận tiền", "Chuyển khoản"]}
+                    />
                 </Group>
             </Group>
 
             {/* Table */}
-            {/* Table */}
             {filteredTransactions.length === 0 ? (
                 <Center mt="xl">
-                    <Text size="sm" color="dimmed">Chưa có lịch sử giao dịch nào!</Text>
+                    <Text size="sm" c="dimmed">Chưa có lịch sử giao dịch nào!</Text>
                 </Center>
             ) : (
                 <>
-                    <Table verticalSpacing="sm" mt="sm">
+                    <Table verticalSpacing="sm" mt="xl">
                         <Table.Thead>
                             <Table.Tr>
                                 <Table.Th>Thời gian</Table.Th>

@@ -14,14 +14,14 @@ const StaffPortalShortcut: React.FC = () => {
                 align="center"
                 justify="space-between"
                 gap="xl"
-                bg="white"
+                bg="blue"
                 px={20}
                 py={10}
                 style={{ borderRadius: "var(--mantine-radius-md)" }}
             >
                 <Group gap="xs">
                     <Avatar src="/staff_avatar.jpg" alt="Staff avatar" size="lg" />
-                    <Flex direction="column">
+                    <Flex direction="column" c="white">
                         <Text>
                             <strong>Kim Mẫn Đình</strong>
                         </Text>
@@ -31,7 +31,7 @@ const StaffPortalShortcut: React.FC = () => {
                     </Flex>
                 </Group>
                 <Button variant="subtle" p={5} radius="xl" onClick={open}>
-                    <IconMenu2 size={25} color="black" />
+                    <IconMenu2 size={25} color="white" />
                 </Button>
             </Flex>
             <Drawer

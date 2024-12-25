@@ -47,16 +47,13 @@ export default function StaffLayout({ children }: Readonly<{ children: React.Rea
     }
 
     return (
-        <Group align="top" preventGrowOverflow={false} grow gap="0" bg="#ebf4fc">
+        <Group align="top" preventGrowOverflow={false} grow gap="0" wrap="nowrap">
             <SideMenu forCustomer={false} items={menuItems} />
-            <Stack my={40}>
-                <Group justify="flex-end" mx={40}>
+            <Stack>
+                <Group justify="flex-end" mr={40} mt={10}>
                     <StaffPortalShortcut />
                 </Group>
-
-                <Center>
-                    {children}
-                </Center>
+                {children}
             </Stack>
         </Group>
     );
