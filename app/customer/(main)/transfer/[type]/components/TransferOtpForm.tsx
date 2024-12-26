@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
-import { resetTransfer } from "@/lib/slices/TransferSlice";
+import { useAppSelector, useAppDispatch } from "@/app/customer/lib/hooks/withTypes";
+import { resetTransfer } from "@/app/customer/lib/slices/TransferSlice";
 
 import { Button, Center, Text, Title, Stack, PinInput, Fieldset } from "@mantine/core";
 import { useForm } from "@mantine/form";

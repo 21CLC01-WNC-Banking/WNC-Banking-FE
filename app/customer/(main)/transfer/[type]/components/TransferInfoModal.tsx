@@ -1,4 +1,5 @@
-import { useAppSelector } from "@/lib/hooks/withTypes";
+import { useAppSelector } from "@/app/customer/lib/hooks/withTypes";
+import { formatCurrency } from "@/app/customer/lib/utils";
 
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
@@ -9,10 +10,6 @@ interface TransferInfoModal {
 
 const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => {
     const transfer = useAppSelector((state) => state.transfer.currentTransfer);
-
-    const formatWithThousandSeparator = (x: number) => {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
 
     return (
         <Modal
@@ -41,17 +38,17 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => 
 
                 <Group grow justify="between">
                     <Text variant="text">Nguời nhận</Text>
-                    <Text fw={700}>{transfer.receiverAccount} </Text>
+                    <Text fw={700}>{transfer?.receiverAccount} </Text>
                 </Group>
 
                 <Group grow justify="between">
                     <Text variant="text">Số tiền</Text>
-                    <Text fw={700}>{formatWithThousandSeparator(transfer.amount)} VND </Text>
+                    <Text fw={700}>{formatCurrency(transfer ? transfer.amount : 0)}</Text>
                 </Group>
 
                 <Group grow justify="between">
                     <Text variant="text">Diễn giải</Text>
-                    <Text fw={700}>{transfer.message} </Text>
+                    <Text fw={700}>{transfer?.message} </Text>
                 </Group>
 
                 <Group grow justify="between">
@@ -62,7 +59,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => 
                 <Group grow justify="between">
                     <Text fw={600}>Tổng số tiền</Text>
                     <Text fw={700} c="blue">
-                        {formatWithThousandSeparator(transfer.amount)} VND{" "}
+                        {formatCurrency(transfer ? transfer.amount : 0)}
                     </Text>
                 </Group>
 
