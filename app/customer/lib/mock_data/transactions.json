@@ -1,0 +1,72 @@
+[
+    {
+        "dateTime": "05/12/2024 10:00",
+        "accountType": "Thanh toán",
+        "amount": "+800.000 VND",
+        "transactionType": "Nhận tiền",
+        "balance": "5,800.000 VND"
+    },
+    {
+        "dateTime": "05/12/2024 13:30",
+        "accountType": "Thanh toán",
+        "amount": "-500.000 VND",
+        "transactionType": "Thanh toán",
+        "balance": "5,300.000 VND"
+    },
+    {
+        "dateTime": "04/12/2024 15:15",
+        "accountType": "Thanh toán",
+        "amount": "-1.000.000 VND",
+        "transactionType": "Chuyển khoản",
+        "balance": "4,300.000 VND"
+    },
+    {
+        "dateTime": "04/12/2024 18:45",
+        "accountType": "Thanh toán",
+        "amount": "+2.000.000 VND",
+        "transactionType": "Nhận tiền",
+        "balance": "6,300.000 VND"
+    },
+    {
+        "dateTime": "03/12/2024 09:00",
+        "accountType": "Thanh toán",
+        "amount": "-300.000 VND",
+        "transactionType": "Thanh toán",
+        "balance": "6.000.000 VND"
+    },
+    {
+        "dateTime": "03/12/2024 11:20",
+        "accountType": "Thanh toán",
+        "amount": "+1,500.000 VND",
+        "transactionType": "Nhận tiền",
+        "balance": "7,500.000 VND"
+    },
+    {
+        "dateTime": "02/12/2024 20:45",
+        "accountType": "Thanh toán",
+        "amount": "-2.000.000 VND",
+        "transactionType": "Chuyển khoản",
+        "balance": "5,500.000 VND"
+    },
+    {
+        "dateTime": "02/12/2024 10:10",
+        "accountType": "Thanh toán",
+        "amount": "+3.000.000 VND",
+        "transactionType": "Nhận tiền",
+        "balance": "8,500.000 VND"
+    },
+    {
+        "dateTime": "01/12/2024 14:30",
+        "accountType": "Thanh toán",
+        "amount": "-800.000 VND",
+        "transactionType": "Thanh toán",
+        "balance": "7,700.000 VND"
+    },
+    {
+        "dateTime": "01/12/2024 18:50",
+        "accountType": "Thanh toán",
+        "amount": "+5.000.000 VND",
+        "transactionType": "Nhận tiền",
+        "balance": "12,700.000 VND"
+    }
+]
