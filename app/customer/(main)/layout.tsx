@@ -16,7 +16,7 @@ import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
 
-import { useAppSelector } from "@/lib/hooks/withTypes";
+import { useAppSelector } from "@/app/customer/lib/hooks/withTypes";
 
 const menuItems = [
     {
@@ -62,16 +62,15 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
-    const user = useAppSelector((state) => state.auth.currentUser);
-    const email = user?.email;
+    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
     useEffect(() => {
-        if (!email) {
+        if (!isLoggedIn) {
             router.push("/customer/login");
         }
-    }, [email, router]);
+    }, [isLoggedIn, router]);
 
-    if (!email) {
+    if (!isLoggedIn) {
         return <Loading />;
     }
 

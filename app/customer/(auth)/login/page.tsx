@@ -4,10 +4,10 @@ import { useRouter } from "nextjs-toploader/app";
 import Link from "next/link";
 
 import ReCAPTCHA from "react-google-recaptcha";
-import useCaptcha from "@/lib/hooks/useCaptcha";
+import useCaptcha from "@/app/customer/lib/hooks/useCaptcha";
 
-import { useAppDispatch } from "@/lib/hooks/withTypes";
-import { loginThunk } from "@/lib/slices/AuthSlice";
+import { useAppDispatch } from "@/app/customer/lib/hooks/withTypes";
+import { loginThunk } from "@/app/customer/lib/thunks/AuthThunks";
 
 import {
     Anchor,
@@ -26,7 +26,7 @@ import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import { IconCheck, IconX } from "@tabler/icons-react";
 
 const Login = () => {
-    const { captchaToken, captchaRef, handleCaptcha } = useCaptcha();
+    const { captchaToken, captchaRef, handleCaptcha, refreshCaptcha } = useCaptcha();
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -64,6 +64,8 @@ const Login = () => {
                 message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
                 position: "bottom-right",
             });
+
+            refreshCaptcha();
         }
     };
 
