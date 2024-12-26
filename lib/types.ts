@@ -34,7 +34,7 @@ export interface PaymentRequest {
 
 export interface Transaction {
     id: number,
-    dateTime: string;
+    createdAt: string;
     sender_account_number: string;
     amount: string;
     receiver_account_number: string;

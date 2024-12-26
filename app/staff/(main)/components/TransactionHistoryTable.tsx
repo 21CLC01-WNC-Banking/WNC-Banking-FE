@@ -7,6 +7,8 @@ import { Transaction } from "@/lib/types";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
 import classes from "./AccountCard.module.css";
+import { format, parseISO } from "date-fns";
+
 
 // Hàm hỗ trợ phân trang
 function chunk<T>(array: T[], size: number): T[][] {
@@ -21,10 +23,7 @@ const TransactionHistoryTable: React.FC = () => {
     // State for modal control
     const [opened, { open, close }] = useDisclosure(false);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    // const [accountInfo, setAccountInfo] = useState<{ owner: string; accountNumber: string }>({
-    //     owner: "",
-    //     accountNumber: "",
-    // });
+    const [error, setError] = useState<string>("");
 
     // State for statistics data
     const [accountInfo, setAccountInfo] = useState<{ title: string; stats: string }[]>([
@@ -59,8 +58,9 @@ const TransactionHistoryTable: React.FC = () => {
                     { title: "Tổng số giao dịch", stats: `${data.data.length}` },
                 ]);
                 setTransactions(data.data);
+                setError("");
             } else {
-                console.log("lỗi rồi");
+                setError("Số tài khoản không tồn tại!");
                 setTransactions([]);
             }
         } catch (error) {
@@ -90,8 +90,8 @@ const TransactionHistoryTable: React.FC = () => {
     // Sort transactions by time
     const sortByTime = (elements: Transaction[], filter: string) => {
         return elements.sort((a, b) => {
-            const dateA = new Date(a.dateTime);
-            const dateB = new Date(b.dateTime);
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
             return filter === "Mới nhất"
                 ? dateB.getTime() - dateA.getTime()
                 : dateA.getTime() - dateB.getTime();
@@ -106,6 +106,11 @@ const TransactionHistoryTable: React.FC = () => {
         }),
         timeFilter
     );
+
+    const formatDateTime = (isoString: string): string => {
+        const date = parseISO(isoString);
+        return format(date, "HH:mm dd/MM/yyyy");
+    };
 
     // Chunk the filtered transactions into pages (5 items per page)
     const paginatedTransactions = chunk(filteredTransactions, 5);
@@ -142,7 +147,7 @@ const TransactionHistoryTable: React.FC = () => {
                         : "red.2"
             }
         >
-            <Table.Td>{transaction.dateTime}</Table.Td>
+            <Table.Td>{formatDateTime(transaction.createdAt)}</Table.Td>
             <Table.Td>{transaction.amount}</Table.Td>
             <Table.Td>{transaction.transactionType}</Table.Td>
             <Table.Td>{transaction.balance}</Table.Td>
@@ -231,7 +236,7 @@ const TransactionHistoryTable: React.FC = () => {
             {/* Table */}
             {filteredTransactions.length === 0 ? (
                 <Center mt="xl">
-                    <Text size="sm" c="dimmed">Chưa có lịch sử giao dịch nào!</Text>
+                    <Text size="sm" c="dimmed">{error ? error : "Chưa có lịch sử giao dịch nào!"}</Text>
                 </Center>
             ) : (
                 <>

@@ -3,7 +3,7 @@ import DepositForm from "../components/DepositForm";
 
 const Deposit: React.FC = () => {
     return (
-        <Stack mx="md" style={{ minWidth: 1100 }}>
+        <Stack mx={40} style={{ minWidth: 1100 }}>
             <Center>
                 <Title order={2}>Nạp tiền vào tài khoản</Title>
             </Center>
