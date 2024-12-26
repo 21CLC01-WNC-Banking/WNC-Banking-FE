@@ -1,9 +1,9 @@
 export interface Transfer {
-    id?: number;
-    senderAccount: string;
-    receiverAccount: string;
     amount: number;
     message: string;
+    receiverAccount: string;
+    receiverBank: string;
+    senderAccount: string;
     senderHandlesFee: boolean;
 }
 
