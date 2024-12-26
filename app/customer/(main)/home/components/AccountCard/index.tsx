@@ -1,22 +1,55 @@
-import { Text } from "@mantine/core";
+"use client";
+
+import { useEffect } from "react";
+
+import { Text, rem } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconX } from "@tabler/icons-react";
 import classes from "./AccountCard.module.css";
 
-const data = [
-    {
-        title: "Chủ tài khoản",
-        stats: "DANG NHAT HOA",
-    },
-    {
-        title: "Số tài khoản",
-        stats: "0123 4567 8901",
-    },
-    {
-        title: "Số dư",
-        stats: "120,000,000 VND",
-    },
-];
+import { useAppDispatch, useAppSelector } from "@/app/customer/lib/hooks/withTypes";
+import { getAccountThunk } from "@/app/customer/lib/thunks/AuthThunks";
+import { formatCurrency, formatAccountNumber } from "@/app/customer/lib/utils";
 
 const AccountCard = () => {
+    const dispatch = useAppDispatch();
+    const account = useAppSelector((state) => state.auth.account);
+
+    const data = [
+        {
+            title: "Chủ tài khoản",
+            stats: account?.name || "-",
+        },
+        {
+            title: "Số tài khoản",
+            stats: account ? formatAccountNumber(account.accountNumber) : "-",
+        },
+        {
+            title: "Số dư",
+            stats: account ? formatCurrency(account.balance) : "-",
+        },
+    ];
+
+    useEffect(() => {
+        const fetchAccount = async () => {
+            try {
+                await dispatch(getAccountThunk()).unwrap();
+            } catch (error) {
+                notifications.show({
+                    withBorder: true,
+                    radius: "md",
+                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                    color: "red",
+                    title: "Truy vấn thông tin tài khoản thất bại",
+                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                    position: "bottom-right",
+                });
+            }
+        };
+
+        fetchAccount();
+    }, [dispatch]);
+
     const stats = data.map((stat) => (
         <div key={stat.title} className={classes.stat}>
             <Text className={classes.title}>{stat.title}</Text>
