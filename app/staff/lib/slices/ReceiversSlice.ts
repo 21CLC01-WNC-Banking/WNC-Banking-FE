@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { Account } from "@/lib/types";
+import { Account } from "@/app/staff/lib/types";
 
 import accounts from "@/lib/mock_data/accounts.json";
 

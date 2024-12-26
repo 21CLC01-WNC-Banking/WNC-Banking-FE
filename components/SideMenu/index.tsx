@@ -12,6 +12,10 @@ import CurrentTime from "@/components/CurrentTime";
 
 import classes from "./SideMenu.module.css";
 
+import { useAppDispatch } from "@/app/staff/lib/hooks/withTypes";
+import { logout as customerLogout } from "@/app/customer/lib/slices/AuthSlice";
+import { logout as staffLogout } from "@/app/staff/lib/slices/AuthSlice";
+
 interface SideMenuProps {
     forCustomer: boolean;
     items: {
@@ -26,14 +30,16 @@ interface SideMenuProps {
 const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
     const router = useRouter();
     const pathname = usePathname();
+    const dispatch = useAppDispatch();
 
     const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
 
         if (forCustomer) {
+            dispatch(customerLogout());
             router.push("/customer/login");
         } else {
-            localStorage.removeItem("email");
+            dispatch(staffLogout());
             router.push("/staff/login");
         }
     };

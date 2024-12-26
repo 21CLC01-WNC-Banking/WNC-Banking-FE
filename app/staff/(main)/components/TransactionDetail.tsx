@@ -1,5 +1,5 @@
-import { Transaction } from "@/lib/types";
-import { Title, Text, Container, Flex, Center } from '@mantine/core';
+import { Transaction } from "@/app/staff/lib/types";
+import { Title, Text, Container, Flex, Center } from "@mantine/core";
 
 interface TransactionDetailProps {
     transaction: Transaction | null;
@@ -53,6 +53,6 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) =>
             </Flex>
         </Container>
     );
-}
+};
 
 export default TransactionDetail;

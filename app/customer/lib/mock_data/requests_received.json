@@ -1,0 +1,122 @@
+[
+    {
+        "requestor": "Nguyễn Văn A",
+        "amount": "1,500.000 VND",
+        "message": "Thanh toán tiền học phí tháng 12",
+        "requestTime": "01/12/2024 09:00",
+        "resolveTime": "",
+        "status": "Chưa thanh toán"
+    },
+    {
+        "requestor": "Lê Hoàng C",
+        "amount": "250.000 VND",
+        "message": "Chi phí chia đôi bữa ăn tối",
+        "requestTime": "02/12/2024 18:30",
+        "resolveTime": "04/12/2024 12:00",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Vũ Thị E",
+        "amount": "1.000.000 VND",
+        "message": "Trả tiền mua sách chung",
+        "requestTime": "30/11/2024 14:00",
+        "resolveTime": "",
+        "status": "Đã hủy"
+    },
+    {
+        "requestor": "Trần Văn G",
+        "amount": "500.000 VND",
+        "message": "Chi phí điện nước tháng trước",
+        "requestTime": "01/12/2024 08:00",
+        "resolveTime": "",
+        "status": "Chưa thanh toán"
+    },
+    {
+        "requestor": "Ngô Văn I",
+        "amount": "700.000 VND",
+        "message": "Tiền thuê xe đi du lịch",
+        "requestTime": "03/12/2024 15:00",
+        "resolveTime": "09/12/2024 12:00",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Đặng Hoàng K",
+        "amount": "300.000 VND",
+        "message": "Trả tiền mua vé xem phim",
+        "requestTime": "06/12/2024 10:30",
+        "resolveTime": "06/12/2024 16:30",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Lê Thị M",
+        "amount": "2.000.000 VND",
+        "message": "Thanh toán tiền thuê nhà",
+        "requestTime": "01/12/2024 11:00",
+        "resolveTime": "",
+        "status": "Chưa thanh toán"
+    },
+    {
+        "requestor": "Trần Thị O",
+        "amount": "600.000 VND",
+        "message": "Trả tiền chia quà sinh nhật",
+        "requestTime": "04/12/2024 13:00",
+        "resolveTime": "",
+        "status": "Đã hủy"
+    },
+    {
+        "requestor": "Ngô Thành Q",
+        "amount": "450.000 VND",
+        "message": "Chi phí liên hoan cuối năm",
+        "requestTime": "05/12/2024 18:00",
+        "resolveTime": "12/12/2024 22:00",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Phạm Thị S",
+        "amount": "800.000 VND",
+        "message": "Tiền mượn mua quần áo",
+        "requestTime": "07/12/2024 09:00",
+        "resolveTime": "",
+        "status": "Chưa thanh toán"
+    },
+    {
+        "requestor": "Vũ Hoàng U",
+        "amount": "1,200.000 VND",
+        "message": "Tiền góp mua đồ trang trí",
+        "requestTime": "01/12/2024 16:00",
+        "resolveTime": "",
+        "status": "Đã hủy"
+    },
+    {
+        "requestor": "Trần Văn W",
+        "amount": "350.000 VND",
+        "message": "Chi phí ăn uống buổi tiệc",
+        "requestTime": "02/12/2024 20:00",
+        "resolveTime": "05/12/2024 12:00",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Nguyễn Thị Y",
+        "amount": "900.000 VND",
+        "message": "Tiền mua dụng cụ học tập",
+        "requestTime": "08/12/2024 10:00",
+        "resolveTime": "",
+        "status": "Chưa thanh toán"
+    },
+    {
+        "requestor": "Phạm Văn AA",
+        "amount": "500.000 VND",
+        "message": "Thanh toán phí sửa xe",
+        "requestTime": "01/12/2024 08:30",
+        "resolveTime": "06/12/2024 10:00",
+        "status": "Đã thanh toán"
+    },
+    {
+        "requestor": "Vũ Hoàng CC",
+        "amount": "400.000 VND",
+        "message": "Trả tiền mua hoa quả",
+        "requestTime": "02/12/2024 14:00",
+        "resolveTime": "09/12/2024 09:00",
+        "status": "Đã thanh toán"
+    }
+]

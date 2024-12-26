@@ -27,8 +27,8 @@ import {
 
 import classes from "./ReceiversTable.module.css";
 
-import accounts from "@/lib/mock_data/accounts.json";
-import { Account } from "@/lib/types";
+import accounts from "@/app/customer/lib/mock_data/accounts.json";
+import { ReceiverAccount } from "@/app/customer/lib/types";
 import DeleteReceiverModal from "./DeleteReceiverModal";
 import EditReceiverModal from "./EditReceiverModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
@@ -65,7 +65,7 @@ const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
     );
 };
 
-const filterData = (data: Account[], search: string) => {
+const filterData = (data: ReceiverAccount[], search: string) => {
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
         keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
@@ -73,8 +73,8 @@ const filterData = (data: Account[], search: string) => {
 };
 
 const sortData = (
-    data: Account[],
-    payload: { sortBy: keyof Account | null; reversed: boolean; search: string }
+    data: ReceiverAccount[],
+    payload: { sortBy: keyof ReceiverAccount | null; reversed: boolean; search: string }
 ) => {
     const { sortBy } = payload;
 
@@ -101,10 +101,10 @@ const ReceiversTable = () => {
 
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
-    const [sortBy, setSortBy] = useState<keyof Account | null>(null);
+    const [sortBy, setSortBy] = useState<keyof ReceiverAccount | null>(null);
     const [reverseSortDirection, setReverseSortDirection] = useState(false);
 
-    const setSorting = (field: keyof Account) => {
+    const setSorting = (field: keyof ReceiverAccount) => {
         const reversed = field === sortBy ? !reverseSortDirection : false;
         setReverseSortDirection(reversed);
         setSortBy(field);
@@ -117,7 +117,7 @@ const ReceiversTable = () => {
         setSortedData(sortData(data, { sortBy, reversed: reverseSortDirection, search: value }));
     };
 
-    const handleTransferAction = (row: Account) => {
+    const handleTransferAction = (row: ReceiverAccount) => {
         if (row.bank === "WNC Bank") {
             router.push(`/customer/transfer/internal?to=${row.accountNumber.trim()}`);
         } else {

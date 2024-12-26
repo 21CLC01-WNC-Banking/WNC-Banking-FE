@@ -55,10 +55,10 @@ const UserForm: React.FC = () => {
                     position: "bottom-right"
                 })
             }
-        } catch (err: any) {
+        } catch (error) {
             showNotification({
                 title: "Lỗi",
-                message: err.message || "Có lỗi xảy ra, vui lòng thử lại",
+                message: "Xảy ra lỗi kết nối với máy chủ, vui lòng thử lại sau!",
                 color: "red",
                 position: "bottom-right",
             });

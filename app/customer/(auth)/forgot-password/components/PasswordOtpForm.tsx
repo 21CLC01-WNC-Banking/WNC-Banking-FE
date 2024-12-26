@@ -12,14 +12,24 @@ import {
     Fieldset,
     Anchor,
     Group,
+    rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { IconX } from "@tabler/icons-react";
+
+import { useAppDispatch, useAppSelector } from "@/app/customer/lib/hooks/withTypes";
+import { forgotPasswordOtpThunk } from "@/app/customer/lib/thunks/ForgotPasswordThunks";
 
 interface OtpFormProps {
     handleNextStep?: () => void;
 }
 
 const PasswordOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
+    const dispatch = useAppDispatch();
+
+    const email = useAppSelector((state) => state.forgotPassword.email);
+
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
@@ -33,13 +43,26 @@ const PasswordOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
                     ? "Mã OTP không hợp lệ"
                     : null,
         },
+        transformValues: (values) => ({ ...values, email: email }),
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            await dispatch(forgotPasswordOtpThunk(values)).unwrap();
 
-        if (handleNextStep) {
-            handleNextStep();
+            if (handleNextStep) {
+                handleNextStep();
+            }
+        } catch (error) {
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                color: "red",
+                title: "Gửi mã OTP thất bại",
+                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
         }
     };
 

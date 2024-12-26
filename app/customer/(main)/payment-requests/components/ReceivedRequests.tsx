@@ -15,9 +15,9 @@ import {
 } from "@mantine/core";
 import { IconCreditCardPay, IconSearch } from "@tabler/icons-react";
 
-import { PaymentRequest } from "@/lib/types";
-import { chunk } from "@/lib/utils";
-import data from "@/lib/mock_data/requests_received.json";
+import { PaymentRequest } from "@/app/customer/lib/types";
+import { chunk } from "@/app/customer/lib/utils";
+import data from "@/app/customer/lib/mock_data/requests_received.json";
 import CancelModal from "./CancelModal";
 import InfoModal from "./InfoModal";
 

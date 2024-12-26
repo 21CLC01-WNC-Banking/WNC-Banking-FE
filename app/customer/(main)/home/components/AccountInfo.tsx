@@ -14,16 +14,13 @@ import {
 } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 
-import { Transaction } from "@/lib/types";
-import { chunk } from "@/lib/utils";
-import data from "@/lib/mock_data/transactions.json";
+import { Transaction } from "@/app/customer/lib/types";
+import { chunk } from "@/app/customer/lib/utils";
+import data from "@/app/customer/lib/mock_data/transactions.json";
 import AccountCard from "./AccountCard";
 
 const AccountInfo: React.FC = () => {
-    const transactions: Transaction[] = data.map((transaction) => ({
-        ...transaction,
-        transactionType: transaction.transactionType as "Nhận tiền" | "Chuyển khoản" | "Thanh toán",
-    }));
+    const transactions = data as Transaction[];
 
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả");
     const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");

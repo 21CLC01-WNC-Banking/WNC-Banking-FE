@@ -1,13 +1,19 @@
 export interface Transfer {
-    id?: number;
-    senderAccount: string;
-    receiverAccount: string;
     amount: number;
     message: string;
+    receiverAccount: string;
+    receiverBank: string;
+    senderAccount: string;
     senderHandlesFee: boolean;
 }
 
-export interface Account {
+export interface UserAccount {
+    name: string;
+    accountNumber: string;
+    balance: number;
+}
+
+export interface ReceiverAccount {
     name: string;
     bank: string;
     accountNumber: string;
@@ -33,7 +39,7 @@ export interface PaymentRequest {
 }
 
 export interface Transaction {
-    id: number,
+    id: number;
     dateTime: string;
     sender_account_number: string;
     amount: string;
