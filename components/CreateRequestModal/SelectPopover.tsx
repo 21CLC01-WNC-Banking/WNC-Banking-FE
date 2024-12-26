@@ -2,7 +2,7 @@ import { Popover, ActionIcon, Select } from "@mantine/core";
 import { IconAddressBook } from "@tabler/icons-react";
 import { UseFormReturnType } from "@mantine/form";
 
-import { Account } from "@/lib/types";
+import { Account } from "@/app/staff/lib/types";
 import data from "@/lib/mock_data/accounts.json";
 
 const targets = data.filter((receiver: Account) => receiver.bank === "WNC Bank");

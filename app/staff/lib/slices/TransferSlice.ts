@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { Transfer } from "@/lib/types";
+import { Transfer } from "@/app/staff/lib/types";
 
 interface TransferState {
     currentTransfer: Transfer;

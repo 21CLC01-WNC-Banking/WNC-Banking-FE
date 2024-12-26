@@ -1,14 +1,17 @@
-import { Stack, Center, Title } from "@mantine/core";
+import { Paper, Center, Title, Stack } from "@mantine/core";
 import TransactionHistoryTable from "../components/TransactionHistoryTable";
 
 const TransferHistory: React.FC = () => {
     return (
-        <Stack mx={120}>
+        <Stack>
             <Center>
                 <Title order={2}>Lịch sử giao dịch</Title>
             </Center>
-            <TransactionHistoryTable />
+            <Paper withBorder mx={40} radius="md" p={30} mt={30}>
+                <TransactionHistoryTable />
+            </Paper>
         </Stack>
+
     );
 };
 export default TransferHistory;

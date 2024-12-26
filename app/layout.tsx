@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
+import StoreProvider from "./customer/StoreProvider";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <body>
                 <MantineProvider>
                     <Notifications />
-                    {children}
+                    <StoreProvider>{children}</StoreProvider>
                 </MantineProvider>
             </body>
         </html>
