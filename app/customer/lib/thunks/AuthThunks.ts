@@ -43,7 +43,6 @@ export const getAccountThunk = createAppAsyncThunk("auth/account", async (_, { d
     }
 
     const data = await response.json();
-    console.log(data);
 
     const account = {
         name: data.data.name,
