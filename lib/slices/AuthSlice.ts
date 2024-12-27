@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserAccount } from "../types";
+import { UserAccount } from "../types/customer";
 
 interface AuthState {
     isLoggedIn: boolean | null;
-    account: UserAccount | null;
+    customerAccount: UserAccount | null;
 }
 
 const initialState: AuthState = {
     isLoggedIn: null,
-    account: null,
+    customerAccount: null,
 };
 
 export const authSlice = createSlice({
@@ -18,8 +18,8 @@ export const authSlice = createSlice({
         login: (state) => {
             state.isLoggedIn = true;
         },
-        setAuthUser: (state, action: PayloadAction<UserAccount>) => {
-            state.account = action.payload;
+        setCustomerAccount: (state, action: PayloadAction<UserAccount>) => {
+            state.customerAccount = action.payload;
         },
         logout: (state) => {
             state.isLoggedIn = false;
@@ -27,5 +27,5 @@ export const authSlice = createSlice({
     },
 });
 
-export const { login, setAuthUser, logout } = authSlice.actions;
+export const { login, setCustomerAccount, logout } = authSlice.actions;
 export const authReducer = authSlice.reducer;

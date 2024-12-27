@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { Account } from "@/app/staff/lib/types";
+import { ReceiverAccount } from "@/lib/types/customer";
 
 import accounts from "@/lib/mock_data/accounts.json";
 
 interface ReceiversState {
-    receivers: Account[];
-    filteredReceivers: Account[];
+    receivers: ReceiverAccount[];
+    filteredReceivers: ReceiverAccount[];
 }
 
 const initialState: ReceiversState = {
@@ -20,7 +20,7 @@ export const receiversSlice = createSlice({
     initialState,
     reducers: {
         setFilteredReceivers: (state, action: PayloadAction<string>) => {
-            state.filteredReceivers = state.receivers.filter((receiver: Account) => {
+            state.filteredReceivers = state.receivers.filter((receiver: ReceiverAccount) => {
                 return receiver.bank.toLowerCase().includes(action.payload.toLowerCase());
             });
         },

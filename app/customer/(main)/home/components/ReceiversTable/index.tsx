@@ -27,8 +27,8 @@ import {
 
 import classes from "./ReceiversTable.module.css";
 
-import accounts from "@/app/customer/lib/mock_data/accounts.json";
-import { ReceiverAccount } from "@/app/customer/lib/types";
+import accounts from "@/lib/mock_data/accounts.json";
+import { ReceiverAccount } from "@/lib/types/customer";
 import DeleteReceiverModal from "./DeleteReceiverModal";
 import EditReceiverModal from "./EditReceiverModal";
 import CreateRequestModal from "@/components/CreateRequestModal";

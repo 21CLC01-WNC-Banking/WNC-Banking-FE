@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Transaction } from "@/app/staff/lib/types";
+import { Transaction } from "@/lib/types/staff";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
 import classes from "./AccountCard.module.css";

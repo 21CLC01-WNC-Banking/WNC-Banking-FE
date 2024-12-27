@@ -14,8 +14,8 @@ import {
 } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 
-import { Transaction } from "@/app/customer/lib/types";
-import { chunk } from "@/app/customer/lib/utils";
+import { Transaction } from "@/lib/types/customer";
+import { chunk } from "@/lib/utils";
 import data from "@/app/customer/lib/mock_data/transactions.json";
 import AccountCard from "./AccountCard";
 

@@ -4,10 +4,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { transferReducer } from "./slices/TransferSlice";
-import { receiversReducer } from "./slices/ReceiversSlice";
+import { transferReducer } from "./slices/customer/TransferSlice";
+import { receiversReducer } from "./slices/customer/ReceiversSlice";
 import { authReducer } from "./slices/AuthSlice";
-import { forgotPasswordReducer } from "./slices/ForgotPasswordSlice";
+import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
 
 const authPersistConfig = {
     key: "auth",
@@ -20,10 +20,14 @@ const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 export const makeStore = () => {
     const store = configureStore({
         reducer: {
+            auth: persistedAuthReducer,
+
+            // customer
             transfer: transferReducer,
             receivers: receiversReducer,
-            auth: persistedAuthReducer,
             forgotPassword: forgotPasswordReducer,
+
+            // staff
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

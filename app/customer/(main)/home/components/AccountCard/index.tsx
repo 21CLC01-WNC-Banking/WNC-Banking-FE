@@ -7,13 +7,13 @@ import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import classes from "./AccountCard.module.css";
 
-import { useAppDispatch, useAppSelector } from "@/app/customer/lib/hooks/withTypes";
-import { getAccountThunk } from "@/app/customer/lib/thunks/AuthThunks";
-import { formatCurrency, formatAccountNumber } from "@/app/customer/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { getAccountThunk } from "@/lib/thunks/AuthThunks";
+import { formatCurrency, formatAccountNumber } from "@/lib/utils";
 
 const AccountCard = () => {
     const dispatch = useAppDispatch();
-    const account = useAppSelector((state) => state.auth.account);
+    const account = useAppSelector((state) => state.auth.customerAccount);
 
     const data = [
         {

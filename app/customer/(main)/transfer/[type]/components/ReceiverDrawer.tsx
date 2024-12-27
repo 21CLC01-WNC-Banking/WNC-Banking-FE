@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/app/customer/lib/hooks/withTypes";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 import ClickableCard from "@/components/ClickableCard";
 import { Drawer, TextInput, ScrollArea, ActionIcon } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";

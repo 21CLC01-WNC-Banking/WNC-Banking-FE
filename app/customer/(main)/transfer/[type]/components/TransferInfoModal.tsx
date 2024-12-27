@@ -1,5 +1,5 @@
-import { useAppSelector } from "@/app/customer/lib/hooks/withTypes";
-import { formatCurrency } from "@/app/customer/lib/utils";
+import { useAppSelector } from "@/lib/hooks/withTypes";
+import { formatCurrency } from "@/lib/utils";
 
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
@@ -53,7 +53,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => 
 
                 <Group grow justify="between">
                     <Text variant="text">Phí giao dịch</Text>
-                    <Text fw={700}>0 VND </Text>
+                    <Text fw={700}>0 ₫ </Text>
                 </Group>
 
                 <Group grow justify="between">

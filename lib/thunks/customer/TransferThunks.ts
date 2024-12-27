@@ -1,5 +1,5 @@
-import { createAppAsyncThunk } from "../hooks/withTypes";
-import { resetTransfer, setCurrentTransfer } from "../slices/TransferSlice";
+import { createAppAsyncThunk } from "../../hooks/withTypes";
+import { resetTransfer, setCurrentTransfer } from "../../slices/customer/TransferSlice";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

@@ -16,7 +16,7 @@ import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
 
-import { useAppSelector } from "@/app/customer/lib/hooks/withTypes";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 
 const menuItems = [
     {

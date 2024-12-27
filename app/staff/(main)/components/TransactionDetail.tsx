@@ -1,4 +1,4 @@
-import { Transaction } from "@/app/staff/lib/types";
+import { Transaction } from "@/lib/types/staff";
 import { Title, Text, Container, Flex, Center } from "@mantine/core";
 
 interface TransactionDetailProps {
