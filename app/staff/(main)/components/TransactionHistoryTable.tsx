@@ -14,19 +14,13 @@ import {
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Transaction } from "@/app/staff/lib/types";
+import { Transaction } from "@/lib/types/staff";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
 import classes from "./AccountCard.module.css";
-import { format, parseISO } from "date-fns";
+import { formatDateTime } from "../../../../lib/utils/staff";
+import { chunk } from "../../../../lib/utils/staff";
 
-// Hàm hỗ trợ phân trang
-function chunk<T>(array: T[], size: number): T[][] {
-    if (!array.length) return [];
-    const head = array.slice(0, size);
-    const tail = array.slice(size);
-    return [head, ...chunk(tail, size)];
-}
 
 const TransactionHistoryTable: React.FC = () => {
     // State for modal control
@@ -49,8 +43,8 @@ const TransactionHistoryTable: React.FC = () => {
                 value.trim() === ""
                     ? "Số tài khoản không được để trống"
                     : value.length !== 12
-                    ? "Số tài khoản không hợp lệ"
-                    : null,
+                        ? "Số tài khoản không hợp lệ"
+                        : null,
         },
     });
 
@@ -68,11 +62,16 @@ const TransactionHistoryTable: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 setAccountInfo([
-                    { title: "Chủ tài khoản", stats: "Hồ Hữu Tâm" }, // Thay bằng `data.owner`
+                    { title: "Chủ tài khoản", stats: `${data.data[0].customerName}` },
                     { title: "Số tài khoản", stats: values.accountNumber },
                     { title: "Tổng số giao dịch", stats: `${data.data.length}` },
                 ]);
-                setTransactions(data.data);
+                setTransactions(
+                    data.data.map((transaction: any) => ({
+                        ...transaction,
+                        transactionType: transaction.type === "payment" ? "Thanh toán" : transaction.amount < 0 ? "Chuyển khoản" : "Nhận tiền"
+                    }))
+                );
                 setError("");
             } else {
                 setError("Số tài khoản không tồn tại!");
@@ -121,10 +120,6 @@ const TransactionHistoryTable: React.FC = () => {
         timeFilter
     );
 
-    const formatDateTime = (isoString: string): string => {
-        const date = parseISO(isoString);
-        return format(date, "HH:mm dd/MM/yyyy");
-    };
 
     // Chunk the filtered transactions into pages (5 items per page)
     const paginatedTransactions = chunk(filteredTransactions, 5);
@@ -157,8 +152,8 @@ const TransactionHistoryTable: React.FC = () => {
                 transaction.transactionType === "Chuyển khoản"
                     ? "yellow.1"
                     : transaction.transactionType === "Nhận tiền"
-                    ? "green.1"
-                    : "red.2"
+                        ? "green.1"
+                        : "red.2"
             }
         >
             <Table.Td>{formatDateTime(transaction.createdAt)}</Table.Td>

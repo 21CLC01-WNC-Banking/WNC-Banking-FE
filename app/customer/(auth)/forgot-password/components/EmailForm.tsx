@@ -15,8 +15,8 @@ import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 
-import { useAppDispatch } from "@/app/customer/lib/hooks/withTypes";
-import { forgotPasswordEmailThunk } from "@/app/customer/lib/thunks/ForgotPasswordThunks";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { forgotPasswordEmailThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
 
 interface EmailFormProps {
     handleNextStep?: () => void;

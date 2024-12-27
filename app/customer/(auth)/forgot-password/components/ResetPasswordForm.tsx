@@ -8,8 +8,8 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
 
-import { useAppSelector, useAppDispatch } from "@/app/customer/lib/hooks/withTypes";
-import { forgotPasswordThunk } from "@/app/customer/lib/thunks/ForgotPasswordThunks";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
+import { forgotPasswordThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
 
 const ResetPasswordForm = () => {
     const dispatch = useAppDispatch();

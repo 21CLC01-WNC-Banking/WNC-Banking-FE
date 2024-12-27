@@ -36,9 +36,9 @@ export interface Transaction {
     id: number,
     createdAt: string;
     sender_account_number: string;
-    amount: string;
+    amount: number;
     receiver_account_number: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
+    transactionType: string;
     balance: string;
     message: string;
 }

@@ -14,7 +14,8 @@ import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IMaskInput } from "react-imask";
 
-import SelectPopover from "./SelectPopover";
+import { Account } from "@/app/staff/lib/types";
+import data from "@/app/customer/lib/mock_data/accounts.json";
 import { IconMessageDollar } from "@tabler/icons-react";
 
 interface CreateModalProps {
@@ -38,8 +39,8 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({ target, isFromReceiver
                 value.length < 1
                     ? "Vui lòng nhập số tài khoản người nhận"
                     : /[0-9\s]{14}/.test(value)
-                    ? null
-                    : "Số tài khoản người nhận không hợp lệ",
+                        ? null
+                        : "Số tài khoản người nhận không hợp lệ",
             amount: (value) => (value < 10000 ? "Số tiền nợ tối thiểu là 10000 VND" : null),
             message: isNotEmpty("Vui lòng nhập nội dung nhắc nợ"),
         },

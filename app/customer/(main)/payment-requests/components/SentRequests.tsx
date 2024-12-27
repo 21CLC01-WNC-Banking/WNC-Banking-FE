@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { Table, Text, Pagination, Center, TextInput, Group, SegmentedControl } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 
-import { PaymentRequest } from "@/app/customer/lib/types";
-import { chunk } from "@/app/customer/lib/utils";
+import { PaymentRequest } from "@/lib/types/customer";
+import { chunk } from "@/lib/utils/customer";
 import data from "@/app/customer/lib/mock_data/requests_sent.json";
 import CancelModal from "./CancelModal";
 import InfoModal from "./InfoModal";

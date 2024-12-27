@@ -1,12 +1,12 @@
 "use client";
 
-import { Stack, Group, Center } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
 import { IconUserPlus, IconHistory, IconCreditCardPay } from "@tabler/icons-react";
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "./components/StaffPortalShortcut";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAppSelector } from "@/app/staff/lib/hooks/withTypes";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 import Loading from "@/components/Loading";
 
 const menuItems = [
@@ -32,16 +32,15 @@ const menuItems = [
 
 export default function StaffLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
-    const user = useAppSelector((state) => state.auth.currentUser);
-    const email = user?.email;
+    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
     useEffect(() => {
-        if (!email) {
+        if (!isLoggedIn) {
             router.push("/staff/login");
         }
-    }, [email, router]);
+    }, [isLoggedIn, router]);
 
-    if (!email) {
+    if (!isLoggedIn) {
         return <Loading />;
     }
 

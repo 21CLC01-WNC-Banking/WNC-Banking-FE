@@ -1,9 +1,9 @@
-import { createAppAsyncThunk } from "../hooks/withTypes";
+import { createAppAsyncThunk } from "../../hooks/withTypes";
 import {
     setForgotPasswordEmail,
     setForgotPasswordOtp,
     resetForgotPassword,
-} from "../slices/ForgotPasswordSlice";
+} from "../../slices/customer/ForgotPasswordSlice";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

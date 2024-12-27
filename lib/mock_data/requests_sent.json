@@ -1,7 +1,7 @@
 [
     {
         "target": "Trần Thị B",
-        "amount": "1.500.000 VND",
+        "amount": "1.500.000 ₫",
         "message": "Thanh toán tiền học phí tháng 12",
         "requestTime": "01/12/2024 09:00",
         "resolveTime": "",
@@ -9,7 +9,7 @@
     },
     {
         "target": "Phạm Minh D",
-        "amount": "250.000 VND",
+        "amount": "250.000 ₫",
         "message": "Chi phí chia đôi bữa ăn tối",
         "requestTime": "02/12/2024 18:30",
         "resolveTime": "04/12/2024 12:00",
@@ -17,7 +17,7 @@
     },
     {
         "target": "Nguyễn Thành F",
-        "amount": "1.000.000 VND",
+        "amount": "1.000.000 ₫",
         "message": "Trả tiền mua sách chung",
         "requestTime": "30/11/2024 14:00",
         "resolveTime": "",
@@ -25,7 +25,7 @@
     },
     {
         "target": "Lê Thị H",
-        "amount": "500.000 VND",
+        "amount": "500.000 ₫",
         "message": "Chi phí điện nước tháng trước",
         "requestTime": "01/12/2024 08:00",
         "resolveTime": "",
@@ -33,7 +33,7 @@
     },
     {
         "target": "Phan Thanh J",
-        "amount": "700.000 VND",
+        "amount": "700.000 ₫",
         "message": "Tiền thuê xe đi du lịch",
         "requestTime": "03/12/2024 15:00",
         "resolveTime": "09/12/2024 12:00",
@@ -41,7 +41,7 @@
     },
     {
         "target": "Trần Minh L",
-        "amount": "300.000 VND",
+        "amount": "300.000 ₫",
         "message": "Trả tiền mua vé xem phim",
         "requestTime": "06/12/2024 10:30",
         "resolveTime": "06/12/2024 16:30",
@@ -49,7 +49,7 @@
     },
     {
         "target": "Nguyễn Văn N",
-        "amount": "2.000.000 VND",
+        "amount": "2.000.000 ₫",
         "message": "Thanh toán tiền thuê nhà",
         "requestTime": "01/12/2024 11:00",
         "resolveTime": "",
@@ -57,7 +57,7 @@
     },
     {
         "target": "Vũ Hoàng P",
-        "amount": "600.000 VND",
+        "amount": "600.000 ₫",
         "message": "Trả tiền chia quà sinh nhật",
         "requestTime": "04/12/2024 13:00",
         "resolveTime": "",
@@ -65,7 +65,7 @@
     },
     {
         "target": "Lê Văn R",
-        "amount": "450.000 VND",
+        "amount": "450.000 ₫",
         "message": "Chi phí liên hoan cuối năm",
         "requestTime": "05/12/2024 18:00",
         "resolveTime": "12/12/2024 22:00",
@@ -73,7 +73,7 @@
     },
     {
         "target": "Nguyễn Thị T",
-        "amount": "800.000 VND",
+        "amount": "800.000 ₫",
         "message": "Tiền mượn mua quần áo",
         "requestTime": "07/12/2024 09:00",
         "resolveTime": "",
@@ -81,7 +81,7 @@
     },
     {
         "target": "Ngô Thanh V",
-        "amount": "1.200.000 VND",
+        "amount": "1.200.000 ₫",
         "message": "Tiền góp mua đồ trang trí",
         "requestTime": "01/12/2024 16:00",
         "resolveTime": "",
@@ -89,7 +89,7 @@
     },
     {
         "target": "Phạm Minh X",
-        "amount": "350.000 VND",
+        "amount": "350.000 ₫",
         "message": "Chi phí ăn uống buổi tiệc",
         "requestTime": "02/12/2024 20:00",
         "resolveTime": "05/12/2024 12:00",
@@ -97,7 +97,7 @@
     },
     {
         "target": "Trần Thị Z",
-        "amount": "900.000 VND",
+        "amount": "900.000 ₫",
         "message": "Tiền mua dụng cụ học tập",
         "requestTime": "08/12/2024 10:00",
         "resolveTime": "",
@@ -105,7 +105,7 @@
     },
     {
         "target": "Lê Hoàng BB",
-        "amount": "500.000 VND",
+        "amount": "500.000 ₫",
         "message": "Thanh toán phí sửa xe",
         "requestTime": "01/12/2024 08:30",
         "resolveTime": "06/12/2024 10:00",
@@ -113,7 +113,7 @@
     },
     {
         "target": "Nguyễn Thành DD",
-        "amount": "400.000 VND",
+        "amount": "400.000 ₫",
         "message": "Trả tiền mua hoa quả",
         "requestTime": "02/12/2024 14:00",
         "resolveTime": "09/12/2024 09:00",

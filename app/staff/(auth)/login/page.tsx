@@ -19,10 +19,10 @@ import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import Link from "next/link";
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
-import useCaptcha from "@/app/staff/lib/hooks/useCaptcha";
+import useCaptcha from "@/lib/hooks/useCaptcha";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useAppDispatch } from "@/app/staff/lib/hooks/withTypes";
-import { loginThunk } from "@/app/staff/lib/slices/AuthSlice";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { loginThunk } from "@/lib/thunks/AuthThunks";
 
 const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha } = useCaptcha();

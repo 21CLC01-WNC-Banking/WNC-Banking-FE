@@ -4,10 +4,10 @@ import { useRouter } from "nextjs-toploader/app";
 import Link from "next/link";
 
 import ReCAPTCHA from "react-google-recaptcha";
-import useCaptcha from "@/app/customer/lib/hooks/useCaptcha";
+import useCaptcha from "@/lib/hooks/useCaptcha";
 
-import { useAppDispatch } from "@/app/customer/lib/hooks/withTypes";
-import { loginThunk } from "@/app/customer/lib/thunks/AuthThunks";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { loginThunk } from "@/lib/thunks/AuthThunks";
 
 import {
     Anchor,

@@ -12,9 +12,8 @@ import CurrentTime from "@/components/CurrentTime";
 
 import classes from "./SideMenu.module.css";
 
-import { useAppDispatch } from "@/app/staff/lib/hooks/withTypes";
-import { logout as customerLogout } from "@/app/customer/lib/slices/AuthSlice";
-import { logout as staffLogout } from "@/app/staff/lib/slices/AuthSlice";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { logout } from "@/lib/slices/AuthSlice";
 
 interface SideMenuProps {
     forCustomer: boolean;
@@ -35,11 +34,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
     const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
 
+        dispatch(logout());
+
         if (forCustomer) {
-            dispatch(customerLogout());
             router.push("/customer/login");
         } else {
-            dispatch(staffLogout());
             router.push("/staff/login");
         }
     };

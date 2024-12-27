@@ -18,8 +18,8 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 
-import { useAppDispatch, useAppSelector } from "@/app/customer/lib/hooks/withTypes";
-import { forgotPasswordOtpThunk } from "@/app/customer/lib/thunks/ForgotPasswordThunks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { forgotPasswordOtpThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
 
 interface OtpFormProps {
     handleNextStep?: () => void;

@@ -1,4 +1,4 @@
-import { Transaction } from "@/app/staff/lib/types";
+import { Transaction } from "@/lib/types/staff";
 import { Title, Text, Container, Flex, Center } from "@mantine/core";
 
 interface TransactionDetailProps {
@@ -23,7 +23,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) =>
             <Flex direction="column">
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Ngày thực hiện</Text>
-                    <Text fw={700}>{transaction.dateTime}</Text>
+                    <Text fw={700}>{transaction.createdAt}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
