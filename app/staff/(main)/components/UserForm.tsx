@@ -47,10 +47,9 @@ const UserForm: React.FC = () => {
                 });
                 form.reset();
             } else {
-                const data = await response.json();
                 showNotification({
                     title: "Lỗi",
-                    message: data.errors.message,
+                    message: "Email đã được sử dụng",
                     color: "red",
                     position: "bottom-right"
                 })
