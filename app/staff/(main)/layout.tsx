@@ -35,15 +35,15 @@ export default function StaffLayout({ children }: Readonly<{ children: React.Rea
     const user = useAppSelector((state) => state.auth.currentUser);
     const email = user?.email;
 
-    useEffect(() => {
-        if (!email) {
-            router.push("/staff/login");
-        }
-    }, [email, router]);
+    // useEffect(() => {
+    //     if (!email) {
+    //         router.push("/staff/login");
+    //     }
+    // }, [email, router]);
 
-    if (!email) {
-        return <Loading />;
-    }
+    // if (!email) {
+    //     return <Loading />;
+    // }
 
     return (
         <Group align="top" preventGrowOverflow={false} grow gap="0" wrap="nowrap">

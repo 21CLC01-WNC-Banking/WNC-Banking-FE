@@ -1,3 +1,6 @@
+import { format, parseISO } from "date-fns";
+
+
 // helper function to chunk data into pages
 export function chunk<T>(array: T[], size: number): T[][] {
     if (!array.length) {
@@ -9,3 +12,9 @@ export function chunk<T>(array: T[], size: number): T[][] {
 
     return [head, ...chunk(tail, size)];
 }
+
+
+export const formatDateTime = (isoString: string): string => {
+        const date = parseISO(isoString);
+        return format(date, "HH:mm dd/MM/yyyy");
+    };
