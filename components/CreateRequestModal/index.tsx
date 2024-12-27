@@ -14,8 +14,10 @@ import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IMaskInput } from "react-imask";
 
-import { Account } from "@/app/staff/lib/types";
-import data from "@/app/customer/lib/mock_data/accounts.json";
+import { Account } from "@/lib/types/staff";
+import data from "@/lib/mock_data/accounts.json";
+import SelectPopover from "./SelectPopover";
+
 import { IconMessageDollar } from "@tabler/icons-react";
 
 interface CreateModalProps {
