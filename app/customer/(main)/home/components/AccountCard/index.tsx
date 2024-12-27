@@ -8,7 +8,7 @@ import { IconX } from "@tabler/icons-react";
 import classes from "./AccountCard.module.css";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { getAccountThunk } from "@/lib/thunks/AuthThunks";
+import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
 import { formatCurrency, formatAccountNumber } from "@/lib/utils/customer";
 
 const AccountCard = () => {

@@ -7,7 +7,7 @@ import { IconSearch } from "@tabler/icons-react";
 
 import { PaymentRequest } from "@/lib/types/customer";
 import { chunk } from "@/lib/utils/customer";
-import data from "@/app/customer/lib/mock_data/requests_sent.json";
+import data from "@/lib/mock_data/requests_sent.json";
 import CancelModal from "./CancelModal";
 import InfoModal from "./InfoModal";
 import CreateRequestModal from "@/components/CreateRequestModal";

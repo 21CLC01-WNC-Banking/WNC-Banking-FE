@@ -16,7 +16,7 @@ import { IconSearch } from "@tabler/icons-react";
 
 import { Transaction } from "@/lib/types/customer";
 import { chunk } from "@/lib/utils/customer";
-import data from "@/app/customer/lib/mock_data/transactions.json";
+import data from "@/lib/mock_data/transactions.json";
 import AccountCard from "./AccountCard";
 
 const AccountInfo: React.FC = () => {
