@@ -26,10 +26,10 @@ export interface UserAccount {
 }
 
 export interface ReceiverAccount {
-    name: string;
+    id: number;
+    receiverAccountNumber: string;
+    receiverNickname: string;
     bank: string;
-    accountNumber: string;
-    nickname: string;
 }
 
 export interface Transaction {

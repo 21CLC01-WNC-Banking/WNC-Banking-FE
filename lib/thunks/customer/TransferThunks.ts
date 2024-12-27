@@ -65,20 +65,3 @@ export const internalTransferThunk = createAppAsyncThunk(
         }
     }
 );
-
-export const addInternalReceiverThunk = createAppAsyncThunk(
-    "transfer/add-internal-receiver",
-    async (data: { receiverAccountNumber: string; receiverNickname: string }) => {
-        const response = await fetch(`${apiUrl}/saved-receiver/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ ...data, bankId: 0 }),
-        });
-
-        if (!response.ok) {
-            const responseData = await response.json();
-            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
-        }
-    }
-);

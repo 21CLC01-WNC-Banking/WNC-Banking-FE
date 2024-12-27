@@ -14,30 +14,33 @@ import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IMaskInput } from "react-imask";
 
-import { Account } from "@/lib/types/customer";
-import data from "@/lib/mock_data/accounts.json";
 import { IconMessageDollar } from "@tabler/icons-react";
 
 import SelectPopover from "./SelectPopover";
 
 interface CreateModalProps {
-    target?: string;
+    targetAccountNumber?: string;
+    targetName?: string;
     isFromReceiversList: boolean;
 }
 
-const CreateRequestModal: React.FC<CreateModalProps> = ({ target, isFromReceiversList }) => {
+const CreateRequestModal: React.FC<CreateModalProps> = ({
+    targetAccountNumber,
+    targetName,
+    isFromReceiversList,
+}) => {
     const [opened, { open, close }] = useDisclosure(false);
 
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            target: target || "",
+            targetAccountNumber: targetAccountNumber || "",
             amount: 0,
             message: "Nhắc ĐỐI TƯỢNG trả nợ ngày DD/MM/YYYY",
         },
         validate: {
-            target: (value) =>
+            targetAccountNumber: (value) =>
                 value.length < 1
                     ? "Vui lòng nhập số tài khoản người nhận"
                     : /[0-9\s]{14}/.test(value)
@@ -48,7 +51,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({ target, isFromReceiver
         },
         transformValues: (values) => ({
             ...values,
-            target: values.target.split(" ").join(""),
+            target: values.targetAccountNumber.split(" ").join(""),
             message: values.message.trim(),
         }),
     });

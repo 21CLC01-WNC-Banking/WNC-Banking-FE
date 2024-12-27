@@ -9,7 +9,7 @@ const targets = data.filter((receiver: Account) => receiver.bank === "WNC Bank")
 
 interface SelectPopoverProps {
     form: UseFormReturnType<{
-        target: string;
+        targetAccountNumber: string;
         amount: number;
         message: string;
     }>;

@@ -22,7 +22,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
-import { addInternalReceiverThunk } from "@/lib/thunks/customer/TransferThunks";
+import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
 
 interface CompletionScreenProps {
     handleNextStep?: () => void;
@@ -60,11 +60,18 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
 
     const handleSubmit = async (values: typeof form.values) => {
         if (displayNickname) {
+            const name =
+                values.nickname.trim().length > 0
+                    ? values.nickname.trim()
+                    : transfer
+                    ? transfer.receiverName
+                    : "<chưa có tên gợi nhớ>";
+
             try {
                 await dispatch(
                     addInternalReceiverThunk({
                         receiverAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
-                        receiverNickname: values.nickname,
+                        receiverNickname: name,
                     })
                 ).unwrap();
 

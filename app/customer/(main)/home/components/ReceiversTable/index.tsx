@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "nextjs-toploader/app";
+
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { ReceiverAccount } from "@/lib/types/customer";
+import { formatAccountNumber } from "@/lib/utils/customer";
 
 import {
     ActionIcon,
-    Button,
     Center,
     Group,
     keys,
+    rem,
     ScrollArea,
     Stack,
     Table,
@@ -17,21 +22,22 @@ import {
     Tooltip,
     UnstyledButton,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
     IconChevronDown,
     IconChevronUp,
     IconSearch,
     IconSelector,
     IconCreditCardPay,
+    IconX,
 } from "@tabler/icons-react";
 
-import classes from "./ReceiversTable.module.css";
-
-import accounts from "@/lib/mock_data/accounts.json";
-import { ReceiverAccount } from "@/lib/types/customer";
 import DeleteReceiverModal from "./DeleteReceiverModal";
 import EditReceiverModal from "./EditReceiverModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
+
+import classes from "./ReceiversTable.module.css";
+import Loading from "@/components/Loading";
 
 interface SortableTableHeaderProps {
     children: React.ReactNode;
@@ -68,7 +74,9 @@ const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
 const filterData = (data: ReceiverAccount[], search: string) => {
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
-        keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
+        keys(data[0]).some(
+            (key) => typeof item[key] === "string" && item[key].toLowerCase().includes(query)
+        )
     );
 };
 
@@ -85,22 +93,23 @@ const sortData = (
     return filterData(
         [...data].sort((a, b) => {
             if (payload.reversed) {
-                return b[sortBy].localeCompare(a[sortBy]);
+                return String(b[sortBy]).localeCompare(String(a[sortBy]));
             }
 
-            return a[sortBy].localeCompare(b[sortBy]);
+            return String(a[sortBy]).localeCompare(String(b[sortBy]));
         }),
         payload.search
     );
 };
 
-const data = accounts;
-
 const ReceiversTable = () => {
     const router = useRouter();
+    const dispatch = useAppDispatch();
+
+    const receivers = useAppSelector((state) => state.receivers.receivers);
 
     const [search, setSearch] = useState("");
-    const [sortedData, setSortedData] = useState(data);
+    const [sortedData, setSortedData] = useState<ReceiverAccount[]>([]);
     const [sortBy, setSortBy] = useState<keyof ReceiverAccount | null>(null);
     const [reverseSortDirection, setReverseSortDirection] = useState(false);
 
@@ -108,40 +117,49 @@ const ReceiversTable = () => {
         const reversed = field === sortBy ? !reverseSortDirection : false;
         setReverseSortDirection(reversed);
         setSortBy(field);
-        setSortedData(sortData(data, { sortBy: field, reversed, search }));
+        setSortedData(sortData(receivers, { sortBy: field, reversed, search }));
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
-        setSortedData(sortData(data, { sortBy, reversed: reverseSortDirection, search: value }));
+        setSortedData(
+            sortData(receivers, { sortBy, reversed: reverseSortDirection, search: value })
+        );
     };
 
     const handleTransferAction = (row: ReceiverAccount) => {
-        if (row.bank === "WNC Bank") {
-            router.push(`/customer/transfer/internal?to=${row.accountNumber.trim()}`);
-        } else {
-            router.push(
-                `/customer/transfer/external?to=${row.accountNumber}&at=${row.bank.trim()}`
-            );
-        }
+        // if (row.bank === "WNC Bank") {
+        //     router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
+        // } else {
+        //     router.push(
+        //         `/customer/transfer/external?to=${row.receiverAccountNumber}&at=${row.bank.trim()}`
+        //     );
+        // }
+
+        router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
     };
 
     const rows = sortedData.map((row) => (
-        <Table.Tr key={row.name.trim()}>
-            <Table.Td>{row.nickname.trim()}</Table.Td>
-            <Table.Td>{row.name.trim()}</Table.Td>
-            <Table.Td>{row.bank.trim()}</Table.Td>
-            <Table.Td>{row.accountNumber.replace(/(\d{4})/g, "$1 ").trim()}</Table.Td>
+        <Table.Tr key={row.receiverAccountNumber.trim()}>
+            <Table.Td pl="md">{row.receiverNickname.trim()}</Table.Td>
+            {/* <Table.Td>{row.bank.trim()}</Table.Td> */}
+            <Table.Td pl="md">{formatAccountNumber(row.receiverAccountNumber)}</Table.Td>
 
             <Table.Td>
                 <Group gap="md" justify="flex-end">
-                    {row.bank === "WNC Bank" && (
+                    {/* {row.bank === "WNC Bank" && (
                         <CreateRequestModal
-                            target={row.accountNumber.replace(/(\d{4})/g, "$1 ").trim()}
+                            target={formatAccountNumber(row.receiverAccountNumber)}
                             isFromReceiversList={true}
                         />
-                    )}
+                    )} */}
+
+                    <CreateRequestModal
+                        targetAccountNumber={formatAccountNumber(row.receiverAccountNumber)}
+                        targetName={row.receiverNickname}
+                        isFromReceiversList={true}
+                    />
 
                     <Tooltip label="Chuyển khoản">
                         <ActionIcon
@@ -153,60 +171,71 @@ const ReceiversTable = () => {
                         </ActionIcon>
                     </Tooltip>
 
-                    <EditReceiverModal />
+                    <EditReceiverModal receiverId={row.id} />
 
-                    <DeleteReceiverModal />
+                    <DeleteReceiverModal receiverId={row.id} />
                 </Group>
             </Table.Td>
         </Table.Tr>
     ));
 
+    useEffect(() => {
+        const fetchReceivers = async () => {
+            try {
+                await dispatch(getReceiversThunk()).unwrap();
+            } catch (error) {
+                notifications.show({
+                    withBorder: true,
+                    radius: "md",
+                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                    color: "red",
+                    title: "Truy vấn danh sách người nhận thất bại",
+                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                    position: "bottom-right",
+                });
+            }
+        };
+
+        fetchReceivers();
+    }, [dispatch]);
+
+    useEffect(() => {
+        console.log("Receivers updated:", receivers); // Debug log
+        setSortedData(receivers);
+    }, [receivers]);
+
     return (
         <Stack>
-            <Group mb="md" grow justify="space-between" align="center">
-                <TextInput
-                    placeholder="Tìm kiếm"
-                    radius="md"
-                    size="md"
-                    leftSection={<IconSearch size={20} />}
-                    value={search}
-                    onChange={handleSearchChange}
-                />
-
-                <Button size="md" radius="md" maw={200}>
-                    Thêm người nhận
-                </Button>
-            </Group>
+            <TextInput
+                placeholder="Tìm kiếm"
+                radius="md"
+                size="md"
+                leftSection={<IconSearch size={20} />}
+                value={search}
+                onChange={handleSearchChange}
+            />
 
             <ScrollArea h={450}>
                 <Table horizontalSpacing="sm" verticalSpacing="xs" layout="auto" highlightOnHover>
                     <Table.Tbody>
                         <Table.Tr>
                             <SortableTableHeader
-                                sorted={sortBy === "nickname"}
+                                sorted={sortBy === "receiverNickname"}
                                 reversed={reverseSortDirection}
-                                onSort={() => setSorting("nickname")}
+                                onSort={() => setSorting("receiverNickname")}
                             >
                                 Tên gợi nhớ
                             </SortableTableHeader>
 
-                            <SortableTableHeader
-                                sorted={sortBy === "name"}
-                                reversed={reverseSortDirection}
-                                onSort={() => setSorting("name")}
-                            >
-                                Người nhận
-                            </SortableTableHeader>
-
-                            <SortableTableHeader
+                            {/* <SortableTableHeader
                                 sorted={sortBy === "bank"}
                                 reversed={reverseSortDirection}
                                 onSort={() => setSorting("bank")}
                             >
                                 Ngân hàng
-                            </SortableTableHeader>
+                            </SortableTableHeader> */}
 
-                            <Table.Th style={{ fontWeight: 600 }} className={classes.th}>
+                            <Table.Th style={{ fontWeight: 600 }} className={classes.th} pl="md">
                                 Số tài khoản
                             </Table.Th>
 
@@ -219,7 +248,7 @@ const ReceiversTable = () => {
                             rows
                         ) : (
                             <Table.Tr>
-                                <Table.Td colSpan={Object.keys(data[0]).length}>
+                                <Table.Td colSpan={3}>
                                     <Text fw={500} ta="center">
                                         Không tìm thấy người nhận
                                     </Text>

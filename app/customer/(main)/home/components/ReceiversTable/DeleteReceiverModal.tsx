@@ -1,13 +1,49 @@
-import { Modal, Tooltip, ActionIcon, Button, Group } from "@mantine/core";
+"use client";
+
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { deleteReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+
+import { Modal, Tooltip, ActionIcon, Button, Group, rem } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
-import { IconTrash } from "@tabler/icons-react";
+import { IconTrash, IconX, IconCheck } from "@tabler/icons-react";
 
 interface DeleteModalProps {
-    handleDelete?: () => void;
+    receiverId: number;
 }
 
-const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ handleDelete }) => {
+const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ receiverId }) => {
+    const dispatch = useAppDispatch();
     const [opened, { open, close }] = useDisclosure(false);
+
+    const handleDelete = async () => {
+        try {
+            await dispatch(deleteReceiverThunk({ id: receiverId })).unwrap();
+            await dispatch(getReceiversThunk()).unwrap();
+
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
+                color: "teal",
+                title: "Xóa người nhận thành công",
+                message: "Bạn có thể kiểm tra lại danh sách người nhận đã lưu tại Trang chủ.",
+                position: "bottom-right",
+            });
+        } catch (error) {
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                color: "red",
+                title: "Xóa người nhận thất bại",
+                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
+        }
+
+        close();
+    };
 
     return (
         <>
@@ -36,7 +72,7 @@ const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ handleDelete }) => {
                         Quay lại
                     </Button>
 
-                    <Button onClick={close} variant="filled" color="red">
+                    <Button onClick={handleDelete} variant="filled" color="red">
                         Xóa
                     </Button>
                 </Group>

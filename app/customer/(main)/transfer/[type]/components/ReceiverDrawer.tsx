@@ -53,18 +53,18 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
     const accountList = filtered.map((account) => (
         <ClickableCard
             key={account.name}
-            title={account.nickname}
+            title={account.receiverNickname}
             subtitle={
                 type === "internal"
-                    ? [account.name, account.accountNumber]
-                    : [account.name, account.bank, account.accountNumber]
+                    ? [account.name, account.receiverAccountNumber]
+                    : [account.name, account.bank, account.receiverAccountNumber]
             }
             onClick={() => {
                 form.setFieldValue(
                     "receiverAccount",
-                    account.accountNumber.replace(/(\d{4})/g, "$1 ").trim()
+                    account.receiverAccountNumber.replace(/(\d{4})/g, "$1 ").trim()
                 );
-                onSelectReceiver(account.accountNumber.replace(/(\d{4})/g, "$1 ").trim());
+                onSelectReceiver(account.receiverAccountNumber.replace(/(\d{4})/g, "$1 ").trim());
                 close();
             }}
         />

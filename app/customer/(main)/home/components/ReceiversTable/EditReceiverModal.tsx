@@ -1,13 +1,18 @@
-import { Modal, Tooltip, ActionIcon, Button, Group, TextInput } from "@mantine/core";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { renameReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+
+import { Modal, Tooltip, ActionIcon, Button, Group, TextInput, rem } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { IconPencil } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+import { IconPencil, IconX, IconCheck } from "@tabler/icons-react";
 
 interface EditModalProps {
-    handleEdit?: () => void;
+    receiverId: number;
 }
 
-const EditReceiverModal: React.FC<EditModalProps> = ({ handleEdit }) => {
+const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId }) => {
+    const dispatch = useAppDispatch();
     const [opened, { open, close }] = useDisclosure(false);
 
     const form = useForm({
@@ -20,9 +25,37 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ handleEdit }) => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            await dispatch(
+                renameReceiverThunk({ id: receiverId, newNickname: values.nickname })
+            ).unwrap();
+
+            await dispatch(getReceiversThunk()).unwrap();
+
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
+                color: "teal",
+                title: "Chỉnh sửa thông tin người nhận thành công",
+                message: "Bạn có thể kiểm tra lại danh sách người nhận đã lưu tại Trang chủ.",
+                position: "bottom-right",
+            });
+        } catch (error) {
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                color: "red",
+                title: "Chỉnh sửa thông tin người nhận thất bại",
+                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
+        }
+
         close();
+
         form.reset();
     };
 
