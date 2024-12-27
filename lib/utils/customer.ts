@@ -1,3 +1,5 @@
+import { Transfer, TransferRequest } from "../types/customer";
+
 // helper function to chunk data into pages
 export function chunk<T>(array: T[], size: number): T[][] {
     if (!array.length) {
@@ -37,4 +39,15 @@ export const formatDateString = (dateString: string) => {
 // helper function to format account number
 export function formatAccountNumber(accountNumber: string): string {
     return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+export function formatTransferRequest(transfer: Transfer | null): TransferRequest {
+    return {
+        amount: transfer?.amount || 0,
+        description: transfer?.message || "",
+        isSourceFee: transfer?.senderHandlesFee || false,
+        sourceAccountNumber: transfer?.senderAccount.split(" ").join("") || "",
+        targetAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
+        type: "internal",
+    };
 }

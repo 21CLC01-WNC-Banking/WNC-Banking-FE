@@ -2,18 +2,20 @@
 
 import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
 import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
+import { internalTransferThunk } from "@/lib/thunks/customer/TransferThunks";
 
-import { Button, Center, Text, Title, Stack, PinInput, Fieldset } from "@mantine/core";
+import { Button, Center, Text, Title, Stack, PinInput, Fieldset, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { IconX } from "@tabler/icons-react";
 
 interface OtpFormProps {
-    handleNextStep?: () => void;
+    handleNextStep: () => void;
 }
 
 const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
     const dispatch = useAppDispatch();
-
-    const transfer = useAppSelector((state) => state.transfer.currentTransfer);
+    const transferId = useAppSelector((state) => state.transfer.currentTransferId);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -30,17 +32,26 @@ const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        // send the otp and await response
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            await dispatch(
+                internalTransferThunk({
+                    transactionId: transferId ? transferId : "",
+                    otp: values.otp,
+                })
+            ).unwrap();
 
-        // if good, call the transfer API
-        console.log(transfer);
-
-        // finally, reset the transfer state
-        dispatch(resetTransfer());
-
-        if (handleNextStep) {
             handleNextStep();
+        } catch (error) {
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                color: "red",
+                title: "Gửi mã OTP thất bại",
+                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
         }
     };
 

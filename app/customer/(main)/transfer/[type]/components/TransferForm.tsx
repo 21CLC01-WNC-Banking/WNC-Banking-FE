@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
-import { getAccountThunk } from "@/lib/thunks/AuthThunks";
+import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
 import { formatAccountNumber, formatCurrency } from "@/lib/utils/customer";
 
 import {
@@ -34,6 +34,7 @@ import { IconX } from "@tabler/icons-react";
 
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
+import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
 
 const fetchReceiverName = async (accNum: string) => {
     const deformatted = accNum.split(" ").join("");
@@ -73,7 +74,7 @@ const fetchReceiverName = async (accNum: string) => {
 };
 
 interface TransferFormProps {
-    handleNextStep?: () => void;
+    handleNextStep: () => void;
     type: string;
 }
 
@@ -82,13 +83,13 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     const searchParams = useSearchParams();
 
     const [opened, { open, close }] = useDisclosure(false);
+    const [loading, { toggle }] = useDisclosure(false);
 
     const [selectedBank, setSelectedBank] = useState(
         type === "internal" ? "WNC Bank" : searchParams.get("at") || ""
     );
 
     const [receiverName, setReceiverName] = useState("");
-    const [showBalance, setShowBalance] = useState(false);
 
     const handlersRef = useRef<NumberInputHandlers>(null);
 
@@ -125,19 +126,44 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
     const [messageLength, setMessageLength] = useState(form.getValues().message.length);
 
-    const toggleConfirmModal = () => {
+    const estimateTransferFee = async (amount: number) => {
+        try {
+            const fee = await dispatch(transferFeeThunk({ amount: amount })).unwrap();
+
+            return fee;
+        } catch (error) {
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                color: "red",
+                title: "Tính phí giao dịch thất bại",
+                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
+        }
+    };
+
+    const toggleConfirmModal = async () => {
         const validatedForm = form.validate();
 
-        console.log(form.errors);
-
         if (!validatedForm.hasErrors) {
+            // toggle the loading state for the confirm button
+            toggle();
+
+            const fee = await estimateTransferFee(form.getValues().amount);
+
             const newTransfer = {
                 amount: form.getValues().amount,
                 message: form.getValues().message,
                 receiverAccount: form.getValues().receiverAccount,
+                receiverName: receiverName,
                 receiverBank: type === "internal" ? "WNC Bank" : selectedBank,
-                senderAccount: "Mặc định",
+                senderAccount:
+                    formatAccountNumber(userAccount ? userAccount.accountNumber : "") || "-",
+                senderName: userAccount?.name || "-",
                 senderHandlesFee: !form.getValues().receiverHandlesFee,
+                transferFee: fee || 0,
             };
 
             dispatch(setCurrentTransfer(newTransfer));
@@ -147,8 +173,6 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     };
 
     const handleSelectReceiver = async (account: string) => {
-        console.log("touched");
-
         const name = await fetchReceiverName(account);
 
         if (name && name.length > 0) {
@@ -199,9 +223,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
                 <form
                     onSubmit={form.onSubmit(() => {
-                        if (handleNextStep) {
-                            handleNextStep();
-                        }
+                        form.reset();
                     })}
                 >
                     <Group grow gap="xl">
@@ -221,21 +243,13 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     userAccount ? userAccount.accountNumber : ""
                                 )} (mặc định)`,
                             ]}
-                            onChange={() => {
-                                form.setFieldValue("message", `${userAccount?.name} chuyển tiền`);
-                                setShowBalance(true);
-                            }}
                         />
 
                         <TextInput
                             size="md"
                             radius="md"
                             label="Số dư tài khoản"
-                            value={
-                                showBalance
-                                    ? formatCurrency(userAccount?.balance || 0)
-                                    : formatCurrency(0)
-                            }
+                            value={formatCurrency(userAccount?.balance || 0)}
                             styles={{
                                 input: {
                                     color: "var(--mantine-color-blue-filled)",
@@ -279,6 +293,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     ? "Để xem danh sách người nhận không thuộc ngân hàng đã chọn, hãy chọn ngân hàng khác ở danh sách bên trên"
                                     : ""
                             }
+                            error={form.errors.receiverAccount}
                             withAsterisk
                         >
                             <Input
@@ -288,7 +303,6 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 mask="0000 0000 0000"
                                 placeholder="XXXX XXXX XXXX"
                                 rightSectionPointerEvents="all"
-                                error={form.errors.receiverAccount}
                                 key={form.key("receiverAccount")}
                                 {...form.getInputProps("receiverAccount")}
                                 disabled={type === "external" && selectedBank === ""}
@@ -350,7 +364,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 size="md"
                                 radius="md"
                                 onClick={() => handlersRef.current?.decrement()}
-                                variant="default"
+                                variant="outline"
                             >
                                 - 10.000 ₫
                             </Button>
@@ -359,7 +373,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 size="md"
                                 radius="md"
                                 onClick={() => handlersRef.current?.increment()}
-                                variant="default"
+                                variant="outline"
                             >
                                 + 10.000 ₫
                             </Button>
@@ -395,13 +409,24 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                     {/*Invisible button for form submission*/}
                     <UnstyledButton type="submit" id="submit-form"></UnstyledButton>
 
-                    <Button fullWidth onClick={toggleConfirmModal} mt="lg" radius="md">
+                    <Button
+                        fullWidth
+                        loading={loading}
+                        onClick={toggleConfirmModal}
+                        mt="lg"
+                        radius="md"
+                    >
                         Tiếp tục
                     </Button>
                 </form>
             </Fieldset>
 
-            <TransferInfoModal isOpen={opened} onClose={close} />
+            <TransferInfoModal
+                isOpen={opened}
+                onClose={close}
+                handleNextStep={handleNextStep}
+                confirmToggle={toggle}
+            />
         </>
     );
 };

@@ -2,9 +2,21 @@ export interface Transfer {
     amount: number;
     message: string;
     receiverAccount: string;
+    receiverName: string;
     receiverBank: string;
     senderAccount: string;
+    senderName: string;
+    transferFee: number;
     senderHandlesFee: boolean;
+}
+
+export interface TransferRequest {
+    amount: number;
+    description: string;
+    isSourceFee: boolean;
+    sourceAccountNumber: string;
+    targetAccountNumber: string;
+    type: string;
 }
 
 export interface UserAccount {

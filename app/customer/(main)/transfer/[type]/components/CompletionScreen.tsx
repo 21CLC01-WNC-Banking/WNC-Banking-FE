@@ -3,10 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 
-import { Button, Center, Title, Checkbox, Group, TextInput, rem, Fieldset } from "@mantine/core";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { formatCurrency } from "@/lib/utils/customer";
+
+import {
+    Button,
+    Center,
+    Title,
+    Checkbox,
+    Group,
+    TextInput,
+    rem,
+    Fieldset,
+    Stack,
+    Text,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
+import { addInternalReceiverThunk } from "@/lib/thunks/customer/TransferThunks";
 
 interface CompletionScreenProps {
     handleNextStep?: () => void;
@@ -15,7 +31,24 @@ interface CompletionScreenProps {
 const CompletionScreen: React.FC<CompletionScreenProps> = () => {
     const router = useRouter();
 
+    const dispatch = useAppDispatch();
+    const transfer = useAppSelector((state) => state.transfer.currentTransfer);
+
     const [displayNickname, setDisplayNickname] = useState(false);
+
+    const content = [
+        { label: "Tài khoản nguồn", value: [transfer?.senderAccount, transfer?.senderName] },
+        { label: "Nguời nhận", value: [transfer?.receiverAccount, transfer?.receiverName] },
+        { label: "Số tiền", value: [formatCurrency(transfer ? transfer.amount : 0)] },
+        { label: "Diễn giải", value: [transfer?.message] },
+        {
+            label: "Phí giao dịch",
+            value: [
+                formatCurrency(transfer ? transfer.transferFee : 0),
+                transfer?.senderHandlesFee ? "" : "(người nhận trả phí)",
+            ],
+        },
+    ];
 
     const form = useForm({
         mode: "uncontrolled",
@@ -25,23 +58,53 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
+    const handleSubmit = async (values: typeof form.values) => {
         if (displayNickname) {
-            // send the nickname to be set by the server and await response
+            try {
+                await dispatch(
+                    addInternalReceiverThunk({
+                        receiverAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
+                        receiverNickname: values.nickname,
+                    })
+                ).unwrap();
 
-            // if good, pop this notification
+                notifications.show({
+                    withBorder: true,
+                    radius: "md",
+                    icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
+                    color: "teal",
+                    title: "Lưu người nhận thành công",
+                    message: "Bạn có thể kiểm tra lại thông tin người nhận tại Trang chủ.",
+                    position: "bottom-right",
+                });
+
+                dispatch(resetTransfer());
+                router.push("/customer/home");
+            } catch (error) {
+                notifications.show({
+                    withBorder: true,
+                    radius: "md",
+                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
+                    color: "red",
+                    title: "Lưu người nhận thất bại",
+                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                    position: "bottom-right",
+                });
+            }
+        } else {
             notifications.show({
                 withBorder: true,
                 radius: "md",
                 icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
                 color: "teal",
-                title: "Lưu người nhận thành công",
-                message: "Bạn có thể kiểm tra lại thông tin người nhận tại Trang chủ.",
+                title: "Chuyển khoản hoàn tất",
+                message: "Bạn có thể kiểm tra lại thông tin giao dịch tại Trang chủ.",
                 position: "bottom-right",
             });
-        }
 
-        router.push("/customer/home");
+            dispatch(resetTransfer());
+            router.push("/customer/home");
+        }
     };
 
     return (
@@ -49,6 +112,38 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
             <Center>
                 <Title order={2}>Chuyển khoản thành công</Title>
             </Center>
+
+            <Stack my={20} gap="md">
+                {content.map((item) => (
+                    <Group
+                        key={item.label}
+                        grow
+                        preventGrowOverflow={false}
+                        justify="between"
+                        align="flex-start"
+                    >
+                        <Text variant="text">{item.label}</Text>
+
+                        <Stack gap={0}>
+                            {" "}
+                            {item.value.map((value, index) => (
+                                <Text key={index} ta="right" fw={700}>
+                                    {value}
+                                </Text>
+                            ))}
+                        </Stack>
+                    </Group>
+                ))}
+
+                <Group grow preventGrowOverflow={false} justify="between" align="flex-start">
+                    <Text fw={600}>Tổng số tiền</Text>
+                    <Text ta="right" fw={700} fz="h3" c="blue">
+                        {transfer?.senderHandlesFee
+                            ? formatCurrency(transfer ? transfer.amount + transfer.transferFee : 0)
+                            : formatCurrency(transfer ? transfer.amount : 0)}
+                    </Text>
+                </Group>
+            </Stack>
 
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Group grow gap="xl" my="xl">
