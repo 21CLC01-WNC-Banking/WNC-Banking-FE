@@ -39,6 +39,6 @@ export interface Transaction {
     amount: number;
     receiver_account_number: string;
     transactionType: string;
-    balance: string;
+    balance: number;
     message: string;
 }

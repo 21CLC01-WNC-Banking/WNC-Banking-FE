@@ -1,5 +1,6 @@
 import { Transaction } from "@/lib/types/staff";
 import { Title, Text, Container, Flex, Center } from "@mantine/core";
+import { formatDateString } from "@/lib/utils/customer";
 
 interface TransactionDetailProps {
     transaction: Transaction | null;
@@ -23,7 +24,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) =>
             <Flex direction="column">
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Ngày thực hiện</Text>
-                    <Text fw={700}>{transaction.createdAt}</Text>
+                    <Text fw={700}>{formatDateString(transaction.createdAt)}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
@@ -33,12 +34,12 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) =>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Số tiền</Text>
-                    <Text fw={700}>{transaction.amount}</Text>
+                    <Text fw={700}>{`${transaction.amount.toLocaleString("vi-VN")} đồng`}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Từ</Text>
-                    <Text fw={700}>{transaction.sender_account_number}</Text>
+                    <Text fw={700}>{transaction.sender_account_number ? transaction.sender_account_number : "Cổng nhân viên"}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
