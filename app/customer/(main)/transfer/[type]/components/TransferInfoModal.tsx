@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/lib/hooks/withTypes";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils/customer";
 
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 

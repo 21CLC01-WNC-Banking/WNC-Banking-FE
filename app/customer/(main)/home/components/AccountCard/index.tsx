@@ -9,7 +9,7 @@ import classes from "./AccountCard.module.css";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { getAccountThunk } from "@/lib/thunks/AuthThunks";
-import { formatCurrency, formatAccountNumber } from "@/lib/utils";
+import { formatCurrency, formatAccountNumber } from "@/lib/utils/customer";
 
 const AccountCard = () => {
     const dispatch = useAppDispatch();

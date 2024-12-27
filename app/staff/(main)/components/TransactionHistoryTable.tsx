@@ -18,8 +18,8 @@ import { Transaction } from "@/lib/types/staff";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
 import classes from "./AccountCard.module.css";
-import { formatDateTime } from "../../lib/utils";
-import { chunk } from "../../lib/utils";
+import { formatDateTime } from "../../../../lib/utils/staff";
+import { chunk } from "../../../../lib/utils/staff";
 
 
 const TransactionHistoryTable: React.FC = () => {

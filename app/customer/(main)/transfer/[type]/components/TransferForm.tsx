@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
 import { getAccountThunk } from "@/lib/thunks/AuthThunks";
-import { formatAccountNumber, formatCurrency } from "@/lib/utils";
+import { formatAccountNumber, formatCurrency } from "@/lib/utils/customer";
 
 import {
     Button,
