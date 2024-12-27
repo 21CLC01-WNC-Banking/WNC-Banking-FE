@@ -60,19 +60,20 @@ const TransactionHistoryTable: React.FC = () => {
                 }
             );
             if (response.ok) {
+                setError("");
                 const data = await response.json();
+                console.log(data.data.customerName);
                 setAccountInfo([
-                    { title: "Chủ tài khoản", stats: `${data.data[0].customerName}` },
+                    { title: "Chủ tài khoản", stats: data.data.customerName },
                     { title: "Số tài khoản", stats: values.accountNumber },
-                    { title: "Tổng số giao dịch", stats: `${data.data.length}` },
+                    { title: "Tổng số giao dịch", stats: `${data.data.transactions.length}` },
                 ]);
                 setTransactions(
-                    data.data.map((transaction: any) => ({
+                    data.data.transactions.map((transaction: any) => ({
                         ...transaction,
                         transactionType: transaction.type === "payment" ? "Thanh toán" : transaction.amount < 0 ? "Chuyển khoản" : "Nhận tiền"
                     }))
                 );
-                setError("");
             } else {
                 setError("Số tài khoản không tồn tại!");
                 setTransactions([]);
