@@ -195,7 +195,6 @@ const ReceiversTable = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        console.log("Receivers updated:", receivers); // Debug log
         setSortedData(receivers);
     }, [receivers]);
 
@@ -239,14 +238,18 @@ const ReceiversTable = () => {
                     </Table.Tbody>
 
                     <Table.Tbody>
-                        {rows.length > 0 ? (
+                        {receivers.length === 0 ? (
+                            <Table.Tr>
+                                <Table.Td colSpan={3}>
+                                    <Text ta="center">Bạn chưa lưu người nhận nào</Text>
+                                </Table.Td>
+                            </Table.Tr>
+                        ) : rows.length > 0 ? (
                             rows
                         ) : (
                             <Table.Tr>
                                 <Table.Td colSpan={3}>
-                                    <Text fw={500} ta="center">
-                                        Không tìm thấy người nhận
-                                    </Text>
+                                    <Text ta="center">Không tìm thấy người nhận</Text>
                                 </Table.Td>
                             </Table.Tr>
                         )}
