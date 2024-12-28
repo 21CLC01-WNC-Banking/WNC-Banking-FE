@@ -1,8 +1,16 @@
-import { Modal, Tooltip, ActionIcon, Button, Group } from "@mantine/core";
+import { Modal, Tooltip, ActionIcon, Group, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 
-const InfoModal = () => {
+interface InfoModalProps {
+    title: string;
+    content: {
+        label: string;
+        value: string;
+    }[];
+}
+
+const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
@@ -10,7 +18,7 @@ const InfoModal = () => {
             <Modal
                 opened={opened}
                 onClose={close}
-                title="Chi tiết nhắc nợ"
+                title={title}
                 radius="md"
                 centered
                 styles={{
@@ -26,12 +34,17 @@ const InfoModal = () => {
                     },
                 }}
             >
-                Not yet
-                <Group mt="lg" justify="flex-end">
-                    <Button onClick={close} variant="default">
-                        Quay lại
-                    </Button>
-                </Group>
+                <Stack my={20} gap="md">
+                    {content.map((item) => (
+                        <Group key={item.label} grow justify="between" align="flex-start">
+                            <Text variant="text">{item.label}</Text>
+
+                            <Text ta="right" fw={700}>
+                                {item.value}
+                            </Text>
+                        </Group>
+                    ))}
+                </Stack>
             </Modal>
 
             <Tooltip label="Chi tiết">
