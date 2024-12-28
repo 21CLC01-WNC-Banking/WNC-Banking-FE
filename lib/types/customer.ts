@@ -32,31 +32,43 @@ export interface ReceiverAccount {
     bank: string;
 }
 
-export interface Transaction {
-    dateTime: string;
-    accountType: string;
-    amount: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-    balance: string;
-}
-
 export interface PaymentRequest {
-    requestor?: string;
-    target?: string;
-    amount: string;
-    message: string;
-    requestTime: string;
-    resolveTime?: string;
-    status: "Đã thanh toán" | "Chưa thanh toán" | "Đã hủy";
+    receiver: string; // receiver name
+    sender: string; // sender name
+    debtReminder: {
+        id: string;
+        type: string;
+        createdAt: string;
+        updatedAt: string;
+        deletedAt: string;
+        bankId: number;
+        amount: number;
+        description: string;
+        status: string;
+        isSourceFee: boolean;
+        sourceAccountNumber: string;
+        sourceBalance: number;
+        targetAccountNumber: string;
+        targetBalance: number;
+    };
+    reply: {
+        id: number;
+        content: string;
+        createdAt: string;
+        updatedAt: string;
+        deletedAt: string;
+        debtReminderId: string;
+        userReplyName: string;
+    };
 }
 
 export interface Transaction {
-    id: number;
-    dateTime: string;
-    sender_account_number: string;
-    amount: string;
-    receiver_account_number: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-    balance: string;
-    message: string;
+    id: string;
+    amount: number;
+    balance: number;
+    createdAt: string;
+    description: string;
+    sourceAccountNumber: string;
+    targetAccountNumber: string;
+    type: string;
 }

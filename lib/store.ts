@@ -8,6 +8,7 @@ import { transferReducer } from "./slices/customer/TransferSlice";
 import { receiversReducer } from "./slices/customer/ReceiversSlice";
 import { authReducer } from "./slices/AuthSlice";
 import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
+import { transactionsReducer } from "./slices/customer/TransactionsSlice";
 
 const authPersistConfig = {
     key: "auth",
@@ -26,6 +27,7 @@ export const makeStore = () => {
             transfer: transferReducer,
             receivers: receiversReducer,
             forgotPassword: forgotPasswordReducer,
+            transactions: transactionsReducer,
 
             // staff
         },

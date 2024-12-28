@@ -6,8 +6,8 @@ import { IconCheck, IconX } from "@tabler/icons-react";
 
 import { Transfer, TransferRequest } from "../types/customer";
 
-// helper function to chunk data into pages
-export function chunk<T>(array: T[], size: number): T[][] {
+// chunk data into pages for tables
+export const chunk = <T>(array: T[], size: number): T[][] => {
     if (!array.length) {
         return [];
     }
@@ -16,17 +16,17 @@ export function chunk<T>(array: T[], size: number): T[][] {
     const tail = array.slice(size);
 
     return [head, ...chunk(tail, size)];
-}
+};
 
-// helper function to format currency
-export function formatCurrency(amount: number): string {
+// format currency
+export const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
     }).format(amount);
-}
+};
 
-// helper function to format date
+// format date
 export const formatDateString = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -42,13 +42,13 @@ export const formatDateString = (dateString: string) => {
     return formattedDateTime;
 };
 
-// helper function to format account number
-export function formatAccountNumber(accountNumber: string): string {
+// format account number
+export const formatAccountNumber = (accountNumber: string): string => {
     return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
-}
+};
 
-// helper function to convert Transfer object to a valid backend request
-export function formatTransferRequest(transfer: Transfer | null): TransferRequest {
+// convert Transfer object to a valid backend request
+export const formatTransferRequest = (transfer: Transfer | null): TransferRequest => {
     return {
         amount: transfer?.amount || 0,
         description: transfer?.message || "",
@@ -57,10 +57,10 @@ export function formatTransferRequest(transfer: Transfer | null): TransferReques
         targetAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
         type: "internal",
     };
-}
+};
 
-// helper function to toast
-export function makeToast(type: "success" | "error", title: string, message: string) {
+// make toast
+export const makeToast = (type: "success" | "error", title: string, message: string) => {
     if (type === "success") {
         notifications.show({
             withBorder: true,
@@ -84,4 +84,32 @@ export function makeToast(type: "success" | "error", title: string, message: str
     }
 
     return null;
-}
+};
+
+// map transaction type from server
+export const mapTransactionType = (type: string) => {
+    switch (type) {
+        case "internal":
+            return "Chuyển khoản nội bộ";
+        case "external":
+            return "Chuyển khoản liên ngân hàng";
+        case "debt_payment":
+            return "Thanh toán nợ";
+        default:
+            return "Unknown";
+    }
+};
+
+// map payment request status from server
+export const mapRequestStatus = (type: string) => {
+    switch (type) {
+        case "pending":
+            return "Chưa thanh toán";
+        case "success":
+            return "Đã thanh toán";
+        case "failed":
+            return "Đã hủy";
+        default:
+            return "Unknown";
+    }
+};

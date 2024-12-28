@@ -2,31 +2,65 @@
 
 import { useState, useEffect } from "react";
 
-import { Table, Text, Pagination, Center, TextInput, Group, SegmentedControl } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-
 import { PaymentRequest } from "@/lib/types/customer";
-import { chunk } from "@/lib/utils/customer";
-import data from "@/lib/mock_data/requests_sent.json";
-import CancelModal from "./CancelModal";
-import InfoModal from "./InfoModal";
+import {
+    chunk,
+    formatDateString,
+    formatCurrency,
+    makeToast,
+    mapRequestStatus,
+} from "@/lib/utils/customer";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { getSentRequestsThunk } from "@/lib/thunks/customer/TransactionsThunk";
+
+import { Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
+
+import InfoModal from "@/components/InfoModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
+import CancelModal from "./CancelModal";
+
+const makeRequestInfoModalContent = (request: PaymentRequest) => {
+    return {
+        title: "Thông tin nhắc nợ",
+        content: [
+            { label: "Mã nhắc nợ", value: request.debtReminder.id },
+            { label: "Thời gian", value: formatDateString(request.debtReminder.createdAt) },
+            {
+                label: "Người nợ",
+                value: request.receiver,
+            },
+            { label: "Số tiền nợ", value: formatCurrency(request.debtReminder.amount) },
+            { label: "Nội dung", value: request.debtReminder.description },
+            { label: "Trạng thái", value: mapRequestStatus(request.debtReminder.status) },
+        ],
+    };
+};
 
 const SentRequests: React.FC = () => {
-    const requests: PaymentRequest[] = data.map((request) => ({
-        ...request,
-        status: request.status as "Đã thanh toán" | "Chưa thanh toán" | "Đã hủy",
-    }));
+    const dispatch = useAppDispatch();
+    const requests = useAppSelector((state) => state.transactions.sentRequests);
 
-    const [requestStatusFilter, setRequestStatusFilter] = useState<string>("Tất cả");
+    const [requestStatusFilter, setRequestStatusFilter] = useState<string>("all");
     const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");
     const [activePage, setActivePage] = useState<number>(1);
+
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                await dispatch(getSentRequestsThunk()).unwrap();
+            } catch (error) {
+                makeToast("error", "Truy vấn danh sách nhắc nợ thất bại", (error as Error).message);
+            }
+        };
+
+        fetchRequests();
+    }, [dispatch]);
 
     // sort requests by time
     const sortByTime = (elements: PaymentRequest[], filter: string) => {
         return elements.sort((a, b) => {
-            const dateA = new Date(a.requestTime);
-            const dateB = new Date(b.requestTime);
+            const dateA = new Date(a.debtReminder.createdAt);
+            const dateB = new Date(b.debtReminder.createdAt);
             return filter === "Mới nhất"
                 ? dateB.getTime() - dateA.getTime()
                 : dateA.getTime() - dateB.getTime();
@@ -36,8 +70,8 @@ const SentRequests: React.FC = () => {
     // filter requests based on selected filters
     const filteredRequests = sortByTime(
         requests.filter((request) => {
-            if (requestStatusFilter === "Tất cả") return true;
-            return request.status === requestStatusFilter;
+            if (requestStatusFilter === "all") return true;
+            return request.debtReminder.status === requestStatusFilter;
         }),
         timeFilter
     );
@@ -63,22 +97,22 @@ const SentRequests: React.FC = () => {
         <Table.Tr
             key={index}
             bg={
-                request.status === "Đã hủy"
+                request.debtReminder.status === "pending"
                     ? "yellow.1"
-                    : request.status === "Đã thanh toán"
+                    : request.debtReminder.status === "success"
                     ? "green.1"
                     : "red.2"
             }
         >
-            <Table.Td>{request.requestTime}</Table.Td>
-            <Table.Td>{request.target}</Table.Td>
-            <Table.Td>{request.amount}</Table.Td>
-            <Table.Td>{request.status}</Table.Td>
+            <Table.Td>{request.debtReminder.createdAt}</Table.Td>
+            <Table.Td>{request.receiver}</Table.Td>
+            <Table.Td>{request.debtReminder.amount}</Table.Td>
+            <Table.Td>{request.debtReminder.status}</Table.Td>
             <Table.Td>
                 <Group gap="md" justify="flex-end">
-                    {request.status === "Chưa thanh toán" && <CancelModal />}
+                    {request.debtReminder.status === "pending" && <CancelModal />}
 
-                    <InfoModal />
+                    <InfoModal {...makeRequestInfoModalContent(request)} />
                 </Group>
             </Table.Td>
         </Table.Tr>
@@ -86,14 +120,7 @@ const SentRequests: React.FC = () => {
 
     return (
         <>
-            <Group mb="md" grow justify="space-between" align="center">
-                <TextInput
-                    placeholder="Tìm kiếm"
-                    radius="md"
-                    size="md"
-                    leftSection={<IconSearch size={20} />}
-                />
-
+            <Group mb="md" grow justify="flex-end" align="center">
                 <CreateRequestModal isFromReceiversList={false} />
             </Group>
 
@@ -103,6 +130,7 @@ const SentRequests: React.FC = () => {
                     <Text>Thời gian gửi nhắc nợ:</Text>
 
                     <SegmentedControl
+                        radius="md"
                         color="blue"
                         value={timeFilter}
                         onChange={setTimeFilter}
@@ -114,10 +142,16 @@ const SentRequests: React.FC = () => {
                     <Text>Trạng thái:</Text>
 
                     <SegmentedControl
+                        radius="md"
                         color="blue"
                         value={requestStatusFilter}
                         onChange={setRequestStatusFilter}
-                        data={["Tất cả", "Đã thanh toán", "Chưa thanh toán", "Đã hủy"]}
+                        data={[
+                            { label: "Tất cả", value: "all" },
+                            { label: "Đã thanh toán", value: "success" },
+                            { label: "Chưa thanh toán", value: "pending" },
+                            { label: "Đã hủy", value: "failed" },
+                        ]}
                     />
                 </Group>
             </Group>
@@ -130,9 +164,20 @@ const SentRequests: React.FC = () => {
                         <Table.Th>Đối tượng nợ</Table.Th>
                         <Table.Th>Số tiền nợ</Table.Th>
                         <Table.Th>Trạng thái</Table.Th>
+                        <Table.Th></Table.Th>
                     </Table.Tr>
                 </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
+                <Table.Tbody>
+                    {rows.length === 0 ? (
+                        <Table.Tr>
+                            <Table.Td colSpan={5}>
+                                <Text ta="center">Không có nhắc nợ nào</Text>
+                            </Table.Td>
+                        </Table.Tr>
+                    ) : (
+                        rows
+                    )}
+                </Table.Tbody>
             </Table>
 
             {/* Pagination */}
