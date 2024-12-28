@@ -111,7 +111,12 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                     : /[0-9\s]{14}/.test(value)
                     ? null
                     : "Số tài khoản người nhận không hợp lệ",
-            amount: (value) => (value < 10000 ? "Số tiền cần chuyển tối thiểu là 10.000 ₫" : null),
+            amount: (value) =>
+                value < 2000
+                    ? "Số tiền chuyển phải lớn hơn 2.000 ₫"
+                    : value > (userAccount?.balance ?? 0)
+                    ? "Số dư không đủ"
+                    : null,
             message: isNotEmpty("Vui lòng nhập nội dung chuyển khoản"),
         },
         transformValues: (values) => ({
