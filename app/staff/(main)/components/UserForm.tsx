@@ -26,7 +26,6 @@ const UserForm: React.FC = () => {
                 email: values.email,
                 name: values.name,
                 phoneNumber: values.phone,
-                password: "khongnhopassword",
             };
 
             const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {

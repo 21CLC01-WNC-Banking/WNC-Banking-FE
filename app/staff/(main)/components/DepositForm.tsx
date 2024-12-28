@@ -88,6 +88,7 @@ const DepositForm = () => {
                 body: JSON.stringify({
                     accountNumber: values.accountNumber,
                     amount: values.amount,
+                    description: values.message,
                 }),
             });
 

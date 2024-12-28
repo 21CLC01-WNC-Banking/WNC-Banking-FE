@@ -35,10 +35,10 @@ export interface PaymentRequest {
 export interface Transaction {
     id: number,
     createdAt: string;
-    sender_account_number: string;
+    sourceAccountNumber: string;
     amount: number;
-    receiver_account_number: string;
+    targetAccountNumber: string;
     transactionType: string;
     balance: number;
-    message: string;
+    description: string;
 }
