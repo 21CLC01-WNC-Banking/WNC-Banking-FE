@@ -1,11 +1,9 @@
 "use client";
 
-import { Button, Group, Modal, Stack, Text, rem } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { IconX } from "@tabler/icons-react";
+import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { formatCurrency, formatTransferRequest } from "@/lib/utils/customer";
+import { formatCurrency, formatTransferRequest, makeToast } from "@/lib/utils/customer";
 import { internalPreTransferThunk } from "@/lib/thunks/customer/TransferThunks";
 
 interface TransferInfoModal {
@@ -45,15 +43,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
 
             handleNextStep();
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Xác nhận chuyển khoản thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Xác nhận chuyển khoản thất bại", (error as Error).message);
         }
 
         const submitButton = document.getElementById("submit-form");

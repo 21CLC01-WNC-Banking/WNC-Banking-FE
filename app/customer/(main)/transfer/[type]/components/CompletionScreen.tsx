@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "nextjs-toploader/app";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { formatCurrency } from "@/lib/utils/customer";
+import { formatCurrency, makeToast } from "@/lib/utils/customer";
 
 import {
     Button,
@@ -13,14 +13,11 @@ import {
     Checkbox,
     Group,
     TextInput,
-    rem,
     Fieldset,
     Stack,
     Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
 import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
 
@@ -75,39 +72,23 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
                     })
                 ).unwrap();
 
-                notifications.show({
-                    withBorder: true,
-                    radius: "md",
-                    icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-                    color: "teal",
-                    title: "Lưu người nhận thành công",
-                    message: "Bạn có thể kiểm tra lại thông tin người nhận tại Trang chủ.",
-                    position: "bottom-right",
-                });
+                makeToast(
+                    "success",
+                    "Lưu người nhận thành công",
+                    "Bạn có thể kiểm tra lại thông tin người nhận tại Trang chủ."
+                );
 
                 dispatch(resetTransfer());
                 router.push("/customer/home");
             } catch (error) {
-                notifications.show({
-                    withBorder: true,
-                    radius: "md",
-                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                    color: "red",
-                    title: "Lưu người nhận thất bại",
-                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                    position: "bottom-right",
-                });
+                makeToast("error", "Lưu người nhận thất bại", (error as Error).message);
             }
         } else {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-                color: "teal",
-                title: "Chuyển khoản hoàn tất",
-                message: "Bạn có thể kiểm tra lại thông tin giao dịch tại Trang chủ.",
-                position: "bottom-right",
-            });
+            makeToast(
+                "success",
+                "Chuyển khoản hoàn tất",
+                "Bạn có thể kiểm tra lại thông tin giao dịch tại Trang chủ."
+            );
 
             dispatch(resetTransfer());
             router.push("/customer/home");

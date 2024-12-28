@@ -1,11 +1,11 @@
 import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { renameReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
 
-import { Modal, Tooltip, ActionIcon, Button, Group, TextInput, rem } from "@mantine/core";
+import { Modal, Tooltip, ActionIcon, Button, Group, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconPencil, IconX, IconCheck } from "@tabler/icons-react";
+import { IconPencil } from "@tabler/icons-react";
+import { makeToast } from "@/lib/utils/customer";
 
 interface EditModalProps {
     receiverId: number;
@@ -34,25 +34,13 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickn
 
             await dispatch(getReceiversThunk()).unwrap();
 
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-                color: "teal",
-                title: "Chỉnh sửa thông tin người nhận thành công",
-                message: "Bạn có thể kiểm tra lại danh sách người nhận đã lưu tại Trang chủ.",
-                position: "bottom-right",
-            });
+            makeToast(
+                "success",
+                "Chỉnh sửa thông tin người nhận thành công",
+                "Bạn có thể kiểm tra lại danh sách người nhận đã lưu tại Trang chủ."
+            );
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Chỉnh sửa thông tin người nhận thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Chỉnh sửa thông tin người nhận thất bại", (error as Error).message);
         }
 
         handleModalClose();

@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "nextjs-toploader/app";
 
-import { Fieldset, Center, Title, Group, Button, PasswordInput, Anchor, rem } from "@mantine/core";
+import { Fieldset, Center, Title, Group, Button, PasswordInput, Anchor } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
 
 import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
 import { forgotPasswordThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
+import { makeToast } from "@/lib/utils/customer";
 
 const ResetPasswordForm = () => {
     const dispatch = useAppDispatch();
@@ -42,27 +41,11 @@ const ResetPasswordForm = () => {
         try {
             await dispatch(forgotPasswordThunk(values)).unwrap();
 
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-                color: "teal",
-                title: "Đặt lại mật khẩu thành công",
-                message: "Vui lòng đăng nhập để tiếp tục.",
-                position: "bottom-right",
-            });
+            makeToast("success", "Đặt lại mật khẩu thành công", "Vui lòng đăng nhập để tiếp tục.");
 
             router.push("/customer/login");
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Gửi mã OTP thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Đặt lại mật khẩu thất bại", (error as Error).message);
         }
     };
 

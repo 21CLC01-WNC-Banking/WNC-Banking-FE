@@ -6,14 +6,13 @@ import { useRouter } from "nextjs-toploader/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
 import { ReceiverAccount } from "@/lib/types/customer";
-import { formatAccountNumber } from "@/lib/utils/customer";
+import { formatAccountNumber, makeToast } from "@/lib/utils/customer";
 
 import {
     ActionIcon,
     Center,
     Group,
     keys,
-    rem,
     ScrollArea,
     Stack,
     Table,
@@ -22,14 +21,12 @@ import {
     Tooltip,
     UnstyledButton,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import {
     IconChevronDown,
     IconChevronUp,
     IconSearch,
     IconSelector,
     IconCreditCardPay,
-    IconX,
 } from "@tabler/icons-react";
 
 import DeleteReceiverModal from "./DeleteReceiverModal";
@@ -186,15 +183,11 @@ const ReceiversTable = () => {
             try {
                 await dispatch(getReceiversThunk()).unwrap();
             } catch (error) {
-                notifications.show({
-                    withBorder: true,
-                    radius: "md",
-                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                    color: "red",
-                    title: "Truy vấn danh sách người nhận thất bại",
-                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                    position: "bottom-right",
-                });
+                makeToast(
+                    "error",
+                    "Truy vấn danh sách người nhận thất bại",
+                    (error as Error).message
+                );
             }
         };
 

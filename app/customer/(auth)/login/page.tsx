@@ -19,11 +19,9 @@ import {
     PasswordInput,
     TextInput,
     Title,
-    rem,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { makeToast } from "@/lib/utils/customer";
 
 const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha, refreshCaptcha } = useCaptcha();
@@ -47,27 +45,16 @@ const Login = () => {
     const handleSubmit = async (values: typeof form.values) => {
         try {
             await dispatch(loginThunk({ ...values, recaptchaToken: captchaToken })).unwrap();
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-                color: "teal",
-                title: "Đăng nhập thành công",
-                message: "Chào mừng bạn quay trở lại với WNC Banking App.",
-                position: "bottom-right",
-            });
+
+            makeToast(
+                "success",
+                "Đăng nhập thành công",
+                "Chào mừng bạn quay trở lại với WNC Banking App."
+            );
 
             router.push("/customer");
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Đăng nhập thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Đăng nhập thất bại", (error as Error).message);
 
             refreshCaptcha();
         }

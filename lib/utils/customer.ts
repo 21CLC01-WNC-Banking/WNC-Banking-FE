@@ -1,3 +1,9 @@
+import React from "react";
+
+import { rem } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
+
 import { Transfer, TransferRequest } from "../types/customer";
 
 // helper function to chunk data into pages
@@ -41,6 +47,7 @@ export function formatAccountNumber(accountNumber: string): string {
     return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
 }
 
+// helper function to convert Transfer object to a valid backend request
 export function formatTransferRequest(transfer: Transfer | null): TransferRequest {
     return {
         amount: transfer?.amount || 0,
@@ -50,4 +57,31 @@ export function formatTransferRequest(transfer: Transfer | null): TransferReques
         targetAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
         type: "internal",
     };
+}
+
+// helper function to toast
+export function makeToast(type: "success" | "error", title: string, message: string) {
+    if (type === "success") {
+        notifications.show({
+            withBorder: true,
+            radius: "md",
+            icon: React.createElement(IconCheck, { style: { width: rem(20), height: rem(20) } }),
+            color: "teal",
+            title: title,
+            message: message,
+            position: "bottom-right",
+        });
+    } else {
+        notifications.show({
+            withBorder: true,
+            radius: "md",
+            icon: React.createElement(IconX, { style: { width: rem(20), height: rem(20) } }),
+            color: "red",
+            title: title,
+            message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
+            position: "bottom-right",
+        });
+    }
+
+    return null;
 }

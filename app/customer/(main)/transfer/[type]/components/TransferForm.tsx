@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
 import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
-import { formatAccountNumber, formatCurrency } from "@/lib/utils/customer";
+import { formatAccountNumber, formatCurrency, makeToast } from "@/lib/utils/customer";
 
 import {
     Button,
@@ -23,14 +23,11 @@ import {
     Tooltip,
     UnstyledButton,
     Input,
-    rem,
     NumberInputHandlers,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IMaskInput } from "react-imask";
-import { IconX } from "@tabler/icons-react";
 
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
@@ -56,15 +53,7 @@ const fetchReceiverName = async (accNum: string) => {
             message = "Không tìm thấy người nhận. Vui lòng kiểm tra lại số tài khoản.";
         }
 
-        notifications.show({
-            withBorder: true,
-            radius: "md",
-            icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-            color: "red",
-            title: "Truy vấn người nhận thất bại",
-            message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
-            position: "bottom-right",
-        });
+        makeToast("error", "Truy vấn người nhận thất bại", message);
 
         return "";
     }
@@ -137,15 +126,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
             return fee;
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Tính phí giao dịch thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Tính phí giao dịch thất bại", (error as Error).message);
         }
     };
 
@@ -198,15 +179,11 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
             try {
                 await dispatch(getAccountThunk()).unwrap();
             } catch (error) {
-                notifications.show({
-                    withBorder: true,
-                    radius: "md",
-                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                    color: "red",
-                    title: "Truy vấn thông tin tài khoản thất bại",
-                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                    position: "bottom-right",
-                });
+                makeToast(
+                    "error",
+                    "Truy vấn thông tin tài khoản thất bại",
+                    (error as Error).message
+                );
             }
         };
 

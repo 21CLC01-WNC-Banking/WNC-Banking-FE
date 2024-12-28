@@ -1,22 +1,11 @@
 import Link from "next/link";
 
-import {
-    Fieldset,
-    Center,
-    Title,
-    Group,
-    TextInput,
-    Button,
-    Anchor,
-    Stack,
-    rem,
-} from "@mantine/core";
+import { Fieldset, Center, Title, Group, TextInput, Button, Anchor, Stack } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconX } from "@tabler/icons-react";
 
 import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { forgotPasswordEmailThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
+import { makeToast } from "@/lib/utils/customer";
 
 interface EmailFormProps {
     handleNextStep?: () => void;
@@ -42,15 +31,7 @@ const EmailForm: React.FC<EmailFormProps> = ({ handleNextStep }) => {
                 handleNextStep();
             }
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Gửi email thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            makeToast("error", "Gửi email thất bại", (error as Error).message);
         }
     };
 
