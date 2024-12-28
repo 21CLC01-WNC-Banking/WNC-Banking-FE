@@ -1,48 +1,34 @@
-import { useAppSelector } from "@/lib/hooks/withTypes";
-import ClickableCard from "@/components/ClickableCard";
-import { Drawer, TextInput, ScrollArea, ActionIcon } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
+import { useEffect, useState } from "react";
+
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
+import { formatAccountNumber, makeToast } from "@/lib/utils/customer";
+import { getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+
+import { Drawer, TextInput, ScrollArea, ActionIcon, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAddressBook, IconSearch } from "@tabler/icons-react";
-import { useState } from "react";
+
+import ClickableCard from "@/components/ClickableCard";
 
 interface ReceiverDrawerProps {
-    form: UseFormReturnType<
-        {
-            receiverAccount: string;
-            amount: number;
-            message: string;
-            receiverHandlesFee: boolean;
-        },
-        (values: {
-            receiverAccount: string;
-            amount: number;
-            message: string;
-            receiverHandlesFee: boolean;
-        }) => {
-            sourceAccountNumber: string;
-            targetAccountNumber: string;
-            amount: number;
-            isSourceFee: boolean;
-            description: string;
-            type: string;
-        }
-    >;
+    formHandler: (account: string) => void;
     type: string;
     selectedBank: string;
-    onSelectReceiver: (account: string) => void;
+    onSelect: (account: string) => void;
 }
 
 const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
-    form,
+    formHandler,
     type,
     selectedBank,
-    onSelectReceiver,
+    onSelect,
 }) => {
-    const [opened, { open, close }] = useDisclosure(false);
-    const [query, setQuery] = useState("");
+    const dispatch = useAppDispatch();
+    const accounts = useAppSelector((state) => state.receivers.receivers);
 
-    const accounts = useAppSelector((state) => state.receivers.filteredReceivers);
+    const [opened, { open, close }] = useDisclosure(false);
+
+    const [query, setQuery] = useState("");
 
     const filtered = accounts.filter((account) =>
         Object.values(account).some((value) =>
@@ -52,23 +38,40 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
 
     const accountList = filtered.map((account) => (
         <ClickableCard
-            key={account.name}
+            key={account.receiverAccountNumber}
             title={account.receiverNickname}
             subtitle={
                 type === "internal"
-                    ? [account.name, account.receiverAccountNumber]
-                    : [account.name, account.bank, account.receiverAccountNumber]
+                    ? [account.receiverAccountNumber]
+                    : [
+                          account.receiverNickname,
+                          "To integrate external banks",
+                          account.receiverAccountNumber,
+                      ]
             }
             onClick={() => {
-                form.setFieldValue(
-                    "receiverAccount",
-                    account.receiverAccountNumber.replace(/(\d{4})/g, "$1 ").trim()
-                );
-                onSelectReceiver(account.receiverAccountNumber.replace(/(\d{4})/g, "$1 ").trim());
+                formHandler(formatAccountNumber(account.receiverAccountNumber));
+                onSelect(formatAccountNumber(account.receiverAccountNumber));
                 close();
             }}
         />
     ));
+
+    useEffect(() => {
+        const fetchReceivers = async () => {
+            try {
+                await dispatch(getReceiversThunk()).unwrap();
+            } catch (error) {
+                makeToast(
+                    "error",
+                    "Truy vấn danh sách người nhận thất bại",
+                    (error as Error).message
+                );
+            }
+        };
+
+        fetchReceivers();
+    }, [dispatch]);
 
     return (
         <>
@@ -112,7 +115,13 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                 />
                 <div>
                     <ScrollArea.Autosize mah="75vh" type="always" mt="md">
-                        {accountList}
+                        {accountList.length === 0 ? (
+                            <Text fw={500} ta="center">
+                                Không tìm thấy người nhận
+                            </Text>
+                        ) : (
+                            accountList
+                        )}
                     </ScrollArea.Autosize>
                 </div>
             </Drawer>

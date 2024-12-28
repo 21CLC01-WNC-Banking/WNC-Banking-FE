@@ -32,35 +32,7 @@ import { IMaskInput } from "react-imask";
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
 import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
-
-const fetchReceiverName = async (accNum: string) => {
-    const deformatted = accNum.split(" ").join("");
-
-    const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/account/customer-name?accountNumber=${deformatted}`,
-        {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        const responseData = await response.json();
-        let message = responseData.errors[0].message;
-
-        if (message.includes("no rows")) {
-            message = "Không tìm thấy người nhận. Vui lòng kiểm tra lại số tài khoản.";
-        }
-
-        makeToast("error", "Truy vấn người nhận thất bại", message);
-
-        return "";
-    }
-
-    const data = await response.json();
-    return data.data.name;
-};
+import { getReceiverNameThunk } from "@/lib/thunks/customer/ReceiversThunks";
 
 interface TransferFormProps {
     handleNextStep: () => void;
@@ -69,6 +41,8 @@ interface TransferFormProps {
 
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
+    const userAccount = useAppSelector((state) => state.auth.customerAccount);
+
     const searchParams = useSearchParams();
 
     const [opened, { open, close }] = useDisclosure(false);
@@ -77,12 +51,9 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     const [selectedBank, setSelectedBank] = useState(
         type === "internal" ? "WNC Bank" : searchParams.get("at") || ""
     );
-
     const [receiverName, setReceiverName] = useState("");
 
     const handlersRef = useRef<NumberInputHandlers>(null);
-
-    const userAccount = useAppSelector((state) => state.auth.customerAccount);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -90,7 +61,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         initialValues: {
             receiverAccount: searchParams.get("to") || "",
             amount: 0,
-            message: `${userAccount?.name} chuyển tiền`,
+            message: `${userAccount?.name} chuyen tien`,
             receiverHandlesFee: false,
         },
         validate: {
@@ -130,6 +101,23 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         }
     };
 
+    const getReceiverName = async (account: string) => {
+        try {
+            const name = await dispatch(getReceiverNameThunk({ accountNumber: account })).unwrap();
+
+            if (name && name.length > 0) {
+                setReceiverName(name);
+            }
+        } catch (error) {
+            makeToast("error", "Truy vấn thông tin người nhận thất bại", (error as Error).message);
+        }
+    };
+
+    // callback to inject into ReceiverDrawer component
+    const handleSetReceiverFormField = (account: string) => {
+        form.setFieldValue("receiverAccount", account);
+    };
+
     const toggleConfirmModal = async () => {
         const validatedForm = form.validate();
 
@@ -158,14 +146,6 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         }
     };
 
-    const handleSelectReceiver = async (account: string) => {
-        const name = await fetchReceiverName(account);
-
-        if (name && name.length > 0) {
-            setReceiverName(name);
-        }
-    };
-
     useEffect(() => {
         dispatch(setFilteredReceivers(selectedBank));
     }, [dispatch, selectedBank]);
@@ -191,7 +171,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
             fetchAccount();
         }
 
-        form.setFieldValue("message", `${userAccount?.name} chuyển tiền`);
+        form.setFieldValue("message", `${userAccount?.name} chuyen tien`);
     }, [dispatch, userAccount]);
 
     return (
@@ -291,9 +271,9 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 rightSection={
                                     <ReceiverDrawer
                                         type={type}
-                                        form={form}
+                                        formHandler={handleSetReceiverFormField}
                                         selectedBank={selectedBank}
-                                        onSelectReceiver={handleSelectReceiver}
+                                        onSelect={getReceiverName}
                                     />
                                 }
                                 onBlur={(event) => {
@@ -302,7 +282,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                             "receiverAccount",
                                             event.currentTarget.value
                                         );
-                                        handleSelectReceiver(event.currentTarget.value);
+                                        getReceiverName(event.currentTarget.value);
                                     }
                                 }}
                             />
@@ -368,7 +348,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         mt="lg"
                         label={`Nội dung chuyển khoản (${messageLength}/100)`}
                         withAsterisk
-                        placeholder="Người dùng chuyển tiền"
+                        placeholder="Nguoi dung chuyen tien"
                         autosize
                         minRows={2}
                         maxRows={4}
