@@ -37,7 +37,6 @@ import EditReceiverModal from "./EditReceiverModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
 
 import classes from "./ReceiversTable.module.css";
-import Loading from "@/components/Loading";
 
 interface SortableTableHeaderProps {
     children: React.ReactNode;
@@ -171,7 +170,10 @@ const ReceiversTable = () => {
                         </ActionIcon>
                     </Tooltip>
 
-                    <EditReceiverModal receiverId={row.id} />
+                    <EditReceiverModal
+                        receiverId={row.id}
+                        receiverNickname={row.receiverNickname}
+                    />
 
                     <DeleteReceiverModal receiverId={row.id} />
                 </Group>

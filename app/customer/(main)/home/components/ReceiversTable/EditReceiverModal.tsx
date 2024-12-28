@@ -9,16 +9,17 @@ import { IconPencil, IconX, IconCheck } from "@tabler/icons-react";
 
 interface EditModalProps {
     receiverId: number;
+    receiverNickname: string;
 }
 
-const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId }) => {
+const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickname }) => {
     const dispatch = useAppDispatch();
     const [opened, { open, close }] = useDisclosure(false);
 
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
-            nickname: "",
+            nickname: receiverNickname,
         },
         validate: {
             nickname: (value) => (value.trim().length < 1 ? "Vui lòng nhập tên gợi nhớ" : null),
@@ -54,8 +55,11 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId }) => {
             });
         }
 
-        close();
+        handleModalClose();
+    };
 
+    const handleModalClose = () => {
+        close();
         form.reset();
     };
 
@@ -63,7 +67,7 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId }) => {
         <>
             <Modal
                 opened={opened}
-                onClose={close}
+                onClose={handleModalClose}
                 title="Chỉnh sửa thông tin người nhận"
                 radius="md"
                 centered
@@ -91,7 +95,7 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId }) => {
                         {...form.getInputProps("nickname")}
                     />
                     <Group mt="lg" justify="flex-end">
-                        <Button onClick={close} variant="default">
+                        <Button onClick={handleModalClose} variant="default">
                             Hủy
                         </Button>
 

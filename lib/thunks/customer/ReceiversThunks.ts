@@ -4,7 +4,7 @@ import { setReceivers } from "../../slices/customer/ReceiversSlice";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getReceiversThunk = createAppAsyncThunk("receivers/get", async (_, { dispatch }) => {
-    const response = await fetch(`${apiUrl}/saved-receiver/`, {
+    const response = await fetch(`${apiUrl}/customer/saved-receiver/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -23,7 +23,7 @@ export const getReceiversThunk = createAppAsyncThunk("receivers/get", async (_, 
 export const addInternalReceiverThunk = createAppAsyncThunk(
     "transfer/add-internal-receiver",
     async (data: { receiverAccountNumber: string; receiverNickname: string }) => {
-        const response = await fetch(`${apiUrl}/saved-receiver/`, {
+        const response = await fetch(`${apiUrl}/customer/saved-receiver/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -40,7 +40,7 @@ export const addInternalReceiverThunk = createAppAsyncThunk(
 export const renameReceiverThunk = createAppAsyncThunk(
     "transfer/add-internal-receiver",
     async (data: { id: number; newNickname: string }) => {
-        const response = await fetch(`${apiUrl}/saved-receiver/${data.id}`, {
+        const response = await fetch(`${apiUrl}/customer/saved-receiver/${data.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -57,7 +57,7 @@ export const renameReceiverThunk = createAppAsyncThunk(
 export const deleteReceiverThunk = createAppAsyncThunk(
     "transfer/add-internal-receiver",
     async (data: { id: number }) => {
-        const response = await fetch(`${apiUrl}/saved-receiver/${data.id}`, {
+        const response = await fetch(`${apiUrl}/customer/saved-receiver/${data.id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
