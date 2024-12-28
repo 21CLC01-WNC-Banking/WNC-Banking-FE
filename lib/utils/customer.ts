@@ -38,7 +38,7 @@ export const formatDateString = (dateString: string) => {
 
 // helper function to format account number
 export function formatAccountNumber(accountNumber: string): string {
-    return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ");
+    return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
 }
 
 export function formatTransferRequest(transfer: Transfer | null): TransferRequest {
