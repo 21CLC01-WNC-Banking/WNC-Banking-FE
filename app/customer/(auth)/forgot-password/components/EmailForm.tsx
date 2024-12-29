@@ -31,7 +31,15 @@ const EmailForm: React.FC<EmailFormProps> = ({ handleNextStep }) => {
                 handleNextStep();
             }
         } catch (error) {
-            makeToast("error", "Gửi email thất bại", (error as Error).message);
+            if ((error as Error).message.includes("no rows")) {
+                makeToast(
+                    "error",
+                    "Xác thực email thất bại",
+                    "Không có tài khoản nào được đăng kí với địa chỉ email này."
+                );
+            } else {
+                makeToast("error", "Xác thực email thất bại", (error as Error).message);
+            }
         }
     };
 

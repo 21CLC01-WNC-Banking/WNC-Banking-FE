@@ -52,7 +52,11 @@ const PasswordOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
                 handleNextStep();
             }
         } catch (error) {
-            makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
+            if ((error as Error).message === "Invalid OTP") {
+                makeToast("error", "Gửi mã OTP thất bại", "Mã OTP không hợp lệ hoặc đã hết hạn.");
+            } else {
+                makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
+            }
         }
     };
 
