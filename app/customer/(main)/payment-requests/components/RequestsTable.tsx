@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "nextjs-toploader/app";
 
 import { PaymentRequest } from "@/lib/types/customer";
 import {
@@ -9,36 +10,67 @@ import {
     formatCurrency,
     makeToast,
     mapRequestStatus,
+    mapColor,
 } from "@/lib/utils/customer";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { getSentRequestsThunk } from "@/lib/thunks/customer/TransactionsThunk";
+import {
+    getReceivedRequestsThunk,
+    getSentRequestsThunk,
+} from "@/lib/thunks/customer/TransactionsThunk";
 
-import { Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
+import {
+    Table,
+    Text,
+    Pagination,
+    Center,
+    Group,
+    SegmentedControl,
+    ActionIcon,
+    Tooltip,
+} from "@mantine/core";
+import { IconCreditCardPay } from "@tabler/icons-react";
 
 import InfoModal from "@/components/InfoModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
 import CancelModal from "./CancelModal";
 
-const makeRequestInfoModalContent = (request: PaymentRequest) => {
+const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" | "sent") => {
     return {
         title: "Thông tin nhắc nợ",
         content: [
             { label: "Mã nhắc nợ", value: request.debtReminder.id },
             { label: "Thời gian", value: formatDateString(request.debtReminder.createdAt) },
             {
-                label: "Người nợ",
-                value: request.receiver,
+                label: type === "received" ? "Người nhắc nợ" : "Người nợ",
+                value: type === "received" ? request.sender : request.receiver,
             },
             { label: "Số tiền nợ", value: formatCurrency(request.debtReminder.amount) },
             { label: "Nội dung", value: request.debtReminder.description },
-            { label: "Trạng thái", value: mapRequestStatus(request.debtReminder.status) },
+            {
+                label: "Trạng thái",
+                value: mapRequestStatus(request.debtReminder.status),
+                color: mapColor(request.debtReminder.status),
+            },
+            ...(request.reply
+                ? [
+                      { label: "Người hủy", value: request.reply.userReplyName },
+                      { label: "Nội dung hủy", value: request.reply.content },
+                  ]
+                : []),
         ],
     };
 };
 
-const SentRequests: React.FC = () => {
+interface RequestsTableProps {
+    type: "received" | "sent";
+}
+
+const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
+    const router = useRouter();
     const dispatch = useAppDispatch();
-    const requests = useAppSelector((state) => state.transactions.sentRequests);
+    const requests = useAppSelector((state) =>
+        type === "received" ? state.transactions.receivedRequests : state.transactions.sentRequests
+    );
 
     const [requestStatusFilter, setRequestStatusFilter] = useState<string>("all");
     const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");
@@ -47,14 +79,32 @@ const SentRequests: React.FC = () => {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                await dispatch(getSentRequestsThunk()).unwrap();
+                await dispatch(
+                    type === "received" ? getReceivedRequestsThunk() : getSentRequestsThunk()
+                ).unwrap();
             } catch (error) {
                 makeToast("error", "Truy vấn danh sách nhắc nợ thất bại", (error as Error).message);
             }
         };
 
         fetchRequests();
-    }, [dispatch]);
+    }, [dispatch, type]);
+
+    const handleTransferAction = (row: PaymentRequest) => {
+        // if (row.bank === "WNC Bank") {
+        //     router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
+        // } else {
+        //     router.push(
+        //         `/customer/transfer/external?to=${row.receiverAccountNumber}&at=${row.bank.trim()}`
+        //     );
+        // }
+
+        router.push(
+            `/customer/transfer/debt-payment?to=${row.debtReminder.targetAccountNumber.trim()}&amount=${
+                row.debtReminder.amount
+            }`
+        );
+    };
 
     // sort requests by time
     const sortByTime = (elements: PaymentRequest[], filter: string) => {
@@ -94,25 +144,33 @@ const SentRequests: React.FC = () => {
 
     // create table rows for current page
     const rows = currentPageRequests.map((request, index) => (
-        <Table.Tr
-            key={index}
-            bg={
-                request.debtReminder.status === "pending"
-                    ? "yellow.1"
-                    : request.debtReminder.status === "success"
-                    ? "green.1"
-                    : "red.2"
-            }
-        >
-            <Table.Td>{request.debtReminder.createdAt}</Table.Td>
-            <Table.Td>{request.receiver}</Table.Td>
-            <Table.Td>{request.debtReminder.amount}</Table.Td>
-            <Table.Td>{request.debtReminder.status}</Table.Td>
+        <Table.Tr key={index}>
+            <Table.Td>{formatDateString(request.debtReminder.createdAt)}</Table.Td>
+            <Table.Td>{type === "received" ? request.sender : request.receiver}</Table.Td>
+            <Table.Td>{formatCurrency(request.debtReminder.amount)}</Table.Td>
+            <Table.Td fw={600} c={mapColor(request.debtReminder.status)}>
+                {mapRequestStatus(request.debtReminder.status)}
+            </Table.Td>
             <Table.Td>
                 <Group gap="md" justify="flex-end">
-                    {request.debtReminder.status === "pending" && <CancelModal />}
+                    {type === "received" && request.debtReminder.status === "pending" && (
+                        <Tooltip label="Thanh toán">
+                            <ActionIcon
+                                radius="md"
+                                variant="subtle"
+                                color="green"
+                                onClick={() => handleTransferAction(request)}
+                            >
+                                <IconCreditCardPay size={20} />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
 
-                    <InfoModal {...makeRequestInfoModalContent(request)} />
+                    {request.debtReminder.status === "pending" && (
+                        <CancelModal requestId={request.debtReminder.id} type={type} />
+                    )}
+
+                    <InfoModal {...makeRequestInfoModalContent(request, type)} />
                 </Group>
             </Table.Td>
         </Table.Tr>
@@ -120,9 +178,11 @@ const SentRequests: React.FC = () => {
 
     return (
         <>
-            <Group mb="md" grow justify="flex-end" align="center">
-                <CreateRequestModal isFromReceiversList={false} />
-            </Group>
+            {type === "sent" && (
+                <Group mb="md" grow justify="flex-end" align="center">
+                    <CreateRequestModal isFromReceiversList={false} />
+                </Group>
+            )}
 
             {/* Filter Section */}
             <Group justify="space-between" align="center" mb="md" mt="xl">
@@ -157,11 +217,13 @@ const SentRequests: React.FC = () => {
             </Group>
 
             {/* Table */}
-            <Table verticalSpacing="sm" mt="xl">
+            <Table verticalSpacing="sm" mt="xl" highlightOnHover>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Thời gian nhắc</Table.Th>
-                        <Table.Th>Đối tượng nợ</Table.Th>
+                        <Table.Th>
+                            {type === "received" ? "Người nhắc nợ" : "Đối tượng nợ"}
+                        </Table.Th>
                         <Table.Th>Số tiền nợ</Table.Th>
                         <Table.Th>Trạng thái</Table.Th>
                         <Table.Th></Table.Th>
@@ -183,6 +245,7 @@ const SentRequests: React.FC = () => {
             {/* Pagination */}
             <Center>
                 <Pagination
+                    radius="md"
                     total={paginatedRequests.length}
                     value={activePage}
                     onChange={setActivePage}
@@ -193,4 +256,4 @@ const SentRequests: React.FC = () => {
     );
 };
 
-export default SentRequests;
+export default RequestsTable;

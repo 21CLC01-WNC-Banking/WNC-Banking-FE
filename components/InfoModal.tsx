@@ -7,6 +7,7 @@ interface InfoModalProps {
     content: {
         label: string;
         value: string;
+        color?: string;
     }[];
 }
 
@@ -39,7 +40,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
                         <Group key={item.label} grow justify="between" align="flex-start">
                             <Text variant="text">{item.label}</Text>
 
-                            <Text ta="right" fw={700}>
+                            <Text ta="right" fw={700} c={item.color}>
                                 {item.value}
                             </Text>
                         </Group>
@@ -48,7 +49,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
             </Modal>
 
             <Tooltip label="Chi tiết">
-                <ActionIcon variant="subtle" color="blue" onClick={open}>
+                <ActionIcon radius="md" variant="subtle" color="blue" onClick={open}>
                     <IconInfoCircle size={20} />
                 </ActionIcon>
             </Tooltip>

@@ -66,3 +66,23 @@ export const getReceivedRequestsThunk = createAppAsyncThunk(
         dispatch(setReceivedRequests(responseData.data || []));
     }
 );
+
+export const cancelRequestThunk = createAppAsyncThunk(
+    "transactions/cancel-requests",
+    async (data: { requestId: string; content: string }) => {
+        const response = await fetch(
+            `${apiUrl}/transaction/cancel-debt-reminder/${data.requestId}`,
+            {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ content: data.content }),
+            }
+        );
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+    }
+);
