@@ -115,10 +115,10 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                 />
                 <div>
                     <ScrollArea.Autosize mah="75vh" type="always" mt="md">
-                        {accountList.length === 0 ? (
-                            <Text fw={500} ta="center">
-                                Không tìm thấy người nhận
-                            </Text>
+                        {accounts.length === 0 ? (
+                            <Text ta="center">Bạn chưa lưu người nhận nào</Text>
+                        ) : accountList.length === 0 ? (
+                            <Text ta="center">Không tìm thấy người nhận</Text>
                         ) : (
                             accountList
                         )}
