@@ -60,27 +60,39 @@ export const formatTransferRequest = (transfer: Transfer | null): TransferReques
 };
 
 // make toast
-export const makeToast = (type: "success" | "error", title: string, message: string) => {
-    if (type === "success") {
-        notifications.show({
-            withBorder: true,
-            radius: "md",
-            icon: React.createElement(IconCheck, { style: { width: rem(20), height: rem(20) } }),
-            color: "teal",
-            title: title,
-            message: message,
-            position: "bottom-right",
-        });
-    } else {
-        notifications.show({
-            withBorder: true,
-            radius: "md",
-            icon: React.createElement(IconX, { style: { width: rem(20), height: rem(20) } }),
-            color: "red",
-            title: title,
-            message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
-            position: "bottom-right",
-        });
+export const makeToast = (type: "success" | "error" | "info", title: string, message: string) => {
+    switch (type) {
+        case "success":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: React.createElement(IconCheck, {
+                    style: { width: rem(20), height: rem(20) },
+                }),
+                color: "teal",
+                title: title,
+                message: message,
+                position: "bottom-right",
+            });
+        case "error":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: React.createElement(IconX, { style: { width: rem(20), height: rem(20) } }),
+                color: "red",
+                title: title,
+                message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
+        case "info":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                color: "blue",
+                title: title,
+                message: message,
+                position: "bottom-right",
+            });
     }
 
     return null;
@@ -111,5 +123,25 @@ export const mapRequestStatus = (type: string) => {
             return "Đã hủy";
         default:
             return "Unknown";
+    }
+};
+
+// return corresponding color string for transaction type or request status
+export const mapColor = (type: string) => {
+    switch (type) {
+        case "internal":
+            return "green.7";
+        case "success":
+            return "green.7";
+        case "external":
+            return "yellow.7";
+        case "pending":
+            return "yellow.7";
+        case "debt_payment":
+            return "red.7";
+        case "failed":
+            return "red.7";
+        default:
+            return "";
     }
 };
