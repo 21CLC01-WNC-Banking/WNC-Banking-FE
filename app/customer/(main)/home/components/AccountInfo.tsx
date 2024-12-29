@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 
-import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
+import {
+    Paper,
+    Table,
+    Text,
+    Pagination,
+    Center,
+    Group,
+    SegmentedControl,
+    Button,
+} from "@mantine/core";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 
@@ -13,6 +22,7 @@ import {
     formatAccountNumber,
     formatCurrency,
     formatDateString,
+    mapColor,
     mapTransactionType,
 } from "@/lib/utils/customer";
 import { makeToast } from "@/lib/utils/customer";
@@ -26,7 +36,11 @@ const makeTransactionInfoModalContent = (transaction: Transaction) => {
         content: [
             { label: "Mã giao dịch", value: transaction.id },
             { label: "Thời gian", value: formatDateString(transaction.createdAt) },
-            { label: "Loại giao dịch", value: mapTransactionType(transaction.type) },
+            {
+                label: "Loại giao dịch",
+                value: mapTransactionType(transaction.type),
+                color: mapColor(transaction.type),
+            },
             {
                 label: "Tài khoản nguồn",
                 value: formatAccountNumber(transaction.sourceAccountNumber),
@@ -45,7 +59,6 @@ const makeTransactionInfoModalContent = (transaction: Transaction) => {
 const AccountInfo: React.FC = () => {
     const dispatch = useAppDispatch();
     const transactions = useAppSelector((state) => state.transactions.transactionHistory);
-    console.log(transactions);
 
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("all");
     const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");
@@ -108,16 +121,7 @@ const AccountInfo: React.FC = () => {
         <Table.Tr key={index}>
             <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
             <Table.Td>{formatCurrency(transaction.amount)}</Table.Td>
-            <Table.Td
-                c={
-                    transaction.type === "internal"
-                        ? "green.7"
-                        : transaction.type === "external"
-                        ? "yellow.7"
-                        : "red.7"
-                }
-                fw={600}
-            >
+            <Table.Td c={mapColor(transaction.type)} fw={600}>
                 {mapTransactionType(transaction.type)}
             </Table.Td>
             <Table.Td>{formatCurrency(transaction.balance)}</Table.Td>
@@ -136,6 +140,36 @@ const AccountInfo: React.FC = () => {
             {/* Filter Section */}
             <Group justify="space-between" align="center" mb="md" mt="xl">
                 <Group justify="flex-start" gap="md">
+                    <Button
+                        radius="md"
+                        variant="default"
+                        onClick={async () => {
+                            const response = await fetch(
+                                `http://localhost:8080/api/v1/core/test-notification`,
+                                {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    credentials: "include",
+                                    body: JSON.stringify({
+                                        content: "Pee-woop.",
+                                        deviceId: 2,
+                                        title: "Test notification",
+                                    }),
+                                }
+                            );
+
+                            if (!response.ok) {
+                                const responseData = await response.json();
+                                throw new Error(
+                                    responseData.errors[0].message ||
+                                        "Đã xảy ra lỗi kết nối với máy chủ."
+                                );
+                            }
+                        }}
+                    >
+                        Notify
+                    </Button>
+
                     <Text>Thời gian:</Text>
 
                     <SegmentedControl
@@ -178,9 +212,11 @@ const AccountInfo: React.FC = () => {
                 </Table.Thead>
                 <Table.Tbody>
                     {rows.length === 0 ? (
-                        <Table.Td colSpan={5}>
-                            <Text ta="center">Chưa có giao dịch nào</Text>
-                        </Table.Td>
+                        <Table.Tr>
+                            <Table.Td colSpan={5}>
+                                <Text ta="center">Chưa có giao dịch nào</Text>
+                            </Table.Td>
+                        </Table.Tr>
                     ) : (
                         rows
                     )}
@@ -190,6 +226,7 @@ const AccountInfo: React.FC = () => {
             {/* Pagination */}
             <Center>
                 <Pagination
+                    radius="md"
                     total={paginatedTransactions.length}
                     value={activePage}
                     onChange={setActivePage}

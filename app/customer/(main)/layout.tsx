@@ -17,6 +17,8 @@ import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
 
 import { useAppSelector } from "@/lib/hooks/withTypes";
+import { makeToast } from "@/lib/utils/customer";
+import useWebSocket from "@/lib/hooks/useWebSocket";
 
 const menuItems = [
     {
@@ -69,6 +71,18 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
             router.push("/customer/login");
         }
     }, [isLoggedIn, router]);
+
+    // websocket connection to receive notifications
+    useWebSocket((data) => {
+        if (data === "established") return;
+
+        try {
+            const parts = data.split("\n");
+            makeToast("info", parts[0], parts[1]);
+        } catch (error) {
+            console.error("Error parsing message:", error);
+        }
+    });
 
     if (!isLoggedIn) {
         return <Loading />;
