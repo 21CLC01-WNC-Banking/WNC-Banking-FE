@@ -1,29 +1,20 @@
 "use client";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
-import {
-    Paper,
-    Table,
-    Text,
-    Pagination,
-    Center,
-    Button,
-} from "@mantine/core";
+import { IconEdit, IconTrash, IconUserPlus } from "@tabler/icons-react";
+import { Paper, Table, Text, Pagination, Center, Button, Flex } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { chunk } from "../../../../lib/utils/staff";
 import { Employee } from "@/lib/types/staff";
 import EditEmployeeModal from "./EditEmployeeModal";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { showNotification } from "@mantine/notifications";
+import EmployeeForm from "./EmployeeForm";
 
 
 const EmployeeListTable: React.FC = () => {
 
+    // Handle get all employees
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [error, setError] = useState<string>("");
-
-    const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -50,7 +41,12 @@ const EmployeeListTable: React.FC = () => {
         fetchEmployees();
     }, [employees]);
 
-    //handle delete selected employee
+    // Handle add a new employee
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    //Handle delete selected employee
+    const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const handleDelete = async () => {
         if (!employeeToDelete) return;
 
@@ -97,7 +93,7 @@ const EmployeeListTable: React.FC = () => {
     };
 
 
-    // State for modal control
+    // Handle edit employee
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const handleSave = (updatedEmployee: Employee) => {
@@ -159,6 +155,15 @@ const EmployeeListTable: React.FC = () => {
 
     return (
         <Paper radius="md" mt="lg" p="lg">
+            <Flex justify="flex-end">
+                <Button
+                    onClick={() => setIsAddModalOpen(true)}
+                >
+                    <IconUserPlus />
+                    Thêm mới nhân viên
+                </Button>
+            </Flex>
+
             {/* Table */}
             {employees.length === 0 ? (
                 <Center mt="xl" bg="red.3">
@@ -193,6 +198,14 @@ const EmployeeListTable: React.FC = () => {
                     mt="xl"
                 />
             </Center>
+
+            <EmployeeForm
+                opened={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onSave={(newEmployee: Employee) => {
+                    setEmployees((prev) => [newEmployee, ...prev]);
+                }}
+            />
 
             <EditEmployeeModal
                 employee={selectedEmployee}
