@@ -26,6 +26,5 @@ export const loginThunk = createAppAsyncThunk("auth/login", async (data: object,
 
         throw new Error(message || "Đã xảy ra lỗi kết nối với máy chủ.");
     }
-
     dispatch(login());
 });

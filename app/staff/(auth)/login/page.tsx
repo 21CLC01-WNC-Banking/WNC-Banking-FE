@@ -17,7 +17,6 @@ import {
 import { notifications } from "@mantine/notifications";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import Link from "next/link";
-import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import useCaptcha from "@/lib/hooks/useCaptcha";
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -27,7 +26,6 @@ import { loginThunk } from "@/lib/thunks/AuthThunks";
 const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha } = useCaptcha();
     const router = useRouter();
-    const [error, setError] = useState("");
     const dispatch = useAppDispatch();
 
     const form = useForm({

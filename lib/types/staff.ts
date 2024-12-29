@@ -14,14 +14,6 @@ export interface Account {
     nickname: string;
 }
 
-// export interface Transaction {
-//     dateTime: string;
-//     accountType: string;
-//     amount: string;
-//     transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-//     balance: string;
-// }
-
 export interface PaymentRequest {
     requestor?: string;
     target?: string;
@@ -41,4 +33,11 @@ export interface Transaction {
     transactionType: string;
     balance: number;
     description: string;
+}
+
+export interface Employee {
+    id: number,
+    name: string,
+    email: string,
+    phoneNumber: string,
 }
