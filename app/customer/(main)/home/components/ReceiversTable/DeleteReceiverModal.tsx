@@ -56,18 +56,18 @@ const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ receiverId }) => {
             >
                 Bạn có chắc muốn xóa người nhận này?
                 <Group mt="lg" justify="flex-end">
-                    <Button onClick={close} variant="default">
+                    <Button radius="md" onClick={close} variant="default">
                         Quay lại
                     </Button>
 
-                    <Button onClick={handleDelete} variant="filled" color="red">
+                    <Button radius="md" onClick={handleDelete} variant="filled" color="red">
                         Xóa
                     </Button>
                 </Group>
             </Modal>
 
             <Tooltip label="Xóa">
-                <ActionIcon variant="subtle" color="red" onClick={open}>
+                <ActionIcon radius="md" variant="subtle" color="red" onClick={open}>
                     <IconTrash size={20} />
                 </ActionIcon>
             </Tooltip>

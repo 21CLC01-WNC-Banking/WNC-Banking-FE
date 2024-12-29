@@ -128,11 +128,11 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                     />
 
                     <Group mt="lg" justify="flex-end">
-                        <Button onClick={close} variant="default">
+                        <Button radius="md" onClick={close} variant="default">
                             Hủy
                         </Button>
 
-                        <Button type="submit" variant="filled">
+                        <Button radius="md" type="submit" variant="filled">
                             Tạo nhắc nợ
                         </Button>
                     </Group>
@@ -141,12 +141,12 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
 
             {isFromReceiversList ? (
                 <Tooltip label="Nhắc nợ">
-                    <ActionIcon variant="subtle" color="blue" onClick={open}>
+                    <ActionIcon radius="md" variant="subtle" color="blue" onClick={open}>
                         <IconMessageDollar size={20} />
                     </ActionIcon>
                 </Tooltip>
             ) : (
-                <Button size="md" radius="md" maw={200} onClick={open}>
+                <Button radius="md" size="md" maw={200} onClick={open}>
                     Tạo nhắc nợ mới
                 </Button>
             )}

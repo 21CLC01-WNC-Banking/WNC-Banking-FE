@@ -159,6 +159,7 @@ const ReceiversTable = () => {
 
                     <Tooltip label="Chuyển khoản">
                         <ActionIcon
+                            radius="md"
                             variant="subtle"
                             color="green"
                             onClick={() => handleTransferAction(row)}

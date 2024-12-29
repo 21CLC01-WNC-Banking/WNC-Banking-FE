@@ -83,11 +83,11 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickn
                         {...form.getInputProps("nickname")}
                     />
                     <Group mt="lg" justify="flex-end">
-                        <Button onClick={handleModalClose} variant="default">
+                        <Button radius="md" onClick={handleModalClose} variant="default">
                             Hủy
                         </Button>
 
-                        <Button type="submit" variant="filled">
+                        <Button radius="md" type="submit" variant="filled">
                             Lưu
                         </Button>
                     </Group>
@@ -95,7 +95,7 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickn
             </Modal>
 
             <Tooltip label="Chỉnh sửa" onClick={open}>
-                <ActionIcon variant="subtle" color="gray">
+                <ActionIcon radius="md" variant="subtle" color="gray">
                     <IconPencil size={20} />
                 </ActionIcon>
             </Tooltip>
