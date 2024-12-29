@@ -78,6 +78,8 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
 
         try {
             const parts = data.split("\n");
+            const audio = new Audio("/notification.mp3");
+            audio.play();
             makeToast("info", parts[0], parts[1]);
         } catch (error) {
             console.error("Error parsing message:", error);
