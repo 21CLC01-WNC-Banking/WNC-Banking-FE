@@ -27,8 +27,6 @@ export const transferFeeThunk = createAppAsyncThunk(
 export const internalPreTransferThunk = createAppAsyncThunk(
     "transfer/internal-pre-transfer",
     async (data: TransferRequest, { dispatch }) => {
-        console.log(data);
-
         const response = await fetch(`${apiUrl}/transaction/pre-internal-transfer`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -38,13 +36,11 @@ export const internalPreTransferThunk = createAppAsyncThunk(
 
         if (!response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
         }
 
         const responseData = await response.json();
 
-        console.log(responseData.data);
         dispatch(setCurrentTransferId(responseData.data));
     }
 );
