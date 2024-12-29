@@ -74,6 +74,8 @@ export const makeToast = (type: "success" | "error" | "info", title: string, mes
                 message: message,
                 position: "bottom-right",
             });
+
+            break;
         case "error":
             notifications.show({
                 withBorder: true,
@@ -84,6 +86,8 @@ export const makeToast = (type: "success" | "error" | "info", title: string, mes
                 message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
                 position: "bottom-right",
             });
+
+            break;
         case "info":
             notifications.show({
                 withBorder: true,
