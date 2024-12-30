@@ -44,7 +44,10 @@ export const formatDateString = (dateString: string) => {
 
 // format account number
 export const formatAccountNumber = (accountNumber: string): string => {
-    return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+    return accountNumber
+        .replace(/\s/g, "")
+        .replace(/(\d{4})(?=\d)/g, "$1 ")
+        .trim();
 };
 
 // convert Transfer object to a valid backend request
