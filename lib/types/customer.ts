@@ -10,10 +10,11 @@ export interface Transfer {
     senderHandlesFee: boolean;
 }
 
+// use this to create new payment requests as well
 export interface TransferRequest {
     amount: number;
     description: string;
-    isSourceFee: boolean;
+    isSourceFee?: boolean;
     sourceAccountNumber: string;
     targetAccountNumber: string;
     type: string;
