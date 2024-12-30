@@ -6,7 +6,7 @@ interface TransactionDetailProps {
     transaction: ExternalTransaction | null;
 }
 
-const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) => {
+const ExternalTransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) => {
     if (!transaction) {
         return <div>Không có giao dịch nào được chọn</div>;
     }
@@ -61,4 +61,4 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transaction }) =>
     );
 };
 
-export default TransactionDetail;
+export default ExternalTransactionDetail;

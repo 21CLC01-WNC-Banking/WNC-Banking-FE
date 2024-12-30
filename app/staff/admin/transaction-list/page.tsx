@@ -1,5 +1,5 @@
 import { Paper, Center, Title, Stack } from "@mantine/core";
-import TransactionTable from "../components/TransactionTable";
+import TransactionTable from "../components/ExternalTransactionHistoryTable";
 
 const TransactionList: React.FC = () => {
     return (

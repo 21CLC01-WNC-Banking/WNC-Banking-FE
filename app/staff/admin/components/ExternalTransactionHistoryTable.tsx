@@ -15,15 +15,14 @@ import {
 import { Input, InputBase, Combobox, useCombobox } from '@mantine/core';
 import { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Transaction } from "@/lib/types/staff";
-import TransactionDetail from "./TransactionDetail";
+import ExternalTransactionDetail from "./ExternalTransactionDetail";
 import classes from "../../employee/components/AccountCard.module.css";
 import { chunk } from "../../../../lib/utils/staff";
 import { formatDateString } from "@/lib/utils/customer";
 import { ExternalTransaction } from "@/lib/types/staff";
 
 
-const TransactionTable: React.FC = () => {
+const ExternalTransactionHistoryTable: React.FC = () => {
     // State for modal control
     const [opened, { open, close }] = useDisclosure(false);
     //const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -356,10 +355,10 @@ const TransactionTable: React.FC = () => {
                     blur: 3,
                 }}
             >
-                <TransactionDetail transaction={selectedTransaction} />
+                <ExternalTransactionDetail transaction={selectedTransaction} />
             </Modal>
         </Paper>
     );
 };
 
-export default TransactionTable;
+export default ExternalTransactionHistoryTable;
