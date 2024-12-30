@@ -1,3 +1,4 @@
+import { TransferRequest } from "@/lib/types/customer";
 import { createAppAsyncThunk } from "../../hooks/withTypes";
 import {
     setReceivedRequests,
@@ -67,8 +68,25 @@ export const getReceivedRequestsThunk = createAppAsyncThunk(
     }
 );
 
+export const createRequestThunk = createAppAsyncThunk(
+    "transactions/create-request",
+    async (data: TransferRequest) => {
+        const response = await fetch(`${apiUrl}/transaction/debt-reminder`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+    }
+);
+
 export const cancelRequestThunk = createAppAsyncThunk(
-    "transactions/cancel-requests",
+    "transactions/cancel-request",
     async (data: { requestId: string; content: string }) => {
         const response = await fetch(
             `${apiUrl}/transaction/cancel-debt-reminder/${data.requestId}`,

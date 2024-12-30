@@ -45,6 +45,23 @@ export const internalPreTransferThunk = createAppAsyncThunk(
     }
 );
 
+export const preDebtTransferThunk = createAppAsyncThunk(
+    "transfer/pre-debt-transfer",
+    async (data: { transactionId: string }) => {
+        const response = await fetch(`${apiUrl}/transaction/pre-debt-transfer`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+    }
+);
+
 export const internalTransferThunk = createAppAsyncThunk(
     "transfer/internal-transfer",
     async (data: { transactionId: string; otp: string }) => {

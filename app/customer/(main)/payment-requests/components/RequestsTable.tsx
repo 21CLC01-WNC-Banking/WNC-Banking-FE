@@ -39,7 +39,7 @@ const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" |
         title: "Thông tin nhắc nợ",
         content: [
             { label: "Mã nhắc nợ", value: request.debtReminder.id },
-            { label: "Thời gian", value: formatDateString(request.debtReminder.createdAt) },
+            { label: "Thời gian", value: formatDateString(request.debtReminder.updatedAt) },
             {
                 label: type === "received" ? "Người nhắc nợ" : "Người nợ",
                 value: type === "received" ? request.sender : request.receiver,
@@ -53,8 +53,10 @@ const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" |
             },
             ...(request.reply
                 ? [
+                      { label: "divider" },
                       { label: "Người hủy", value: request.reply.userReplyName },
                       { label: "Nội dung hủy", value: request.reply.content },
+                      { label: "Thời gian hủy", value: formatDateString(request.reply.updatedAt) },
                   ]
                 : []),
         ],
@@ -100,17 +102,17 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
         // }
 
         router.push(
-            `/customer/transfer/debt-payment?to=${row.debtReminder.targetAccountNumber.trim()}&amount=${
-                row.debtReminder.amount
-            }`
+            `/customer/transfer/debt-payment?id=${
+                row.debtReminder.id
+            }&to=${row.debtReminder.targetAccountNumber.trim()}&amount=${row.debtReminder.amount}`
         );
     };
 
     // sort requests by time
     const sortByTime = (elements: PaymentRequest[], filter: string) => {
         return elements.sort((a, b) => {
-            const dateA = new Date(a.debtReminder.createdAt);
-            const dateB = new Date(b.debtReminder.createdAt);
+            const dateA = new Date(a.debtReminder.updatedAt);
+            const dateB = new Date(b.debtReminder.updatedAt);
             return filter === "Mới nhất"
                 ? dateB.getTime() - dateA.getTime()
                 : dateA.getTime() - dateB.getTime();
@@ -145,7 +147,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
     // create table rows for current page
     const rows = currentPageRequests.map((request, index) => (
         <Table.Tr key={index}>
-            <Table.Td>{formatDateString(request.debtReminder.createdAt)}</Table.Td>
+            <Table.Td>{formatDateString(request.debtReminder.updatedAt)}</Table.Td>
             <Table.Td>{type === "received" ? request.sender : request.receiver}</Table.Td>
             <Table.Td>{formatCurrency(request.debtReminder.amount)}</Table.Td>
             <Table.Td fw={600} c={mapColor(request.debtReminder.status)}>

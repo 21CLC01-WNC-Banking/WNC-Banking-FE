@@ -1,5 +1,12 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
+import { makeToast } from "@/lib/utils/customer";
+import { createRequestThunk } from "@/lib/thunks/customer/TransactionsThunk";
+
 import {
     Button,
     NumberInput,
@@ -9,27 +16,32 @@ import {
     Input,
     ActionIcon,
     Tooltip,
+    NumberInputHandlers,
+    Stack,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IMaskInput } from "react-imask";
-
 import { IconMessageDollar } from "@tabler/icons-react";
 
 import SelectPopover from "./SelectPopover";
 
 interface CreateModalProps {
     targetAccountNumber?: string;
-    targetName?: string;
     isFromReceiversList: boolean;
 }
 
 const CreateRequestModal: React.FC<CreateModalProps> = ({
     targetAccountNumber,
-    targetName,
     isFromReceiversList,
 }) => {
+    const dispatch = useAppDispatch();
+    const userAccount = useAppSelector((state) => state.auth.customerAccount);
+
     const [opened, { open, close }] = useDisclosure(false);
+
+    // for NumberInput increment and decrement functions
+    const handlersRef = useRef<NumberInputHandlers>(null);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -37,7 +49,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
         initialValues: {
             targetAccountNumber: targetAccountNumber || "",
             amount: 0,
-            message: "Nhắc ĐỐI TƯỢNG trả nợ ngày DD/MM/YYYY",
+            message: "Nhac thanh toan no",
         },
         validate: {
             targetAccountNumber: (value) =>
@@ -56,17 +68,60 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
         }),
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            const newRequest = {
+                amount: values.amount,
+                description: values.message,
+                sourceAccountNumber: userAccount?.accountNumber || "",
+                targetAccountNumber: values.targetAccountNumber.split(" ").join(""),
+                type: "debt_payment",
+            };
+
+            await dispatch(createRequestThunk(newRequest)).unwrap();
+
+            makeToast(
+                "success",
+                "Tạo nhắc nợ thành công",
+                "Bạn có thể xem chi tiết tại trang Nhắc nợ."
+            );
+        } catch (error) {
+            makeToast("error", "Tạo nhắc nợ thất bại", (error as Error).message);
+        }
+
+        handleModalClose();
+    };
+
+    const handleModalClose = () => {
         close();
         form.reset();
     };
+
+    useEffect(() => {
+        const fetchAccount = async () => {
+            try {
+                await dispatch(getAccountThunk()).unwrap();
+            } catch (error) {
+                makeToast(
+                    "error",
+                    "Truy vấn thông tin tài khoản thất bại",
+                    (error as Error).message
+                );
+            }
+        };
+
+        if (userAccount === null) {
+            fetchAccount();
+        }
+
+        form.setFieldValue("message", `${userAccount?.name} nhac thanh toan no`);
+    }, [dispatch, userAccount]);
 
     return (
         <>
             <Modal
                 opened={opened}
-                onClose={close}
+                onClose={handleModalClose}
                 title="Tạo nhắc nợ mới"
                 radius="md"
                 centered
@@ -93,25 +148,50 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                             placeholder="XXXX XXXX XXXX"
                             rightSectionPointerEvents="all"
                             error={form.errors.target}
-                            key={form.key("target")}
-                            {...form.getInputProps("target")}
+                            key={form.key("targetAccountNumber")}
+                            {...form.getInputProps("targetAccountNumber")}
                             rightSection={<SelectPopover form={form} />}
                         />
                     </Input.Wrapper>
 
-                    <NumberInput
-                        size="md"
-                        radius="md"
-                        mt="lg"
-                        label="Số tiền nợ"
-                        withAsterisk
-                        allowNegative={false}
-                        allowDecimal={false}
-                        thousandSeparator=","
-                        suffix=" VND"
-                        key={form.key("amount")}
-                        {...form.getInputProps("amount")}
-                    />
+                    <Stack mt="lg" gap="md">
+                        <NumberInput
+                            size="md"
+                            radius="md"
+                            label="Số tiền nợ"
+                            withAsterisk
+                            handlersRef={handlersRef}
+                            step={10000}
+                            allowNegative={false}
+                            allowDecimal={false}
+                            hideControls
+                            decimalSeparator=","
+                            thousandSeparator="."
+                            suffix=" ₫"
+                            key={form.key("amount")}
+                            {...form.getInputProps("amount")}
+                        />
+
+                        <Group grow mb={form.errors.amount ? "lg" : 0}>
+                            <Button
+                                radius="md"
+                                size="md"
+                                onClick={() => handlersRef.current?.decrement()}
+                                variant="outline"
+                            >
+                                -10.000 ₫
+                            </Button>
+
+                            <Button
+                                radius="md"
+                                size="md"
+                                onClick={() => handlersRef.current?.increment()}
+                                variant="outline"
+                            >
+                                +10.000 ₫
+                            </Button>
+                        </Group>
+                    </Stack>
 
                     <Textarea
                         size="md"
@@ -128,7 +208,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                     />
 
                     <Group mt="lg" justify="flex-end">
-                        <Button radius="md" onClick={close} variant="default">
+                        <Button radius="md" onClick={handleModalClose} variant="default">
                             Hủy
                         </Button>
 

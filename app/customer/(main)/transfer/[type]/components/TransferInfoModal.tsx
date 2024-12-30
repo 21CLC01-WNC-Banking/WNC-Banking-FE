@@ -1,16 +1,22 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { formatCurrency, formatTransferRequest, makeToast } from "@/lib/utils/customer";
-import { internalPreTransferThunk } from "@/lib/thunks/customer/TransferThunks";
+import {
+    internalPreTransferThunk,
+    preDebtTransferThunk,
+} from "@/lib/thunks/customer/TransferThunks";
+import { setCurrentTransferId } from "@/lib/slices/customer/TransferSlice";
 
 interface TransferInfoModal {
     isOpen: boolean;
     onClose: () => void;
     handleNextStep: () => void;
     confirmToggle: () => void;
+    type: string;
 }
 
 const TransferInfoModal: React.FC<TransferInfoModal> = ({
@@ -18,7 +24,9 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
     onClose,
     handleNextStep,
     confirmToggle,
+    type,
 }) => {
+    const searchParams = useSearchParams();
     const dispatch = useAppDispatch();
     const transfer = useAppSelector((state) => state.transfer.currentTransfer);
 
@@ -39,7 +47,15 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
     const handleTransferSubmit = async () => {
         try {
             onClose();
-            await dispatch(internalPreTransferThunk(formatTransferRequest(transfer))).unwrap();
+
+            if (type === "internal" || type === "external") {
+                await dispatch(internalPreTransferThunk(formatTransferRequest(transfer))).unwrap();
+            } else {
+                const transactionId = searchParams.get("id") || "";
+                dispatch(setCurrentTransferId(transactionId));
+                
+                await dispatch(preDebtTransferThunk({ transactionId: transactionId })).unwrap();
+            }
 
             handleNextStep();
         } catch (error) {

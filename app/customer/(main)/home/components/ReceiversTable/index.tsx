@@ -153,7 +153,6 @@ const ReceiversTable = () => {
 
                     <CreateRequestModal
                         targetAccountNumber={formatAccountNumber(row.receiverAccountNumber)}
-                        targetName={row.receiverNickname}
                         isFromReceiversList={true}
                     />
 

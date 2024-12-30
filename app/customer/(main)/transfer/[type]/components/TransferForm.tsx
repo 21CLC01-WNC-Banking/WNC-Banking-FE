@@ -53,13 +53,14 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     );
     const [receiverName, setReceiverName] = useState("");
 
+    // for NumberInput increment and decrement functions
     const handlersRef = useRef<NumberInputHandlers>(null);
 
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            receiverAccount: searchParams.get("to") || "",
+            receiverAccount: formatAccountNumber(searchParams.get("to") || ""),
             amount: parseInt(searchParams.get("amount") || "0"),
             message:
                 type === "debt-payment"
@@ -80,7 +81,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                     : value > (userAccount?.balance ?? 0)
                     ? "Số dư không đủ"
                     : null,
-            message: isNotEmpty("Vui lòng nhập nội dung chuyển khoản"),
+            message: isNotEmpty("Vui lòng nhập diễn giải chuyển khoản"),
         },
         transformValues: (values) => ({
             sourceAccountNumber: userAccount?.accountNumber || "",
@@ -377,7 +378,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     onClick={() => handlersRef.current?.decrement()}
                                     variant="outline"
                                 >
-                                    - 10.000 ₫
+                                    -10.000 ₫
                                 </Button>
 
                                 <Button
@@ -386,7 +387,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     onClick={() => handlersRef.current?.increment()}
                                     variant="outline"
                                 >
-                                    + 10.000 ₫
+                                    +10.000 ₫
                                 </Button>
                             </Group>
                         )}
@@ -396,7 +397,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         size="md"
                         radius="md"
                         mt="lg"
-                        label={`Nội dung chuyển khoản (${messageLength}/100)`}
+                        label={`Diễn giải (${messageLength}/100)`}
                         withAsterisk
                         placeholder={type === "debt-payment" ? "Thanh toan no" : "Chuyen tien"}
                         autosize
@@ -440,6 +441,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                 onClose={close}
                 handleNextStep={handleNextStep}
                 confirmToggle={toggle}
+                type={type}
             />
         </>
     );

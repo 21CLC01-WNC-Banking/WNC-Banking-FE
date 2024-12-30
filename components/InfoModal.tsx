@@ -1,4 +1,4 @@
-import { Modal, Tooltip, ActionIcon, Group, Stack, Text } from "@mantine/core";
+import { Modal, Tooltip, ActionIcon, Group, Stack, Text, Divider } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 
@@ -6,7 +6,7 @@ interface InfoModalProps {
     title: string;
     content: {
         label: string;
-        value: string;
+        value?: string;
         color?: string;
     }[];
 }
@@ -36,15 +36,19 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
                 }}
             >
                 <Stack my={20} gap="md">
-                    {content.map((item) => (
-                        <Group key={item.label} grow justify="between" align="flex-start">
-                            <Text variant="text">{item.label}</Text>
+                    {content.map((item) =>
+                        item.label === "divider" ? (
+                            <Divider key={item.label} my="md" />
+                        ) : (
+                            <Group key={item.label} grow justify="between" align="flex-start">
+                                <Text variant="text">{item.label}</Text>
 
-                            <Text ta="right" fw={700} c={item.color}>
-                                {item.value}
-                            </Text>
-                        </Group>
-                    ))}
+                                <Text ta="right" fw={700} c={item.color}>
+                                    {item.value}
+                                </Text>
+                            </Group>
+                        )
+                    )}
                 </Stack>
             </Modal>
 
