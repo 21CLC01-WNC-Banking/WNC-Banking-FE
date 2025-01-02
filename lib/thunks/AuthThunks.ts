@@ -1,5 +1,5 @@
 import { createAppAsyncThunk } from "../hooks/withTypes";
-import { login } from "../slices/AuthSlice";
+import { login, logout } from "../slices/AuthSlice";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,4 +28,20 @@ export const loginThunk = createAppAsyncThunk("auth/login", async (data: object,
     }
 
     dispatch(login());
+});
+
+export const logoutThunk = createAppAsyncThunk("auth/logout", async (_, { dispatch }) => {
+    const response = await fetch(`${apiUrl}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const responseData = await response.json();
+
+        throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+    }
+
+    dispatch(logout());
 });
