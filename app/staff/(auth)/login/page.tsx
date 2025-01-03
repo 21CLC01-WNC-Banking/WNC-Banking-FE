@@ -17,18 +17,17 @@ import {
 import { notifications } from "@mantine/notifications";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import Link from "next/link";
-import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import useCaptcha from "@/lib/hooks/useCaptcha";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { loginThunk } from "@/lib/thunks/AuthThunks";
 
 const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha } = useCaptcha();
     const router = useRouter();
-    const [error, setError] = useState("");
     const dispatch = useAppDispatch();
+    const role = useAppSelector((state) => state.auth.authUser?.role);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -54,7 +53,9 @@ const Login = () => {
                 position: "bottom-right",
             });
 
-            router.push("/staff/create-account");
+            role === "admin"
+                ? router.push("/staff/admin/employee-list")
+                : router.push("/staff/employee/create-account");
         } catch (error) {
             notifications.show({
                 withBorder: true,

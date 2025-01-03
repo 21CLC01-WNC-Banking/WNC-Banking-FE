@@ -5,6 +5,9 @@ import { useRouter } from "nextjs-toploader/app";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { formatCurrency, makeToast } from "@/lib/utils/customer";
+import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
+import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { resetFilter } from "@/lib/slices/customer/ReceiversSlice";
 
 import {
     Button,
@@ -18,9 +21,6 @@ import {
     Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
-import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
-import { resetFilter } from "@/lib/slices/customer/ReceiversSlice";
 
 const CompletionScreen = () => {
     const router = useRouter();

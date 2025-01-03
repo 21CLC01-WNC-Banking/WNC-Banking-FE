@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-import { Fieldset, Center, Title, Group, TextInput, Button, Anchor, Stack } from "@mantine/core";
-import { isEmail, useForm } from "@mantine/form";
-
 import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { forgotPasswordEmailThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
 import { makeToast } from "@/lib/utils/customer";
+
+import { Fieldset, Center, Title, Group, TextInput, Button, Anchor, Stack } from "@mantine/core";
+import { isEmail, useForm } from "@mantine/form";
 
 interface EmailFormProps {
     handleNextStep?: () => void;

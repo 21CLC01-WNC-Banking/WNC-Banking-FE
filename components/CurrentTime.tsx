@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { Text, Box } from "@mantine/core";
 
 const CurrentTime: React.FC = () => {

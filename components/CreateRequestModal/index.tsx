@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { IMaskInput } from "react-imask";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
@@ -21,7 +22,6 @@ import {
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { IMaskInput } from "react-imask";
 import { IconMessageDollar } from "@tabler/icons-react";
 
 import SelectPopover from "./SelectPopover";
@@ -36,7 +36,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
     isFromReceiversList,
 }) => {
     const dispatch = useAppDispatch();
-    const userAccount = useAppSelector((state) => state.auth.customerAccount);
+    const userAccount = useAppSelector((state) => state.account.customerAccount);
 
     const [opened, { open, close }] = useDisclosure(false);
 

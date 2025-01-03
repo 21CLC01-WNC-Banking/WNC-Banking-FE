@@ -1,7 +1,9 @@
 "use client";
 
-import { Stack, Stepper, Paper } from "@mantine/core";
 import { useState } from "react";
+
+import { Stack, Stepper, Paper } from "@mantine/core";
+
 import EmailForm from "./components/EmailForm";
 import PasswordOtpForm from "./components/PasswordOtpForm";
 import ResetPasswordForm from "./components/ResetPasswordForm";

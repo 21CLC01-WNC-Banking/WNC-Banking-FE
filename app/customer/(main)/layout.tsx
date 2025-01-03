@@ -3,6 +3,10 @@
 import { useEffect, Suspense } from "react";
 import { useRouter } from "nextjs-toploader/app";
 
+import { useAppSelector } from "@/lib/hooks/withTypes";
+import { makeToast } from "@/lib/utils/customer";
+import useWebSocket from "@/lib/hooks/useWebSocket";
+
 import { Group } from "@mantine/core";
 import {
     IconHome,
@@ -15,10 +19,6 @@ import {
 import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
-
-import { useAppSelector } from "@/lib/hooks/withTypes";
-import { makeToast } from "@/lib/utils/customer";
-import useWebSocket from "@/lib/hooks/useWebSocket";
 
 const menuItems = [
     {
@@ -64,13 +64,13 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
-    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+    const role = useAppSelector((state) => state.auth.authUser?.role);
 
     useEffect(() => {
-        if (!isLoggedIn) {
+        if (role !== "customer") {
             router.push("/customer/login");
         }
-    }, [isLoggedIn, router]);
+    }, [role, router]);
 
     // websocket connection to receive notifications
     useWebSocket((data) => {
@@ -87,7 +87,7 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
         }
     });
 
-    if (!isLoggedIn) {
+    if (!role) {
         return <Loading />;
     }
 

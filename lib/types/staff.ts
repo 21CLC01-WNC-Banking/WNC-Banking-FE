@@ -14,14 +14,6 @@ export interface Account {
     nickname: string;
 }
 
-// export interface Transaction {
-//     dateTime: string;
-//     accountType: string;
-//     amount: string;
-//     transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-//     balance: string;
-// }
-
 export interface PaymentRequest {
     requestor?: string;
     target?: string;
@@ -35,10 +27,28 @@ export interface PaymentRequest {
 export interface Transaction {
     id: number,
     createdAt: string;
-    sender_account_number: string;
+    sourceAccountNumber: string;
     amount: number;
-    receiver_account_number: string;
+    targetAccountNumber: string;
     transactionType: string;
-    balance: string;
-    message: string;
+    balance: number;
+    description: string;
+}
+
+export interface ExternalTransaction {
+    id: number,
+    createdAt: string;
+    sourceAccountNumber: string;
+    amount: number;
+    targetAccountNumber: string;
+    bank: string,
+    balance: number;
+    description: string;
+}
+
+export interface Employee {
+    id: number,
+    name: string,
+    email: string,
+    phoneNumber: string,
 }

@@ -11,11 +11,12 @@ import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
 import { transactionsReducer } from "./slices/customer/TransactionsSlice";
 import { notificationsReducer } from "./slices/customer/NotificationsSlice";
 import { partnerBanksReducer } from "./slices/customer/PartnerBanksSlice";
+import { accountReducer } from "./slices/customer/AccountSlice";
 
 const authPersistConfig = {
     key: "auth",
     storage,
-    whitelist: ["isLoggedIn"], // Only persist login state
+    whitelist: ["authUser"], // Persist userAccount: [name, role, userId]
 };
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
@@ -32,6 +33,7 @@ export const makeStore = () => {
             transactions: transactionsReducer,
             notifications: notificationsReducer,
             partnerBanks: partnerBanksReducer,
+            account: accountReducer,
 
             // staff
         },

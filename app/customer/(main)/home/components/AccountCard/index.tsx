@@ -2,16 +2,16 @@
 
 import { useEffect } from "react";
 
-import { Text } from "@mantine/core";
-import classes from "./AccountCard.module.css";
-
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
 import { formatCurrency, formatAccountNumber, makeToast } from "@/lib/utils/customer";
 
+import { Text } from "@mantine/core";
+import classes from "./AccountCard.module.css";
+
 const AccountCard = () => {
     const dispatch = useAppDispatch();
-    const account = useAppSelector((state) => state.auth.customerAccount);
+    const account = useAppSelector((state) => state.account.customerAccount);
 
     const data = [
         {

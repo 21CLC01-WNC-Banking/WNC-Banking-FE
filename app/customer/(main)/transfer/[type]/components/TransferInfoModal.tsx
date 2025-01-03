@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { formatCurrency, formatTransferRequest, makeToast } from "@/lib/utils/customer";
@@ -11,6 +10,8 @@ import {
     preDebtTransferThunk,
 } from "@/lib/thunks/customer/TransferThunks";
 import { setCurrentTransferId } from "@/lib/slices/customer/TransferSlice";
+
+import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
 interface TransferInfoModal {
     isOpen: boolean;

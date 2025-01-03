@@ -2,19 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import {
-    Paper,
-    Table,
-    Text,
-    Pagination,
-    Center,
-    Group,
-    SegmentedControl,
-    Button,
-} from "@mantine/core";
-
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-
 import { Transaction } from "@/lib/types/customer";
 import { getTransactionHistoryThunk } from "@/lib/thunks/customer/TransactionsThunk";
 import {
@@ -27,8 +15,10 @@ import {
 } from "@/lib/utils/customer";
 import { makeToast } from "@/lib/utils/customer";
 
-import AccountCard from "./AccountCard";
+import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
+
 import InfoModal from "@/components/InfoModal";
+import AccountCard from "./AccountCard";
 
 const makeTransactionInfoModalContent = (transaction: Transaction) => {
     return {
@@ -160,36 +150,6 @@ const AccountInfo: React.FC = () => {
             {/* Filter Section */}
             <Group justify="space-between" align="center" mb="md" mt="xl">
                 <Group justify="flex-end" gap="md">
-                    <Button
-                        radius="md"
-                        variant="default"
-                        onClick={async () => {
-                            const response = await fetch(
-                                `http://localhost:8080/api/v1/core/test-notification`,
-                                {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    credentials: "include",
-                                    body: JSON.stringify({
-                                        content: "Pee-woop.",
-                                        deviceId: 2,
-                                        title: "Test notification",
-                                    }),
-                                }
-                            );
-
-                            if (!response.ok) {
-                                const responseData = await response.json();
-                                throw new Error(
-                                    responseData.errors[0].message ||
-                                        "Đã xảy ra lỗi kết nối với máy chủ."
-                                );
-                            }
-                        }}
-                    >
-                        🔔
-                    </Button>
-
                     <Text>Giao dịch:</Text>
 
                     <SegmentedControl

@@ -1,11 +1,11 @@
 import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { renameReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { makeToast } from "@/lib/utils/customer";
 
 import { Modal, Tooltip, ActionIcon, Button, Group, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
 import { IconPencil } from "@tabler/icons-react";
-import { makeToast } from "@/lib/utils/customer";
 
 interface EditModalProps {
     receiverId: number;

@@ -1,8 +1,8 @@
 "use client";
 
-import { IconArrowUp } from "@tabler/icons-react";
 import { useWindowScroll } from "@mantine/hooks";
 import { Affix, ActionIcon, Transition } from "@mantine/core";
+import { IconArrowUp } from "@tabler/icons-react";
 
 const ScrollToTop = () => {
     const [scroll, scrollTo] = useWindowScroll();

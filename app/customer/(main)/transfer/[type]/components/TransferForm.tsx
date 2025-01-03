@@ -2,10 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { IMaskInput } from "react-imask";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
+import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
+import { getInternalAccountOwnerThunk } from "@/lib/thunks/customer/AccountThunks";
+import { getPartnerBanksThunk } from "@/lib/thunks/customer/PartnerBanksThunks";
 import {
     getExternalAccountOwnerThunk,
     getUserAccountThunk,
@@ -30,13 +34,9 @@ import {
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { IMaskInput } from "react-imask";
 
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
-import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
-import { getInternalAccountOwnerThunk } from "@/lib/thunks/customer/AccountThunks";
-import { getPartnerBanksThunk } from "@/lib/thunks/customer/PartnerBanksThunks";
 
 interface TransferFormProps {
     handleNextStep: () => void;
@@ -45,7 +45,7 @@ interface TransferFormProps {
 
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
-    const userAccount = useAppSelector((state) => state.auth.customerAccount);
+    const userAccount = useAppSelector((state) => state.account.customerAccount);
     const partnerBanks = useAppSelector((state) => state.partnerBanks.partnerBanks);
 
     const searchParams = useSearchParams();

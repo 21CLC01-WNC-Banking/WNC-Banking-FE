@@ -24,7 +24,7 @@ const nextConfig = {
             },
             {
                 source: "/staff",
-                destination: "/staff/create-account",
+                destination: "/staff/employee/create-account",
                 permanent: true,
             },
             {

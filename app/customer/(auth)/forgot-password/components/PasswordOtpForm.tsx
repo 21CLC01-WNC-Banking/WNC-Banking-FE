@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { forgotPasswordOtpThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
+import { makeToast } from "@/lib/utils/customer";
+
 import {
     Button,
     Center,
@@ -14,10 +18,6 @@ import {
     Group,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { forgotPasswordOtpThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
-import { makeToast } from "@/lib/utils/customer";
 
 interface OtpFormProps {
     handleNextStep?: () => void;

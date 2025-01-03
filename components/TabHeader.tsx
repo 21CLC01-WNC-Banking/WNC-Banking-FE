@@ -1,7 +1,8 @@
 "use client";
 
-import { Tabs, Text } from "@mantine/core";
 import React from "react";
+
+import { Tabs, Text } from "@mantine/core";
 
 interface TabHeaderProps {
     tabs: { label: string; content: JSX.Element }[];

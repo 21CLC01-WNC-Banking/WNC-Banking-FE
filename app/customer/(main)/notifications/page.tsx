@@ -1,6 +1,7 @@
 "use client";
 
 import { Paper, Center, Title } from "@mantine/core";
+
 import NotificationItem from "@/components/NotificationItem";
 
 const Notifications = () => {

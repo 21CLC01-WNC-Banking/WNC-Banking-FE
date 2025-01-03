@@ -36,7 +36,7 @@ const DepositForm = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const handleAccountNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
-        if (/^\d*$/.test(input)) {
+        if (/^\d{0,12}$/.test(input)) {
             form.setFieldValue("accountNumber", input);
 
             // Nếu đủ 12 ký tự, gọi API để lấy tên tài khoản
@@ -88,6 +88,7 @@ const DepositForm = () => {
                 body: JSON.stringify({
                     accountNumber: values.accountNumber,
                     amount: values.amount,
+                    description: values.message,
                 }),
             });
 

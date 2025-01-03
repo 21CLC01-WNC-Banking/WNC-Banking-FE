@@ -2,11 +2,11 @@
 
 import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { deleteReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { makeToast } from "@/lib/utils/customer";
 
 import { Modal, Tooltip, ActionIcon, Button, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
-import { makeToast } from "@/lib/utils/customer";
 
 interface DeleteModalProps {
     receiverId: number;

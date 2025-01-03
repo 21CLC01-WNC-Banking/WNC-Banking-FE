@@ -1,5 +1,5 @@
-import { createAppAsyncThunk } from "../../hooks/withTypes";
-import { setCustomerAccount } from "../../slices/AuthSlice";
+import { createAppAsyncThunk } from "@/lib/hooks/withTypes";
+import { setCustomerAccount } from "@/lib/slices/customer/AccountSlice";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
