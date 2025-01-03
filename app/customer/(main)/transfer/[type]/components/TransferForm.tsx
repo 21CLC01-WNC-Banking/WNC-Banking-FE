@@ -2,12 +2,19 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { IMaskInput } from "react-imask";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
-import { getAccountThunk } from "@/lib/thunks/AuthThunks";
-import { formatAccountNumber, formatCurrency } from "@/lib/utils/customer";
+import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
+import { getInternalAccountOwnerThunk } from "@/lib/thunks/customer/AccountThunks";
+import { getPartnerBanksThunk } from "@/lib/thunks/customer/PartnerBanksThunks";
+import {
+    getExternalAccountOwnerThunk,
+    getUserAccountThunk,
+} from "@/lib/thunks/customer/AccountThunks";
+import { formatAccountNumber, formatCurrency, makeToast } from "@/lib/utils/customer";
 
 import {
     Button,
@@ -23,84 +30,47 @@ import {
     Tooltip,
     UnstyledButton,
     Input,
-    rem,
     NumberInputHandlers,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { IMaskInput } from "react-imask";
-import { IconX } from "@tabler/icons-react";
 
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
 
-const fetchReceiverName = async (accNum: string) => {
-    const deformatted = accNum.split(" ").join("");
-
-    const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/account/customer-name?accountNumber=${deformatted}`,
-        {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-        }
-    );
-
-    if (!response.ok) {
-        const responseData = await response.json();
-        let message = responseData.errors[0].message;
-
-        if (message.includes("no rows")) {
-            message = "Không tìm thấy người nhận. Vui lòng kiểm tra lại số tài khoản.";
-        }
-
-        notifications.show({
-            withBorder: true,
-            radius: "md",
-            icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-            color: "red",
-            title: "Truy vấn người nhận thất bại",
-            message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
-            position: "bottom-right",
-        });
-
-        return "";
-    }
-
-    const data = await response.json();
-    return data.data.name;
-};
-
 interface TransferFormProps {
-    handleNextStep?: () => void;
+    handleNextStep: () => void;
     type: string;
 }
 
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
+    const userAccount = useAppSelector((state) => state.account.customerAccount);
+    const partnerBanks = useAppSelector((state) => state.partnerBanks.partnerBanks);
+
     const searchParams = useSearchParams();
 
     const [opened, { open, close }] = useDisclosure(false);
+    const [loading, { toggle }] = useDisclosure(false);
 
     const [selectedBank, setSelectedBank] = useState(
-        type === "internal" ? "WNC Bank" : searchParams.get("at") || ""
+        type === "internal" || type === "debt-payment" ? "0" : searchParams.get("bankId") || "0"
     );
-
     const [receiverName, setReceiverName] = useState("");
-    const [showBalance, setShowBalance] = useState(false);
 
+    // for NumberInput increment and decrement functions
     const handlersRef = useRef<NumberInputHandlers>(null);
-
-    const userAccount = useAppSelector((state) => state.auth.customerAccount);
 
     const form = useForm({
         mode: "uncontrolled",
         validateInputOnBlur: true,
         initialValues: {
-            receiverAccount: searchParams.get("to") || "",
-            amount: 0,
-            message: `${userAccount?.name} chuyển tiền`,
+            receiverAccount: formatAccountNumber(searchParams.get("to") || ""),
+            amount: parseInt(searchParams.get("amount") || "0"),
+            message:
+                type === "debt-payment"
+                    ? `${userAccount?.name} thanh toan no`
+                    : `${userAccount?.name} chuyen tien`,
             receiverHandlesFee: false,
         },
         validate: {
@@ -110,8 +80,13 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                     : /[0-9\s]{14}/.test(value)
                     ? null
                     : "Số tài khoản người nhận không hợp lệ",
-            amount: (value) => (value < 10000 ? "Số tiền cần chuyển tối thiểu là 10.000 ₫" : null),
-            message: isNotEmpty("Vui lòng nhập nội dung chuyển khoản"),
+            amount: (value) =>
+                value < 2000
+                    ? "Số tiền chuyển phải lớn hơn 2.000 ₫"
+                    : value > (userAccount?.balance ?? 0)
+                    ? "Số dư không đủ"
+                    : null,
+            message: isNotEmpty("Vui lòng nhập diễn giải chuyển khoản"),
         },
         transformValues: (values) => ({
             sourceAccountNumber: userAccount?.accountNumber || "",
@@ -125,19 +100,71 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
     const [messageLength, setMessageLength] = useState(form.getValues().message.length);
 
-    const toggleConfirmModal = () => {
+    const estimateTransferFee = async (amount: number) => {
+        try {
+            const fee = await dispatch(transferFeeThunk({ amount: amount })).unwrap();
+
+            return fee;
+        } catch (error) {
+            makeToast("error", "Tính phí giao dịch thất bại", (error as Error).message);
+        }
+    };
+
+    const getReceiverName = async (account: string) => {
+        try {
+            let name;
+            if (type === "internal" || type === "debt-payment") {
+                name = await dispatch(
+                    getInternalAccountOwnerThunk({ accountNumber: account })
+                ).unwrap();
+            } else {
+                // external transfer
+                name = await dispatch(
+                    getExternalAccountOwnerThunk({
+                        accountNumber: account,
+                        bankId: parseInt(selectedBank),
+                    })
+                ).unwrap();
+            }
+
+            if (name && name.length > 0) {
+                setReceiverName(name);
+            }
+        } catch (error) {
+            makeToast("error", "Truy vấn thông tin người nhận thất bại", (error as Error).message);
+        }
+    };
+
+    // callback to inject into ReceiverDrawer component
+    const handleSetReceiverFormField = (account: string) => {
+        form.setFieldValue("receiverAccount", account);
+    };
+
+    const toggleConfirmModal = async () => {
         const validatedForm = form.validate();
 
-        console.log(form.errors);
-
         if (!validatedForm.hasErrors) {
+            // toggle the loading state for the confirm button
+            toggle();
+
+            const fee = await estimateTransferFee(form.getValues().amount);
+
             const newTransfer = {
                 amount: form.getValues().amount,
                 message: form.getValues().message,
                 receiverAccount: form.getValues().receiverAccount,
-                receiverBank: type === "internal" ? "WNC Bank" : selectedBank,
-                senderAccount: "Mặc định",
+                receiverName: receiverName,
+                receiverBankId: parseInt(selectedBank),
+                receiverBank:
+                    type === "internal" || type === "debt-payment"
+                        ? "WNC Bank"
+                        : partnerBanks.find((bank) => bank.id === parseInt(selectedBank))
+                              ?.bankName || "-",
+                senderAccount:
+                    formatAccountNumber(userAccount ? userAccount.accountNumber : "") || "-",
+                senderName: userAccount?.name || "-",
                 senderHandlesFee: !form.getValues().receiverHandlesFee,
+                transferFee: fee || 0,
             };
 
             dispatch(setCurrentTransfer(newTransfer));
@@ -146,19 +173,15 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
         }
     };
 
-    const handleSelectReceiver = async (account: string) => {
-        console.log("touched");
-
-        const name = await fetchReceiverName(account);
-
-        if (name && name.length > 0) {
-            setReceiverName(name);
-        }
-    };
+    useEffect(() => {
+        dispatch(setFilteredReceivers(parseInt(selectedBank)));
+    }, [dispatch, selectedBank]);
 
     useEffect(() => {
-        dispatch(setFilteredReceivers(selectedBank));
-    }, [dispatch, selectedBank]);
+        if (form.getValues().receiverAccount !== "") {
+            getReceiverName(form.getValues().receiverAccount);
+        }
+    }, []);
 
     useEffect(() => {
         setMessageLength(form.getValues().message.length);
@@ -167,17 +190,13 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     useEffect(() => {
         const fetchAccount = async () => {
             try {
-                await dispatch(getAccountThunk()).unwrap();
+                await dispatch(getUserAccountThunk()).unwrap();
             } catch (error) {
-                notifications.show({
-                    withBorder: true,
-                    radius: "md",
-                    icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                    color: "red",
-                    title: "Truy vấn thông tin tài khoản thất bại",
-                    message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                    position: "bottom-right",
-                });
+                makeToast(
+                    "error",
+                    "Truy vấn thông tin tài khoản thất bại",
+                    (error as Error).message
+                );
             }
         };
 
@@ -185,23 +204,49 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
             fetchAccount();
         }
 
-        form.setFieldValue("message", `${userAccount?.name} chuyển tiền`);
+        form.setFieldValue(
+            "message",
+            type === "debt-payment"
+                ? `${userAccount?.name} thanh toan no`
+                : `${userAccount?.name} chuyen tien`
+        );
     }, [dispatch, userAccount]);
+
+    useEffect(() => {
+        // only do this for external transfers
+        if (type === "external") {
+            const fetchBanks = async () => {
+                try {
+                    await dispatch(getPartnerBanksThunk()).unwrap();
+                } catch (error) {
+                    makeToast(
+                        "error",
+                        "Truy vấn danh sách ngân hàng liên kết thất bại",
+                        (error as Error).message
+                    );
+                }
+            };
+
+            fetchBanks();
+        }
+    }, [dispatch]);
 
     return (
         <>
             <Fieldset radius="md" p={30} mt="xl">
                 <Center mb="xl">
                     <Title order={2}>
-                        Chuyển khoản {type === "internal" ? "nội bộ" : "liên ngân hàng"}
+                        {type === "internal"
+                            ? "Chuyển khoản nội bộ"
+                            : type === "debt-payment"
+                            ? "Thanh toán nợ"
+                            : "Chuyển khoản liên ngân hàng"}
                     </Title>
                 </Center>
 
                 <form
                     onSubmit={form.onSubmit(() => {
-                        if (handleNextStep) {
-                            handleNextStep();
-                        }
+                        form.reset();
                     })}
                 >
                     <Group grow gap="xl">
@@ -221,21 +266,13 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     userAccount ? userAccount.accountNumber : ""
                                 )} (mặc định)`,
                             ]}
-                            onChange={() => {
-                                form.setFieldValue("message", `${userAccount?.name} chuyển tiền`);
-                                setShowBalance(true);
-                            }}
                         />
 
                         <TextInput
                             size="md"
                             radius="md"
                             label="Số dư tài khoản"
-                            value={
-                                showBalance
-                                    ? formatCurrency(userAccount?.balance || 0)
-                                    : formatCurrency(0)
-                            }
+                            value={formatCurrency(userAccount?.balance || 0)}
                             styles={{
                                 input: {
                                     color: "var(--mantine-color-blue-filled)",
@@ -256,7 +293,10 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             allowDeselect={false}
                             withAsterisk
                             placeholder="Chọn ngân hàng"
-                            data={["Vietcombank", "Techcombank", "Agribank"]}
+                            data={partnerBanks.map((bank) => ({
+                                label: `${bank.bankName} (${bank.shortName})`,
+                                value: String(bank.id),
+                            }))}
                             value={selectedBank}
                             onChange={(value) => {
                                 if (value) {
@@ -268,7 +308,9 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
                     <Tooltip
                         label="Vui lòng chọn ngân hàng trước khi nhập số tài khoản"
-                        disabled={type === "internal" || selectedBank !== ""}
+                        disabled={
+                            type === "internal" || type === "debt-payment" || selectedBank !== "0"
+                        }
                     >
                         <Input.Wrapper
                             size="md"
@@ -279,7 +321,8 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                     ? "Để xem danh sách người nhận không thuộc ngân hàng đã chọn, hãy chọn ngân hàng khác ở danh sách bên trên"
                                     : ""
                             }
-                            withAsterisk
+                            error={form.errors.receiverAccount}
+                            withAsterisk={type !== "debt-payment"}
                         >
                             <Input
                                 component={IMaskInput}
@@ -288,17 +331,18 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 mask="0000 0000 0000"
                                 placeholder="XXXX XXXX XXXX"
                                 rightSectionPointerEvents="all"
-                                error={form.errors.receiverAccount}
                                 key={form.key("receiverAccount")}
                                 {...form.getInputProps("receiverAccount")}
-                                disabled={type === "external" && selectedBank === ""}
+                                disabled={type === "external" && selectedBank === "0"}
                                 rightSection={
-                                    <ReceiverDrawer
-                                        type={type}
-                                        form={form}
-                                        selectedBank={selectedBank}
-                                        onSelectReceiver={handleSelectReceiver}
-                                    />
+                                    type === "debt-payment" ? null : (
+                                        <ReceiverDrawer
+                                            type={type}
+                                            formHandler={handleSetReceiverFormField}
+                                            selectedBank={selectedBank}
+                                            onSelect={getReceiverName}
+                                        />
+                                    )
                                 }
                                 onBlur={(event) => {
                                     if (event.currentTarget.value.length >= 14) {
@@ -306,8 +350,19 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                             "receiverAccount",
                                             event.currentTarget.value
                                         );
-                                        handleSelectReceiver(event.currentTarget.value);
+                                        getReceiverName(event.currentTarget.value);
                                     }
+                                }}
+                                readOnly={type === "debt-payment"}
+                                styles={{
+                                    input:
+                                        type === "debt-payment"
+                                            ? {
+                                                  color: "var(--mantine-color-blue-filled)",
+                                                  backgroundColor:
+                                                      "var(--mantine-color-blue-light)",
+                                              }
+                                            : undefined,
                                 }}
                             />
                         </Input.Wrapper>
@@ -323,6 +378,10 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             root: {
                                 display: receiverName.length > 0 ? "block" : "none",
                             },
+                            input: {
+                                color: "var(--mantine-color-blue-filled)",
+                                backgroundColor: "var(--mantine-color-blue-light)",
+                            },
                         }}
                         readOnly
                     />
@@ -332,7 +391,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             size="md"
                             radius="md"
                             label="Số tiền cần chuyển"
-                            withAsterisk
+                            withAsterisk={type !== "debt-payment"}
                             handlersRef={handlersRef}
                             step={10000}
                             allowNegative={false}
@@ -341,38 +400,50 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             decimalSeparator=","
                             thousandSeparator="."
                             suffix=" ₫"
+                            readOnly={type === "debt-payment"}
+                            styles={{
+                                input:
+                                    type === "debt-payment"
+                                        ? {
+                                              color: "var(--mantine-color-blue-filled)",
+                                              backgroundColor: "var(--mantine-color-blue-light)",
+                                          }
+                                        : undefined,
+                            }}
                             key={form.key("amount")}
                             {...form.getInputProps("amount")}
                         />
 
-                        <Group grow mb={form.errors.amount ? "lg" : 0}>
-                            <Button
-                                size="md"
-                                radius="md"
-                                onClick={() => handlersRef.current?.decrement()}
-                                variant="default"
-                            >
-                                - 10.000 ₫
-                            </Button>
+                        {type !== "debt-payment" && (
+                            <Group grow mb={form.errors.amount ? "lg" : 0}>
+                                <Button
+                                    radius="md"
+                                    size="md"
+                                    onClick={() => handlersRef.current?.decrement()}
+                                    variant="outline"
+                                >
+                                    -10.000 ₫
+                                </Button>
 
-                            <Button
-                                size="md"
-                                radius="md"
-                                onClick={() => handlersRef.current?.increment()}
-                                variant="default"
-                            >
-                                + 10.000 ₫
-                            </Button>
-                        </Group>
+                                <Button
+                                    radius="md"
+                                    size="md"
+                                    onClick={() => handlersRef.current?.increment()}
+                                    variant="outline"
+                                >
+                                    +10.000 ₫
+                                </Button>
+                            </Group>
+                        )}
                     </Group>
 
                     <Textarea
                         size="md"
                         radius="md"
                         mt="lg"
-                        label={`Nội dung chuyển khoản (${messageLength}/100)`}
+                        label={`Diễn giải (${messageLength}/100)`}
                         withAsterisk
-                        placeholder="Người dùng chuyển tiền"
+                        placeholder={type === "debt-payment" ? "Thanh toan no" : "Chuyen tien"}
                         autosize
                         minRows={2}
                         maxRows={4}
@@ -382,26 +453,40 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         onChange={(event) => setMessageLength(event.currentTarget.value.length)}
                     />
 
-                    <Checkbox
-                        size="md"
-                        radius="md"
-                        mt="lg"
-                        label="Người nhận chịu phí"
-                        description="Nếu không chọn, người gửi tiền sẽ thanh toán phí chuyển khoản"
-                        key={form.key("receiverHandlesFee")}
-                        {...form.getInputProps("receiverHandlesFee")}
-                    />
+                    {type !== "debt-payment" && (
+                        <Checkbox
+                            size="md"
+                            radius="md"
+                            mt="lg"
+                            label="Người nhận chịu phí"
+                            description="Nếu không chọn, bạn sẽ phải thanh toán phí chuyển khoản"
+                            key={form.key("receiverHandlesFee")}
+                            {...form.getInputProps("receiverHandlesFee")}
+                        />
+                    )}
 
                     {/*Invisible button for form submission*/}
                     <UnstyledButton type="submit" id="submit-form"></UnstyledButton>
 
-                    <Button fullWidth onClick={toggleConfirmModal} mt="lg" radius="md">
+                    <Button
+                        radius="md"
+                        fullWidth
+                        loading={loading}
+                        onClick={toggleConfirmModal}
+                        mt="lg"
+                    >
                         Tiếp tục
                     </Button>
                 </form>
             </Fieldset>
 
-            <TransferInfoModal isOpen={opened} onClose={close} />
+            <TransferInfoModal
+                isOpen={opened}
+                onClose={close}
+                handleNextStep={handleNextStep}
+                confirmToggle={toggle}
+                type={type}
+            />
         </>
     );
 };

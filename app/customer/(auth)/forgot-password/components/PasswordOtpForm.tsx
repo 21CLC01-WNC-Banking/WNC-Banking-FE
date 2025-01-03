@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { forgotPasswordOtpThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
+import { makeToast } from "@/lib/utils/customer";
+
 import {
     Button,
     Center,
@@ -12,14 +16,8 @@ import {
     Fieldset,
     Anchor,
     Group,
-    rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconX } from "@tabler/icons-react";
-
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { forgotPasswordOtpThunk } from "@/lib/thunks/customer/ForgotPasswordThunks";
 
 interface OtpFormProps {
     handleNextStep?: () => void;
@@ -54,15 +52,11 @@ const PasswordOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
                 handleNextStep();
             }
         } catch (error) {
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
-                color: "red",
-                title: "Gửi mã OTP thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
-                position: "bottom-right",
-            });
+            if ((error as Error).message === "Invalid OTP") {
+                makeToast("error", "Gửi mã OTP thất bại", "Mã OTP không hợp lệ hoặc đã hết hạn.");
+            } else {
+                makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
+            }
         }
     };
 

@@ -1,5 +1,7 @@
-import { createAppAsyncThunk } from "../hooks/withTypes";
-import { login } from "../slices/AuthSlice";
+import { createAppAsyncThunk } from "@/lib/hooks/withTypes";
+
+import { login, logout } from "@/lib/slices/AuthSlice";
+import { AuthUser } from "@/lib/types/common";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,6 +28,29 @@ export const loginThunk = createAppAsyncThunk("auth/login", async (data: object,
 
         throw new Error(message || "Đã xảy ra lỗi kết nối với máy chủ.");
     }
+    const responseData = await response.json();
 
-    dispatch(login());
+    const newUserAccount: AuthUser = {
+        name: responseData.data.name,
+        role: responseData.data.role,
+        userId: responseData.data.userId,
+    };
+
+    dispatch(login(newUserAccount));
+});
+
+export const logoutThunk = createAppAsyncThunk("auth/logout", async (_, { dispatch }) => {
+    const response = await fetch(`${apiUrl}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const responseData = await response.json();
+
+        throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+    }
+
+    dispatch(logout());
 });

@@ -1,15 +1,14 @@
 import { Paper } from "@mantine/core";
 
 import TabHeader from "@/components/TabHeader";
-import ReceivedRequests from "./components/ReceivedRequests";
-import SentRequests from "./components/SentRequests";
+import RequestsTable from "./components/RequestsTable";
 
 const tabs = [
     {
         label: "Nhắc nợ đã gửi",
         content: (
             <Paper withBorder mx={120} radius="md" p={40} mt={50}>
-                <SentRequests />
+                <RequestsTable type="sent" />
             </Paper>
         ),
     },
@@ -17,7 +16,7 @@ const tabs = [
         label: "Nhắc nợ đã nhận",
         content: (
             <Paper withBorder mx={120} radius="md" p={40} mt={50}>
-                <ReceivedRequests />
+                <RequestsTable type="received" />
             </Paper>
         ),
     },

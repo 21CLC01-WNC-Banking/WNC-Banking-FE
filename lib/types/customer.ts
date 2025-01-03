@@ -2,49 +2,102 @@ export interface Transfer {
     amount: number;
     message: string;
     receiverAccount: string;
+    receiverName: string;
     receiverBank: string;
+    receiverBankId: number;
     senderAccount: string;
+    senderName: string;
+    transferFee: number;
     senderHandlesFee: boolean;
 }
 
-export interface UserAccount {
+// formatted to comply with the backend API
+// use this to create new payment requests as well
+export interface TransferRequest {
+    amount: number;
+    description: string;
+    isSourceFee?: boolean;
+    partnerBankId?: number;
+    sourceAccountNumber: string;
+    targetAccountNumber: string;
+    type: string;
+}
+
+export interface CustomerAccount {
     name: string;
     accountNumber: string;
     balance: number;
 }
 
 export interface ReceiverAccount {
-    name: string;
-    bank: string;
-    accountNumber: string;
-    nickname: string;
-}
-
-export interface Transaction {
-    dateTime: string;
-    accountType: string;
-    amount: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-    balance: string;
+    id: number;
+    receiverAccountNumber: string;
+    receiverNickname: string;
+    bankId: number;
+    bankShortName: string;
 }
 
 export interface PaymentRequest {
-    requestor?: string;
-    target?: string;
-    amount: string;
-    message: string;
-    requestTime: string;
-    resolveTime?: string;
-    status: "Đã thanh toán" | "Chưa thanh toán" | "Đã hủy";
+    receiver: string; // receiver name
+    sender: string; // sender name
+    debtReminder: {
+        id: string;
+        type: string;
+        createdAt: string;
+        updatedAt: string;
+        deletedAt: string;
+        bankId: number;
+        amount: number;
+        description: string;
+        status: string;
+        isSourceFee: boolean;
+        sourceAccountNumber: string;
+        sourceBalance: number;
+        targetAccountNumber: string;
+        targetBalance: number;
+    };
+    reply: {
+        id: number;
+        content: string;
+        createdAt: string;
+        updatedAt: string;
+        deletedAt: string;
+        debtReminderId: string;
+        userReplyName: string;
+    };
 }
 
+// for retrieving transaction history
 export interface Transaction {
+    id: string;
+    amount: number;
+    balance: number;
+    createdAt: string;
+    description: string;
+    sourceAccountNumber: string;
+    targetAccountNumber: string;
+    type: string;
+}
+
+export interface Notification {
     id: number;
-    dateTime: string;
-    sender_account_number: string;
-    amount: string;
-    receiver_account_number: string;
-    transactionType: "Nhận tiền" | "Chuyển khoản" | "Thanh toán";
-    balance: string;
-    message: string;
+    userId: number;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
+    isSeen: boolean;
+    title: string;
+    type: string;
+}
+
+export interface PartnerBank {
+    id: number;
+    bankCode: string;
+    bankName: string;
+    shortName: string;
+    logoUrl: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
 }

@@ -1,48 +1,37 @@
-import { useAppSelector } from "@/lib/hooks/withTypes";
-import ClickableCard from "@/components/ClickableCard";
-import { Drawer, TextInput, ScrollArea, ActionIcon } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
+import { useEffect, useState } from "react";
+
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
+import { formatAccountNumber, makeToast } from "@/lib/utils/customer";
+import { getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+
+import { Drawer, TextInput, ScrollArea, ActionIcon, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAddressBook, IconSearch } from "@tabler/icons-react";
-import { useState } from "react";
+
+import ClickableCard from "@/components/ClickableCard";
+import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
 
 interface ReceiverDrawerProps {
-    form: UseFormReturnType<
-        {
-            receiverAccount: string;
-            amount: number;
-            message: string;
-            receiverHandlesFee: boolean;
-        },
-        (values: {
-            receiverAccount: string;
-            amount: number;
-            message: string;
-            receiverHandlesFee: boolean;
-        }) => {
-            sourceAccountNumber: string;
-            targetAccountNumber: string;
-            amount: number;
-            isSourceFee: boolean;
-            description: string;
-            type: string;
-        }
-    >;
+    formHandler: (account: string) => void;
     type: string;
     selectedBank: string;
-    onSelectReceiver: (account: string) => void;
+    onSelect: (account: string) => void;
 }
 
 const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
-    form,
+    formHandler,
     type,
     selectedBank,
-    onSelectReceiver,
+    onSelect,
 }) => {
-    const [opened, { open, close }] = useDisclosure(false);
-    const [query, setQuery] = useState("");
-
+    const dispatch = useAppDispatch();
     const accounts = useAppSelector((state) => state.receivers.filteredReceivers);
+
+    console.log(accounts);
+
+    const [opened, { open, close }] = useDisclosure(false);
+
+    const [query, setQuery] = useState("");
 
     const filtered = accounts.filter((account) =>
         Object.values(account).some((value) =>
@@ -52,23 +41,42 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
 
     const accountList = filtered.map((account) => (
         <ClickableCard
-            key={account.name}
-            title={account.nickname}
+            key={account.receiverAccountNumber}
+            title={account.receiverNickname}
             subtitle={
                 type === "internal"
-                    ? [account.name, account.accountNumber]
-                    : [account.name, account.bank, account.accountNumber]
+                    ? [formatAccountNumber(account.receiverAccountNumber)]
+                    : [account.bankShortName, formatAccountNumber(account.receiverAccountNumber)]
             }
             onClick={() => {
-                form.setFieldValue(
-                    "receiverAccount",
-                    account.accountNumber.replace(/(\d{4})/g, "$1 ").trim()
-                );
-                onSelectReceiver(account.accountNumber.replace(/(\d{4})/g, "$1 ").trim());
+                formHandler(formatAccountNumber(account.receiverAccountNumber));
+                onSelect(formatAccountNumber(account.receiverAccountNumber));
                 close();
             }}
         />
     ));
+
+    useEffect(() => {
+        const fetchReceivers = async () => {
+            try {
+                await dispatch(getReceiversThunk()).unwrap();
+
+                if (type === "internal" || type === "debt-payment") {
+                    dispatch(setFilteredReceivers(0));
+                } else {
+                    dispatch(setFilteredReceivers(parseInt(selectedBank)));
+                }
+            } catch (error) {
+                makeToast(
+                    "error",
+                    "Truy vấn danh sách người nhận thất bại",
+                    (error as Error).message
+                );
+            }
+        };
+
+        fetchReceivers();
+    }, [dispatch]);
 
     return (
         <>
@@ -77,7 +85,7 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                 color="gray"
                 radius="md"
                 aria-label="Saved receivers"
-                disabled={type === "external" && selectedBank === ""}
+                disabled={type === "external" && selectedBank === "0"}
                 onClick={open}
             >
                 <IconAddressBook size={20} />
@@ -112,7 +120,13 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                 />
                 <div>
                     <ScrollArea.Autosize mah="75vh" type="always" mt="md">
-                        {accountList}
+                        {accounts.length === 0 ? (
+                            <Text ta="center">Bạn chưa lưu người nhận nào</Text>
+                        ) : accountList.length === 0 ? (
+                            <Text ta="center">Không tìm thấy người nhận</Text>
+                        ) : (
+                            accountList
+                        )}
                     </ScrollArea.Autosize>
                 </div>
             </Drawer>

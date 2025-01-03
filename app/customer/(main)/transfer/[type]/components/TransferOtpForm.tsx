@@ -1,19 +1,20 @@
 "use client";
 
 import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
-import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
+import { internalTransferThunk, externalTransferThunk } from "@/lib/thunks/customer/TransferThunks";
+import { makeToast } from "@/lib/utils/customer";
 
 import { Button, Center, Text, Title, Stack, PinInput, Fieldset } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 interface OtpFormProps {
-    handleNextStep?: () => void;
+    handleNextStep: () => void;
+    type: string;
 }
 
-const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
+const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
-
-    const transfer = useAppSelector((state) => state.transfer.currentTransfer);
+    const transferId = useAppSelector((state) => state.transfer.currentTransferId);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -30,17 +31,28 @@ const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        // send the otp and await response
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            if (type === "internal" || type === "debt-payment") {
+                await dispatch(
+                    internalTransferThunk({
+                        transactionId: transferId ? transferId : "",
+                        otp: values.otp,
+                    })
+                ).unwrap();
+            } else {
+                // external transfer
+                await dispatch(
+                    externalTransferThunk({
+                        transactionId: transferId ? transferId : "",
+                        otp: values.otp,
+                    })
+                ).unwrap();
+            }
 
-        // if good, call the transfer API
-        console.log(transfer);
-
-        // finally, reset the transfer state
-        dispatch(resetTransfer());
-
-        if (handleNextStep) {
             handleNextStep();
+        } catch (error) {
+            makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
         }
     };
 

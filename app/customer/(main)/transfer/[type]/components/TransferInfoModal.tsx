@@ -1,21 +1,96 @@
-import { useAppSelector } from "@/lib/hooks/withTypes";
-import { formatCurrency } from "@/lib/utils/customer";
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { formatCurrency, formatTransferRequest, makeToast } from "@/lib/utils/customer";
+import {
+    externalPreTransferThunk,
+    internalPreTransferThunk,
+    preDebtTransferThunk,
+} from "@/lib/thunks/customer/TransferThunks";
+import { setCurrentTransferId } from "@/lib/slices/customer/TransferSlice";
 
 import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 
 interface TransferInfoModal {
     isOpen: boolean;
     onClose: () => void;
+    handleNextStep: () => void;
+    confirmToggle: () => void;
+    type: string;
 }
 
-const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => {
+const TransferInfoModal: React.FC<TransferInfoModal> = ({
+    isOpen,
+    onClose,
+    handleNextStep,
+    confirmToggle,
+    type,
+}) => {
+    const searchParams = useSearchParams();
+    const dispatch = useAppDispatch();
     const transfer = useAppSelector((state) => state.transfer.currentTransfer);
+
+    const content = [
+        { label: "Tài khoản nguồn", value: [transfer?.senderAccount, transfer?.senderName] },
+        { label: "Nguời nhận", value: [transfer?.receiverAccount, transfer?.receiverName] },
+        { label: "Số tiền", value: [formatCurrency(transfer ? transfer.amount : 0)] },
+        { label: "Diễn giải", value: [transfer?.message] },
+        {
+            label: "Phí giao dịch",
+            value: [
+                formatCurrency(transfer ? transfer.transferFee : 0),
+                transfer?.senderHandlesFee ? "" : "(người nhận trả phí)",
+            ],
+        },
+    ];
+
+    const handleTransferSubmit = async () => {
+        try {
+            onClose();
+
+            switch (type) {
+                case "internal":
+                    await dispatch(
+                        internalPreTransferThunk(formatTransferRequest(transfer, type))
+                    ).unwrap();
+                    break;
+                case "external":
+                    await dispatch(
+                        externalPreTransferThunk(formatTransferRequest(transfer, type))
+                    ).unwrap();
+                    break;
+                case "debt-payment":
+                    const transactionId = searchParams.get("id") || "";
+                    dispatch(setCurrentTransferId(transactionId));
+
+                    await dispatch(preDebtTransferThunk({ transactionId: transactionId })).unwrap();
+            }
+
+            handleNextStep();
+        } catch (error) {
+            confirmToggle();
+            makeToast("error", "Xác nhận chuyển khoản thất bại", (error as Error).message);
+        }
+
+        const submitButton = document.getElementById("submit-form");
+
+        submitButton?.click();
+        onClose();
+    };
+
+    const handleClose = () => {
+        confirmToggle();
+        onClose();
+    };
 
     return (
         <Modal
             opened={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             radius="md"
+            size="lg"
             title="Kiểm tra thông tin chuyển khoản"
             centered
             styles={{
@@ -31,49 +106,37 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({ isOpen, onClose }) => 
             }}
         >
             <Stack my={20} gap="md">
-                <Group grow justify="between">
-                    <Text variant="text">Tài khoản nguồn</Text>
-                    <Text fw={700}>Mặc định</Text>
-                </Group>
+                {content.map((item) => (
+                    <Group
+                        key={item.label}
+                        grow
+                        preventGrowOverflow={false}
+                        justify="between"
+                        align="flex-start"
+                    >
+                        <Text variant="text">{item.label}</Text>
 
-                <Group grow justify="between">
-                    <Text variant="text">Nguời nhận</Text>
-                    <Text fw={700}>{transfer?.receiverAccount} </Text>
-                </Group>
+                        <Stack gap={0}>
+                            {" "}
+                            {item.value.map((value, index) => (
+                                <Text key={index} ta="right" fw={700}>
+                                    {value}
+                                </Text>
+                            ))}
+                        </Stack>
+                    </Group>
+                ))}
 
-                <Group grow justify="between">
-                    <Text variant="text">Số tiền</Text>
-                    <Text fw={700}>{formatCurrency(transfer ? transfer.amount : 0)}</Text>
-                </Group>
-
-                <Group grow justify="between">
-                    <Text variant="text">Diễn giải</Text>
-                    <Text fw={700}>{transfer?.message} </Text>
-                </Group>
-
-                <Group grow justify="between">
-                    <Text variant="text">Phí giao dịch</Text>
-                    <Text fw={700}>0 ₫ </Text>
-                </Group>
-
-                <Group grow justify="between">
+                <Group grow preventGrowOverflow={false} justify="between" align="flex-start">
                     <Text fw={600}>Tổng số tiền</Text>
-                    <Text fw={700} c="blue">
-                        {formatCurrency(transfer ? transfer.amount : 0)}
+                    <Text ta="right" fw={700} fz="h3" c="blue">
+                        {transfer?.senderHandlesFee
+                            ? formatCurrency(transfer ? transfer.amount + transfer.transferFee : 0)
+                            : formatCurrency(transfer ? transfer.amount : 0)}
                     </Text>
                 </Group>
 
-                <Button
-                    fullWidth
-                    onClick={() => {
-                        const submitButton = document.getElementById("submit-form");
-
-                        submitButton?.click();
-                        onClose();
-                    }}
-                    mt="md"
-                    radius="md"
-                >
+                <Button fullWidth onClick={handleTransferSubmit} mt="md" radius="md">
                     Xác nhận
                 </Button>
             </Stack>

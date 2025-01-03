@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 import { makeStoreWithPersistor, AppStore } from "@/lib/store";
+
 import Loading from "@/components/Loading";
 
 export default function StoreProvider({ children }: { children: React.ReactNode }) {

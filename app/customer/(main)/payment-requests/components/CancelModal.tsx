@@ -1,13 +1,24 @@
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import {
+    cancelRequestThunk,
+    getReceivedRequestsThunk,
+    getSentRequestsThunk,
+} from "@/lib/thunks/customer/TransactionsThunk";
+import { makeToast } from "@/lib/utils/customer";
+
 import { Modal, Tooltip, ActionIcon, Button, Group, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { IconCancel } from "@tabler/icons-react";
 
 interface CancelModalProps {
-    handleCancel?: () => void;
+    requestId: string;
+    type: "received" | "sent";
 }
 
-const CancelModal: React.FC<CancelModalProps> = ({ handleCancel }) => {
+const CancelModal: React.FC<CancelModalProps> = ({ requestId, type }) => {
+    const dispatch = useAppDispatch();
+
     const [opened, { open, close }] = useDisclosure(false);
 
     const form = useForm({
@@ -21,8 +32,27 @@ const CancelModal: React.FC<CancelModalProps> = ({ handleCancel }) => {
         },
     });
 
-    const handleSubmit = (values: typeof form.values) => {
-        console.log(values);
+    const handleSubmit = async (values: typeof form.values) => {
+        try {
+            await dispatch(
+                cancelRequestThunk({ requestId: requestId, content: values.message })
+            ).unwrap();
+            await dispatch(
+                type === "received" ? getReceivedRequestsThunk() : getSentRequestsThunk()
+            ).unwrap();
+
+            makeToast(
+                "error",
+                "Hủy nhắc nợ thành công",
+                "Bạn có thể xem chi tiết tại trang Nhắc nợ."
+            );
+            handleCloseModal();
+        } catch (error) {
+            makeToast("error", "Hủy nhắc nợ thất bại", (error as Error).message);
+        }
+    };
+
+    const handleCloseModal = () => {
         close();
         form.reset();
     };
@@ -31,7 +61,7 @@ const CancelModal: React.FC<CancelModalProps> = ({ handleCancel }) => {
         <>
             <Modal
                 opened={opened}
-                onClose={close}
+                onClose={handleCloseModal}
                 title="Hủy nhắc nợ"
                 radius="md"
                 centered
@@ -63,11 +93,11 @@ const CancelModal: React.FC<CancelModalProps> = ({ handleCancel }) => {
                     />
 
                     <Group mt="lg" justify="flex-end">
-                        <Button onClick={close} variant="default">
+                        <Button radius="md" onClick={handleCloseModal} variant="default">
                             Quay lại
                         </Button>
 
-                        <Button type="submit" variant="filled" color="red">
+                        <Button radius="md" type="submit" variant="filled" color="red">
                             Xác nhận hủy
                         </Button>
                     </Group>
@@ -75,7 +105,7 @@ const CancelModal: React.FC<CancelModalProps> = ({ handleCancel }) => {
             </Modal>
 
             <Tooltip label="Hủy">
-                <ActionIcon variant="subtle" color="red" onClick={open}>
+                <ActionIcon radius="md" variant="subtle" color="red" onClick={open}>
                     <IconCancel size={20} />
                 </ActionIcon>
             </Tooltip>

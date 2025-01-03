@@ -3,6 +3,10 @@
 import { useEffect, Suspense } from "react";
 import { useRouter } from "nextjs-toploader/app";
 
+import { useAppSelector } from "@/lib/hooks/withTypes";
+import { makeToast } from "@/lib/utils/customer";
+import useWebSocket from "@/lib/hooks/useWebSocket";
+
 import { Group } from "@mantine/core";
 import {
     IconHome,
@@ -15,8 +19,6 @@ import {
 import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
-
-import { useAppSelector } from "@/lib/hooks/withTypes";
 
 const menuItems = [
     {
@@ -62,15 +64,30 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
-    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+    const role = useAppSelector((state) => state.auth.authUser?.role);
 
     useEffect(() => {
-        if (!isLoggedIn) {
+        if (role !== "customer") {
             router.push("/customer/login");
         }
-    }, [isLoggedIn, router]);
+    }, [role, router]);
 
-    if (!isLoggedIn) {
+    // websocket connection to receive notifications
+    useWebSocket((data) => {
+        if (data === "established") return;
+
+        try {
+            // const parts = data.split("\n");
+            const audio = new Audio("/notification.mp3");
+            audio.play();
+            console.log(data);
+            // makeToast("info", parts[0], parts[1]);
+        } catch (error) {
+            console.error("Error parsing message:", error);
+        }
+    });
+
+    if (!role) {
         return <Loading />;
     }
 

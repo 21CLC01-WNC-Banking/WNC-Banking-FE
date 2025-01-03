@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
 
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { logoutThunk } from "@/lib/thunks/AuthThunks";
+import { makeToast } from "@/lib/utils/customer";
+
 import { Text, NavLink } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
 
@@ -11,9 +15,6 @@ import LinkGroup from "@/components/LinkGroup";
 import CurrentTime from "@/components/CurrentTime";
 
 import classes from "./SideMenu.module.css";
-
-import { useAppDispatch } from "@/lib/hooks/withTypes";
-import { logout } from "@/lib/slices/AuthSlice";
 
 interface SideMenuProps {
     forCustomer: boolean;
@@ -31,15 +32,19 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
     const pathname = usePathname();
     const dispatch = useAppDispatch();
 
-    const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
 
-        dispatch(logout());
+        try {
+            await dispatch(logoutThunk()).unwrap();
 
-        if (forCustomer) {
-            router.push("/customer/login");
-        } else {
-            router.push("/staff/login");
+            if (forCustomer) {
+                router.push("/customer/login");
+            } else {
+                router.push("/staff/login");
+            }
+        } catch (error) {
+            makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
         }
     };
 

@@ -18,8 +18,8 @@ import { Transaction } from "@/lib/types/staff";
 import TransactionDetail from "./TransactionDetail";
 import { useForm } from "@mantine/form";
 import classes from "./AccountCard.module.css";
-import { formatDateTime } from "../../../../lib/utils/staff";
 import { chunk } from "../../../../lib/utils/staff";
+import { formatDateString } from "@/lib/utils/customer";
 
 
 const TransactionHistoryTable: React.FC = () => {
@@ -62,7 +62,7 @@ const TransactionHistoryTable: React.FC = () => {
             if (response.ok) {
                 setError("");
                 const data = await response.json();
-                console.log(data.data.customerName);
+                console.log(data.data.transactions);
                 setAccountInfo([
                     { title: "Chủ tài khoản", stats: data.data.customerName },
                     { title: "Số tài khoản", stats: values.accountNumber },
@@ -79,7 +79,7 @@ const TransactionHistoryTable: React.FC = () => {
                 setTransactions([]);
             }
         } catch (error) {
-            console.log("Đã xảy ra lỗi kết nối với máy chủ");
+            setError("Đã xảy ra lỗi kết nối với máy chủ");
             setTransactions([]);
         }
     };
@@ -157,10 +157,10 @@ const TransactionHistoryTable: React.FC = () => {
                         : "red.2"
             }
         >
-            <Table.Td>{formatDateTime(transaction.createdAt)}</Table.Td>
-            <Table.Td>{transaction.amount}</Table.Td>
+            <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
+            <Table.Td>{transaction.amount.toLocaleString("vi-VN")}</Table.Td>
             <Table.Td>{transaction.transactionType}</Table.Td>
-            <Table.Td>{transaction.balance}</Table.Td>
+            <Table.Td>{transaction.balance.toLocaleString("vi-VN")}</Table.Td>
             <Table.Td>
                 <Button
                     variant="subtle"
@@ -243,8 +243,8 @@ const TransactionHistoryTable: React.FC = () => {
 
             {/* Table */}
             {filteredTransactions.length === 0 ? (
-                <Center mt="xl">
-                    <Text size="sm" c="dimmed">
+                <Center mt="xl" bg="red.3">
+                    <Text size="sm">
                         {error ? error : "Chưa có lịch sử giao dịch nào!"}
                     </Text>
                 </Center>

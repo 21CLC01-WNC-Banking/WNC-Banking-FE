@@ -1,5 +1,13 @@
-// helper function to chunk data into pages
-export function chunk<T>(array: T[], size: number): T[][] {
+import React from "react";
+
+import { rem } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
+
+import { Transfer, TransferRequest } from "../types/customer";
+
+// chunk data into pages for tables
+export const chunk = <T>(array: T[], size: number): T[][] => {
     if (!array.length) {
         return [];
     }
@@ -8,17 +16,17 @@ export function chunk<T>(array: T[], size: number): T[][] {
     const tail = array.slice(size);
 
     return [head, ...chunk(tail, size)];
-}
+};
 
-// helper function to format currency
-export function formatCurrency(amount: number): string {
+// format currency
+export const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
     }).format(amount);
-}
+};
 
-// helper function to format date
+// format date
 export const formatDateString = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -34,7 +42,121 @@ export const formatDateString = (dateString: string) => {
     return formattedDateTime;
 };
 
-// helper function to format account number
-export function formatAccountNumber(accountNumber: string): string {
-    return accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ");
-}
+// format account number
+export const formatAccountNumber = (accountNumber: string): string => {
+    return accountNumber
+        .replace(/\s/g, "")
+        .replace(/(\d{4})(?=\d)/g, "$1 ")
+        .trim();
+};
+
+// convert Transfer object to a valid backend request
+export const formatTransferRequest = (transfer: Transfer | null, type: string): TransferRequest => {
+    return {
+        amount: transfer?.amount || 0,
+        description: transfer?.message || "",
+        isSourceFee: transfer?.senderHandlesFee || false,
+        partnerBankId: transfer?.receiverBankId || 0,
+        sourceAccountNumber: transfer?.senderAccount.split(" ").join("") || "",
+        targetAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
+        type: type,
+    };
+};
+
+// make toast
+export const makeToast = (type: "success" | "error" | "info", title: string, message: string) => {
+    switch (type) {
+        case "success":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: React.createElement(IconCheck, {
+                    style: { width: rem(20), height: rem(20) },
+                }),
+                color: "teal",
+                title: title,
+                message: message,
+                position: "bottom-right",
+            });
+
+            break;
+        case "error":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                icon: React.createElement(IconX, { style: { width: rem(20), height: rem(20) } }),
+                color: "red",
+                title: title,
+                message: message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                position: "bottom-right",
+            });
+
+            break;
+        case "info":
+            notifications.show({
+                withBorder: true,
+                radius: "md",
+                color: "blue",
+                title: title,
+                message: message,
+                position: "bottom-right",
+            });
+    }
+
+    return null;
+};
+
+// map transaction type from server
+export const mapTransactionType = (type: string, amount: number) => {
+    let transactionType = "";
+
+    if (amount < 0) {
+        transactionType = "↑ Chuyển tiền";
+    } else {
+        transactionType = "↓ Nhận tiền";
+    }
+
+    if (type === "internal") {
+        transactionType += " nội bộ";
+    } else if (type === "external") {
+        transactionType += " liên ngân hàng";
+    } else if (type === "debt_payment") {
+        transactionType += " thanh toán nợ";
+    }
+
+    return transactionType;
+};
+
+// map payment request status from server
+export const mapRequestStatus = (type: string) => {
+    switch (type) {
+        case "pending":
+            return "Chưa thanh toán";
+        case "success":
+            return "Đã thanh toán";
+        case "failed":
+            return "Đã hủy";
+        default:
+            return "Unknown";
+    }
+};
+
+// return corresponding color string for transaction type or request status
+export const mapColor = (type: string) => {
+    switch (type) {
+        case "internal":
+            return "green.7";
+        case "success":
+            return "green.7";
+        case "external":
+            return "yellow.7";
+        case "pending":
+            return "yellow.7";
+        case "debt_payment":
+            return "red.7";
+        case "failed":
+            return "red.7";
+        default:
+            return "";
+    }
+};

@@ -1,13 +1,37 @@
+"use client";
+
+import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { deleteReceiverThunk, getReceiversThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { makeToast } from "@/lib/utils/customer";
+
 import { Modal, Tooltip, ActionIcon, Button, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconTrash } from "@tabler/icons-react";
 
 interface DeleteModalProps {
-    handleDelete?: () => void;
+    receiverId: number;
 }
 
-const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ handleDelete }) => {
+const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ receiverId }) => {
+    const dispatch = useAppDispatch();
     const [opened, { open, close }] = useDisclosure(false);
+
+    const handleDelete = async () => {
+        try {
+            await dispatch(deleteReceiverThunk({ id: receiverId })).unwrap();
+            await dispatch(getReceiversThunk()).unwrap();
+
+            makeToast(
+                "success",
+                "Xóa người nhận thành công",
+                "Bạn có thể kiểm tra lại danh sách người nhận đã lưu tại Trang chủ."
+            );
+        } catch (error) {
+            makeToast("error", "Xóa người nhận thất bại", (error as Error).message);
+        }
+
+        close();
+    };
 
     return (
         <>
@@ -32,18 +56,18 @@ const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ handleDelete }) => {
             >
                 Bạn có chắc muốn xóa người nhận này?
                 <Group mt="lg" justify="flex-end">
-                    <Button onClick={close} variant="default">
+                    <Button radius="md" onClick={close} variant="default">
                         Quay lại
                     </Button>
 
-                    <Button onClick={close} variant="filled" color="red">
+                    <Button radius="md" onClick={handleDelete} variant="filled" color="red">
                         Xóa
                     </Button>
                 </Group>
             </Modal>
 
             <Tooltip label="Xóa">
-                <ActionIcon variant="subtle" color="red" onClick={open}>
+                <ActionIcon radius="md" variant="subtle" color="red" onClick={open}>
                     <IconTrash size={20} />
                 </ActionIcon>
             </Tooltip>

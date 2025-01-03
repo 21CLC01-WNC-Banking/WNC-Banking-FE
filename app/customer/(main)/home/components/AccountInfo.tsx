@@ -2,49 +2,113 @@
 
 import { useState, useEffect } from "react";
 
-import {
-    Paper,
-    Table,
-    Text,
-    Pagination,
-    Center,
-    TextInput,
-    Group,
-    SegmentedControl,
-} from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { Transaction } from "@/lib/types/customer";
-import { chunk } from "@/lib/utils/customer";
-import data from "@/app/customer/lib/mock_data/transactions.json";
+import { getTransactionHistoryThunk } from "@/lib/thunks/customer/TransactionsThunk";
+import {
+    chunk,
+    formatAccountNumber,
+    formatCurrency,
+    formatDateString,
+    mapColor,
+    mapTransactionType,
+} from "@/lib/utils/customer";
+import { makeToast } from "@/lib/utils/customer";
+
+import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
+
+import InfoModal from "@/components/InfoModal";
 import AccountCard from "./AccountCard";
 
-const AccountInfo: React.FC = () => {
-    const transactions = data as Transaction[];
+const makeTransactionInfoModalContent = (transaction: Transaction) => {
+    return {
+        title: "Thông tin giao dịch",
+        content: [
+            { label: "Mã giao dịch", value: transaction.id },
+            { label: "Thời gian", value: formatDateString(transaction.createdAt) },
+            {
+                label: "Loại giao dịch",
+                value: mapTransactionType(transaction.type, transaction.amount),
+                color: mapColor(transaction.type),
+            },
+            {
+                label: "Tài khoản nguồn",
+                value: formatAccountNumber(transaction.sourceAccountNumber),
+            },
+            {
+                label: "Tài khoản thụ hưởng",
+                value: formatAccountNumber(transaction.targetAccountNumber),
+            },
+            { label: "Số tiền giao dịch", value: formatCurrency(transaction.amount) },
+            { label: "Nội dung", value: transaction.description },
+            { label: "Số dư sau giao dịch", value: formatCurrency(transaction.balance) },
+        ],
+    };
+};
 
-    const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả");
-    const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");
+const AccountInfo: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const transactions = useAppSelector((state) => state.transactions.transactionHistory);
+
+    const [transactionScopeFilter, setTransactionScopeFilter] = useState<string>("all");
+    const [transactionDirectionFilter, setTransactionDirectionFilter] = useState<string>("all");
     const [activePage, setActivePage] = useState<number>(1);
 
-    // sort transactions by time
-    const sortByTime = (elements: Transaction[], filter: string) => {
-        return elements.sort((a, b) => {
-            const dateA = new Date(a.dateTime);
-            const dateB = new Date(b.dateTime);
-            return filter === "Mới nhất"
-                ? dateB.getTime() - dateA.getTime()
-                : dateA.getTime() - dateB.getTime();
-        });
-    };
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            try {
+                await dispatch(getTransactionHistoryThunk()).unwrap();
+            } catch (error) {
+                makeToast(
+                    "error",
+                    "Truy vấn danh sách người nhận thất bại",
+                    (error as Error).message
+                );
+            }
+        };
+
+        fetchTransactions();
+    }, [dispatch]);
 
     // filter transactions based on selected filters
-    const filteredTransactions = sortByTime(
-        transactions.filter((transaction) => {
-            if (transactionTypeFilter === "Tất cả") return true;
-            return transaction.transactionType === transactionTypeFilter;
-        }),
-        timeFilter
-    );
+    const filteredTransactions = transactions.filter((transaction) => {
+        if (transactionScopeFilter === "all" && transactionDirectionFilter === "all") return true;
+
+        let direction = transaction.amount > 0 ? "in" : "out";
+
+        if (transaction.type === "debt_payment") {
+            direction = "debt";
+        }
+
+        if (transactionScopeFilter === "all") {
+            return direction === transactionDirectionFilter;
+        }
+
+        if (transactionDirectionFilter === "all" && transactionScopeFilter !== "debt") {
+            return transaction.type === transactionScopeFilter;
+        }
+
+        switch (transactionDirectionFilter) {
+            case "in":
+                return (
+                    transaction.amount > 0 &&
+                    transaction.type === transactionScopeFilter &&
+                    transaction.type !== "debt_payment"
+                );
+            case "out":
+                return (
+                    transaction.amount < 0 &&
+                    transaction.type === transactionScopeFilter &&
+                    transaction.type !== "debt_payment"
+                );
+            case "debt":
+                return transaction.type === "debt_payment" && transactionScopeFilter !== "external";
+        }
+
+        return (
+            transaction.type === transactionScopeFilter && direction === transactionDirectionFilter
+        );
+    });
 
     // chunk the filtered transactions into pages
     const paginatedTransactions = chunk(filteredTransactions, 6);
@@ -64,21 +128,18 @@ const AccountInfo: React.FC = () => {
 
     // create table rows for current page
     const rows = currentPageTransactions.map((transaction, index) => (
-        <Table.Tr
-            key={index}
-            bg={
-                transaction.transactionType === "Chuyển khoản"
-                    ? "yellow.1"
-                    : transaction.transactionType === "Nhận tiền"
-                    ? "green.1"
-                    : "red.2"
-            }
-        >
-            <Table.Td>{transaction.dateTime}</Table.Td>
-            <Table.Td>{transaction.accountType}</Table.Td>
-            <Table.Td>{transaction.amount}</Table.Td>
-            <Table.Td>{transaction.transactionType}</Table.Td>
-            <Table.Td>{transaction.balance}</Table.Td>
+        <Table.Tr key={index}>
+            <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
+            <Table.Td>{formatCurrency(transaction.amount)}</Table.Td>
+            <Table.Td c={mapColor(transaction.type)} fw={600}>
+                {mapTransactionType(transaction.type, transaction.amount)}
+            </Table.Td>
+            <Table.Td>{formatCurrency(transaction.balance)}</Table.Td>
+            <Table.Td>
+                <Group justify="flex-end" grow>
+                    <InfoModal {...makeTransactionInfoModalContent(transaction)} />
+                </Group>
+            </Table.Td>
         </Table.Tr>
     ));
 
@@ -86,56 +147,70 @@ const AccountInfo: React.FC = () => {
         <Paper radius="md" my="lg" px="lg">
             <AccountCard />
 
-            <TextInput
-                leftSection={<IconSearch size={20} />}
-                placeholder="Tìm kiếm"
-                radius="md"
-                size="md"
-                mt="lg"
-            />
-
             {/* Filter Section */}
-            <Group justify="space-between" align="center" mb="md" mt="lg">
-                <Group justify="flex-start" gap="md">
-                    <Text>Thời gian:</Text>
+            <Group justify="space-between" align="center" mb="md" mt="xl">
+                <Group justify="flex-end" gap="md">
+                    <Text>Giao dịch:</Text>
 
                     <SegmentedControl
+                        radius="md"
                         color="blue"
-                        value={timeFilter}
-                        onChange={setTimeFilter}
-                        data={["Mới nhất", "Cũ nhất"]}
+                        value={transactionDirectionFilter}
+                        onChange={setTransactionDirectionFilter}
+                        data={[
+                            { label: "Tất cả", value: "all" },
+                            { label: "Nhận tiền", value: "in" },
+                            { label: "Chuyển tiền", value: "out" },
+                            { label: "Thanh toán nợ", value: "debt" },
+                        ]}
                     />
                 </Group>
 
                 <Group justify="flex-end" gap="md">
-                    <Text>Loại giao dịch:</Text>
+                    <Text>Phạm vi:</Text>
 
                     <SegmentedControl
+                        radius="md"
                         color="blue"
-                        value={transactionTypeFilter}
-                        onChange={setTransactionTypeFilter}
-                        data={["Tất cả", "Thanh toán", "Nhận tiền", "Chuyển khoản"]}
+                        value={transactionScopeFilter}
+                        onChange={setTransactionScopeFilter}
+                        data={[
+                            { label: "Tất cả", value: "all" },
+                            { label: "Nội bộ", value: "internal" },
+                            { label: "Liên ngân hàng", value: "external" },
+                        ]}
                     />
                 </Group>
             </Group>
 
             {/* Table */}
-            <Table verticalSpacing="sm" mt="xl">
+            <Table verticalSpacing="sm" mt="xl" highlightOnHover>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Thời gian</Table.Th>
-                        <Table.Th>Tài khoản</Table.Th>
                         <Table.Th>Giao dịch</Table.Th>
                         <Table.Th>Loại giao dịch</Table.Th>
-                        <Table.Th>Số dư hiện tại</Table.Th>
+                        <Table.Th>Số dư sau giao dịch</Table.Th>
+                        <Table.Th></Table.Th>
                     </Table.Tr>
                 </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
+                <Table.Tbody>
+                    {rows.length === 0 ? (
+                        <Table.Tr>
+                            <Table.Td colSpan={5}>
+                                <Text ta="center">Chưa có giao dịch nào</Text>
+                            </Table.Td>
+                        </Table.Tr>
+                    ) : (
+                        rows
+                    )}
+                </Table.Tbody>
             </Table>
 
             {/* Pagination */}
             <Center>
                 <Pagination
+                    radius="md"
                     total={paginatedTransactions.length}
                     value={activePage}
                     onChange={setActivePage}

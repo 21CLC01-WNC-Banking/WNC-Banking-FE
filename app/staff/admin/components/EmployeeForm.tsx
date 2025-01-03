@@ -1,22 +1,32 @@
 "use client";
 
-import { Button, Fieldset, TextInput } from "@mantine/core";
+import { Employee } from "@/lib/types/staff";
+import { Button, Fieldset, TextInput, Modal, Title, Center } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 
-const UserForm: React.FC = () => {
+
+interface EmployeeFormProps {
+    opened: boolean;
+    onClose: () => void;
+    onSave: (newEmployee: Employee) => void;
+}
+
+const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) => {
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
             name: "",
             phone: "",
             email: "",
+            password: "",
         },
         validate: {
             name: isNotEmpty("Vui lòng nhập họ tên"),
             email: isEmail("Vui lòng nhập email hợp lệ"),
             phone: (value) =>
                 /^(?:\+84|0)(?:\d){9}$/.test(value) ? null : "Vui lòng nhập số điện thoại hợp lệ",
+            password: isNotEmpty("Vui lòng nhập mật khẩu"),
         },
     });
 
@@ -26,10 +36,11 @@ const UserForm: React.FC = () => {
                 email: values.email,
                 name: values.name,
                 phoneNumber: values.phone,
-                password: "khongnhopassword",
+                password: values.password,
             };
 
-            const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {
+            console.log(payload);
+            const response = await fetch("http://localhost:3001/api/v1/admin/staff", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,16 +52,24 @@ const UserForm: React.FC = () => {
             if (response.ok) {
                 showNotification({
                     title: "Thành công",
-                    message: "Tạo tài khoản thành công!",
+                    message: "Tạo tài khoản nhân viên thành công!",
                     color: "green",
                     position: "bottom-right",
                 });
-                form.reset();
-            } else {
                 const data = await response.json();
+                const newEmployee = {
+                    id: data.data.id,
+                    name: payload.name,
+                    email: payload.email,
+                    phoneNumber: payload.phoneNumber
+                }
+                onSave(newEmployee);
+                form.reset();
+                onClose();
+            } else {
                 showNotification({
                     title: "Lỗi",
-                    message: data.errors.message,
+                    message: "Email đã được sử dụng",
                     color: "red",
                     position: "bottom-right"
                 })
@@ -66,8 +85,17 @@ const UserForm: React.FC = () => {
     };
 
     return (
-        <>
-            <Fieldset radius="md" p={30} mt="lg">
+        <Modal
+            opened={opened}
+            onClose={onClose}
+            size="lg"
+        >
+            <Center>
+                <Title>
+                    Thêm mới nhân viên
+                </Title>
+            </Center>
+            <Fieldset radius="md" p={30} mt="lg" style={{ border: "none" }}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <TextInput
                         size="md"
@@ -101,13 +129,24 @@ const UserForm: React.FC = () => {
                         {...form.getInputProps("phone")}
                     />
 
+                    <TextInput
+                        size="md"
+                        radius="md"
+                        label="Mật khẩu"
+                        required
+                        placeholder="vana123"
+                        mt="lg"
+                        key={form.key("password")}
+                        {...form.getInputProps("password")}
+                    />
+
                     <Button fullWidth type="submit" radius="md" mt={40}>
                         Tạo tài khoản
                     </Button>
                 </form>
             </Fieldset>
-        </>
+        </Modal>
     );
 };
 
-export default UserForm;
+export default EmployeeForm;
