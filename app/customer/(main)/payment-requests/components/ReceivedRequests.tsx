@@ -17,7 +17,7 @@ import { IconCreditCardPay, IconSearch } from "@tabler/icons-react";
 
 import { PaymentRequest } from "@/lib/types/customer";
 import { chunk } from "@/lib/utils/customer";
-import data from "@/app/customer/lib/mock_data/requests_received.json";
+import data from "@/lib/mock_data/requests_received.json";
 import CancelModal from "./CancelModal";
 import InfoModal from "./InfoModal";
 
@@ -75,8 +75,8 @@ const ReceivedRequests: React.FC = () => {
                 request.status === "Đã hủy"
                     ? "yellow.1"
                     : request.status === "Đã thanh toán"
-                    ? "green.1"
-                    : "red.2"
+                        ? "green.1"
+                        : "red.2"
             }
         >
             <Table.Td>{request.requestTime}</Table.Td>
