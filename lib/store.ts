@@ -13,7 +13,7 @@ import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
 const authPersistConfig = {
     key: "auth",
     storage,
-    whitelist: ["customerAccount"], // Persist customerAccount: [name, role, userId]
+    whitelist: ["userAccount"], // Persist userAccount: [name, role, userId]
 };
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);

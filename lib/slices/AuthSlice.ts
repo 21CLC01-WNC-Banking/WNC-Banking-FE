@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserAccount } from "../types/customer";
 
 interface AuthState {
-    customerAccount: UserAccount | null;
+    userAccount: UserAccount | null;
 }
 
 const initialState: AuthState = {
-    customerAccount: null,
+    userAccount: null,
 };
 
 export const authSlice = createSlice({
@@ -14,10 +14,10 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, action: PayloadAction<UserAccount>) => {
-            state.customerAccount = action.payload;
+            state.userAccount = action.payload;
         },
         logout: (state) => {
-            state.customerAccount = null;
+            state.userAccount = null;
         },
     },
 });
