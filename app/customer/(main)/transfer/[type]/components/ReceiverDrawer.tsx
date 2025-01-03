@@ -9,6 +9,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconAddressBook, IconSearch } from "@tabler/icons-react";
 
 import ClickableCard from "@/components/ClickableCard";
+import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
 
 interface ReceiverDrawerProps {
     formHandler: (account: string) => void;
@@ -24,7 +25,9 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
     onSelect,
 }) => {
     const dispatch = useAppDispatch();
-    const accounts = useAppSelector((state) => state.receivers.receivers);
+    const accounts = useAppSelector((state) => state.receivers.filteredReceivers);
+
+    console.log(accounts);
 
     const [opened, { open, close }] = useDisclosure(false);
 
@@ -42,12 +45,8 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
             title={account.receiverNickname}
             subtitle={
                 type === "internal"
-                    ? [account.receiverAccountNumber]
-                    : [
-                          account.receiverNickname,
-                          "To integrate external banks",
-                          account.receiverAccountNumber,
-                      ]
+                    ? [formatAccountNumber(account.receiverAccountNumber)]
+                    : [account.bankShortName, formatAccountNumber(account.receiverAccountNumber)]
             }
             onClick={() => {
                 formHandler(formatAccountNumber(account.receiverAccountNumber));
@@ -61,6 +60,12 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
         const fetchReceivers = async () => {
             try {
                 await dispatch(getReceiversThunk()).unwrap();
+
+                if (type === "internal" || type === "debt-payment") {
+                    dispatch(setFilteredReceivers(0));
+                } else {
+                    dispatch(setFilteredReceivers(parseInt(selectedBank)));
+                }
             } catch (error) {
                 makeToast(
                     "error",
@@ -80,7 +85,7 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                 color="gray"
                 radius="md"
                 aria-label="Saved receivers"
-                disabled={type === "external" && selectedBank === ""}
+                disabled={type === "external" && selectedBank === "0"}
                 onClick={open}
             >
                 <IconAddressBook size={20} />

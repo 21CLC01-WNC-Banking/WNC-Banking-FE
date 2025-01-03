@@ -4,17 +4,20 @@ export interface Transfer {
     receiverAccount: string;
     receiverName: string;
     receiverBank: string;
+    receiverBankId: number;
     senderAccount: string;
     senderName: string;
     transferFee: number;
     senderHandlesFee: boolean;
 }
 
+// formatted to comply with the backend API
 // use this to create new payment requests as well
 export interface TransferRequest {
     amount: number;
     description: string;
     isSourceFee?: boolean;
+    partnerBankId?: number;
     sourceAccountNumber: string;
     targetAccountNumber: string;
     type: string;
@@ -30,7 +33,8 @@ export interface ReceiverAccount {
     id: number;
     receiverAccountNumber: string;
     receiverNickname: string;
-    bank: string;
+    bankId: number;
+    bankShortName: string;
 }
 
 export interface PaymentRequest {
@@ -63,6 +67,7 @@ export interface PaymentRequest {
     };
 }
 
+// for retrieving transaction history
 export interface Transaction {
     id: string;
     amount: number;
@@ -72,4 +77,27 @@ export interface Transaction {
     sourceAccountNumber: string;
     targetAccountNumber: string;
     type: string;
+}
+
+export interface Notification {
+    id: number;
+    userId: number;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
+    isSeen: boolean;
+    title: string;
+    type: string;
+}
+
+export interface PartnerBank {
+    id: number;
+    bankCode: string;
+    bankName: string;
+    shortName: string;
+    logoUrl: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
 }

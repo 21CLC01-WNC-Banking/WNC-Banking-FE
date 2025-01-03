@@ -13,6 +13,7 @@ import classes from "./Transfer.module.css";
 
 const Transfer = () => {
     const params = useParams();
+    const type = Array.isArray(params.type) ? params.type[0] : params.type;
 
     const [active, setActive] = useState(0);
 
@@ -36,14 +37,11 @@ const Transfer = () => {
                 }}
             >
                 <Stepper.Step label="Nhập thông tin" allowStepSelect={false}>
-                    <TransferForm
-                        handleNextStep={handleNextStep}
-                        type={Array.isArray(params.type) ? params.type[0] : params.type}
-                    />
+                    <TransferForm handleNextStep={handleNextStep} type={type} />
                 </Stepper.Step>
 
                 <Stepper.Step label="Xác thực OTP" allowStepSelect={false}>
-                    <TransferOtpForm handleNextStep={handleNextStep} />
+                    <TransferOtpForm handleNextStep={handleNextStep} type={type} />
                 </Stepper.Step>
 
                 <Stepper.Step label="Hoàn tất" allowStepSelect={false}>

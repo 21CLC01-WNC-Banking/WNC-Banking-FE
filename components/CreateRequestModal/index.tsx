@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
+import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
 import { makeToast } from "@/lib/utils/customer";
 import { createRequestThunk } from "@/lib/thunks/customer/TransactionsThunk";
 
@@ -100,7 +100,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
     useEffect(() => {
         const fetchAccount = async () => {
             try {
-                await dispatch(getAccountThunk()).unwrap();
+                await dispatch(getUserAccountThunk()).unwrap();
             } catch (error) {
                 makeToast(
                     "error",

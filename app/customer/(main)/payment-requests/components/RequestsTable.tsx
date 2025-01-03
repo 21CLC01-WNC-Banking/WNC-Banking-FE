@@ -93,14 +93,6 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
     }, [dispatch, type]);
 
     const handleTransferAction = (row: PaymentRequest) => {
-        // if (row.bank === "WNC Bank") {
-        //     router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
-        // } else {
-        //     router.push(
-        //         `/customer/transfer/external?to=${row.receiverAccountNumber}&at=${row.bank.trim()}`
-        //     );
-        // }
-
         router.push(
             `/customer/transfer/debt-payment?id=${
                 row.debtReminder.id

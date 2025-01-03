@@ -9,6 +9,8 @@ import { receiversReducer } from "./slices/customer/ReceiversSlice";
 import { authReducer } from "./slices/AuthSlice";
 import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
 import { transactionsReducer } from "./slices/customer/TransactionsSlice";
+import { notificationsReducer } from "./slices/customer/NotificationsSlice";
+import { partnerBanksReducer } from "./slices/customer/PartnerBanksSlice";
 
 const authPersistConfig = {
     key: "auth",
@@ -28,6 +30,8 @@ export const makeStore = () => {
             receivers: receiversReducer,
             forgotPassword: forgotPasswordReducer,
             transactions: transactionsReducer,
+            notifications: notificationsReducer,
+            partnerBanks: partnerBanksReducer,
 
             // staff
         },

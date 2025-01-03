@@ -125,36 +125,31 @@ const ReceiversTable = () => {
     };
 
     const handleTransferAction = (row: ReceiverAccount) => {
-        // if (row.bank === "WNC Bank") {
-        //     router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
-        // } else {
-        //     router.push(
-        //         `/customer/transfer/external?to=${row.receiverAccountNumber}&at=${row.bank.trim()}`
-        //     );
-        // }
-
-        router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
+        if (row.bankId === null) {
+            router.push(`/customer/transfer/internal?to=${row.receiverAccountNumber.trim()}`);
+        } else {
+            router.push(
+                `/customer/transfer/external?to=${row.receiverAccountNumber}&bankId=${row.bankId}`
+            );
+        }
     };
 
     const rows = sortedData.map((row) => (
         <Table.Tr key={row.receiverAccountNumber.trim()}>
             <Table.Td pl="md">{row.receiverNickname.trim()}</Table.Td>
-            {/* <Table.Td>{row.bank.trim()}</Table.Td> */}
+            <Table.Td pl="md">
+                {row.bankShortName === "" ? "WNC Bank" : row.bankShortName.trim()}
+            </Table.Td>
             <Table.Td pl="md">{formatAccountNumber(row.receiverAccountNumber)}</Table.Td>
 
             <Table.Td>
                 <Group gap="md" justify="flex-end">
-                    {/* {row.bank === "WNC Bank" && (
+                    {row.bankId === null && (
                         <CreateRequestModal
-                            target={formatAccountNumber(row.receiverAccountNumber)}
+                            targetAccountNumber={formatAccountNumber(row.receiverAccountNumber)}
                             isFromReceiversList={true}
                         />
-                    )} */}
-
-                    <CreateRequestModal
-                        targetAccountNumber={formatAccountNumber(row.receiverAccountNumber)}
-                        isFromReceiversList={true}
-                    />
+                    )}
 
                     <Tooltip label="Chuyển khoản">
                         <ActionIcon
@@ -221,13 +216,13 @@ const ReceiversTable = () => {
                                 Tên gợi nhớ
                             </SortableTableHeader>
 
-                            {/* <SortableTableHeader
-                                sorted={sortBy === "bank"}
+                            <SortableTableHeader
+                                sorted={sortBy === "bankShortName"}
                                 reversed={reverseSortDirection}
-                                onSort={() => setSorting("bank")}
+                                onSort={() => setSorting("bankShortName")}
                             >
                                 Ngân hàng
-                            </SortableTableHeader> */}
+                            </SortableTableHeader>
 
                             <Table.Th style={{ fontWeight: 600 }} className={classes.th} pl="md">
                                 Số tài khoản

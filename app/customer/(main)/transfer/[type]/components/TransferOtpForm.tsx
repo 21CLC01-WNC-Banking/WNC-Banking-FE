@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
-import { internalTransferThunk } from "@/lib/thunks/customer/TransferThunks";
+import { internalTransferThunk, externalTransferThunk } from "@/lib/thunks/customer/TransferThunks";
 import { makeToast } from "@/lib/utils/customer";
 
 import { Button, Center, Text, Title, Stack, PinInput, Fieldset } from "@mantine/core";
@@ -9,9 +9,10 @@ import { useForm } from "@mantine/form";
 
 interface OtpFormProps {
     handleNextStep: () => void;
+    type: string;
 }
 
-const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
+const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
     const transferId = useAppSelector((state) => state.transfer.currentTransferId);
 
@@ -32,12 +33,22 @@ const TransferOtpForm: React.FC<OtpFormProps> = ({ handleNextStep }) => {
 
     const handleSubmit = async (values: typeof form.values) => {
         try {
-            await dispatch(
-                internalTransferThunk({
-                    transactionId: transferId ? transferId : "",
-                    otp: values.otp,
-                })
-            ).unwrap();
+            if (type === "internal" || type === "debt-payment") {
+                await dispatch(
+                    internalTransferThunk({
+                        transactionId: transferId ? transferId : "",
+                        otp: values.otp,
+                    })
+                ).unwrap();
+            } else {
+                // external transfer
+                await dispatch(
+                    externalTransferThunk({
+                        transactionId: transferId ? transferId : "",
+                        otp: values.otp,
+                    })
+                ).unwrap();
+            }
 
             handleNextStep();
         } catch (error) {

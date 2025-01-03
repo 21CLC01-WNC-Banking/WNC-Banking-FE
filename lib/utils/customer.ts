@@ -51,14 +51,15 @@ export const formatAccountNumber = (accountNumber: string): string => {
 };
 
 // convert Transfer object to a valid backend request
-export const formatTransferRequest = (transfer: Transfer | null): TransferRequest => {
+export const formatTransferRequest = (transfer: Transfer | null, type: string): TransferRequest => {
     return {
         amount: transfer?.amount || 0,
         description: transfer?.message || "",
         isSourceFee: transfer?.senderHandlesFee || false,
+        partnerBankId: transfer?.receiverBankId || 0,
         sourceAccountNumber: transfer?.senderAccount.split(" ").join("") || "",
         targetAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
-        type: "internal",
+        type: type,
     };
 };
 
@@ -106,17 +107,24 @@ export const makeToast = (type: "success" | "error" | "info", title: string, mes
 };
 
 // map transaction type from server
-export const mapTransactionType = (type: string) => {
-    switch (type) {
-        case "internal":
-            return "Chuyển khoản nội bộ";
-        case "external":
-            return "Chuyển khoản liên ngân hàng";
-        case "debt_payment":
-            return "Thanh toán nợ";
-        default:
-            return "Unknown";
+export const mapTransactionType = (type: string, amount: number) => {
+    let transactionType = "";
+
+    if (amount < 0) {
+        transactionType = "↑ Chuyển tiền";
+    } else {
+        transactionType = "↓ Nhận tiền";
     }
+
+    if (type === "internal") {
+        transactionType += " nội bộ";
+    } else if (type === "external") {
+        transactionType += " liên ngân hàng";
+    } else if (type === "debt_payment") {
+        transactionType += " thanh toán nợ";
+    }
+
+    return transactionType;
 };
 
 // map payment request status from server

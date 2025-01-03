@@ -6,6 +6,7 @@ import { Button, Group, Modal, Stack, Text } from "@mantine/core";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { formatCurrency, formatTransferRequest, makeToast } from "@/lib/utils/customer";
 import {
+    externalPreTransferThunk,
     internalPreTransferThunk,
     preDebtTransferThunk,
 } from "@/lib/thunks/customer/TransferThunks";
@@ -48,17 +49,27 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
         try {
             onClose();
 
-            if (type === "internal" || type === "external") {
-                await dispatch(internalPreTransferThunk(formatTransferRequest(transfer))).unwrap();
-            } else {
-                const transactionId = searchParams.get("id") || "";
-                dispatch(setCurrentTransferId(transactionId));
-                
-                await dispatch(preDebtTransferThunk({ transactionId: transactionId })).unwrap();
+            switch (type) {
+                case "internal":
+                    await dispatch(
+                        internalPreTransferThunk(formatTransferRequest(transfer, type))
+                    ).unwrap();
+                    break;
+                case "external":
+                    await dispatch(
+                        externalPreTransferThunk(formatTransferRequest(transfer, type))
+                    ).unwrap();
+                    break;
+                case "debt-payment":
+                    const transactionId = searchParams.get("id") || "";
+                    dispatch(setCurrentTransferId(transactionId));
+
+                    await dispatch(preDebtTransferThunk({ transactionId: transactionId })).unwrap();
             }
 
             handleNextStep();
         } catch (error) {
+            confirmToggle();
             makeToast("error", "Xác nhận chuyển khoản thất bại", (error as Error).message);
         }
 

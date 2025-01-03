@@ -6,7 +6,7 @@ import { Text } from "@mantine/core";
 import classes from "./AccountCard.module.css";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
+import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
 import { formatCurrency, formatAccountNumber, makeToast } from "@/lib/utils/customer";
 
 const AccountCard = () => {
@@ -31,7 +31,7 @@ const AccountCard = () => {
     useEffect(() => {
         const fetchAccount = async () => {
             try {
-                await dispatch(getAccountThunk()).unwrap();
+                await dispatch(getUserAccountThunk()).unwrap();
             } catch (error) {
                 makeToast(
                     "error",

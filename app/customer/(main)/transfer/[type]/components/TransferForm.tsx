@@ -6,7 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { setCurrentTransfer } from "@/lib/slices/customer/TransferSlice";
 import { setFilteredReceivers } from "@/lib/slices/customer/ReceiversSlice";
-import { getAccountThunk } from "@/lib/thunks/customer/UserAccountThunks";
+import {
+    getExternalAccountOwnerThunk,
+    getUserAccountThunk,
+} from "@/lib/thunks/customer/AccountThunks";
 import { formatAccountNumber, formatCurrency, makeToast } from "@/lib/utils/customer";
 
 import {
@@ -32,7 +35,8 @@ import { IMaskInput } from "react-imask";
 import TransferInfoModal from "./TransferInfoModal";
 import ReceiverDrawer from "./ReceiverDrawer";
 import { transferFeeThunk } from "@/lib/thunks/customer/TransferThunks";
-import { getReceiverNameThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { getInternalAccountOwnerThunk } from "@/lib/thunks/customer/AccountThunks";
+import { getPartnerBanksThunk } from "@/lib/thunks/customer/PartnerBanksThunks";
 
 interface TransferFormProps {
     handleNextStep: () => void;
@@ -42,6 +46,7 @@ interface TransferFormProps {
 const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => {
     const dispatch = useAppDispatch();
     const userAccount = useAppSelector((state) => state.auth.customerAccount);
+    const partnerBanks = useAppSelector((state) => state.partnerBanks.partnerBanks);
 
     const searchParams = useSearchParams();
 
@@ -49,7 +54,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     const [loading, { toggle }] = useDisclosure(false);
 
     const [selectedBank, setSelectedBank] = useState(
-        type === "internal" || type === "debt-payment" ? "WNC Bank" : searchParams.get("at") || ""
+        type === "internal" || type === "debt-payment" ? "0" : searchParams.get("bankId") || "0"
     );
     const [receiverName, setReceiverName] = useState("");
 
@@ -107,7 +112,20 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
 
     const getReceiverName = async (account: string) => {
         try {
-            const name = await dispatch(getReceiverNameThunk({ accountNumber: account })).unwrap();
+            let name;
+            if (type === "internal" || type === "debt-payment") {
+                name = await dispatch(
+                    getInternalAccountOwnerThunk({ accountNumber: account })
+                ).unwrap();
+            } else {
+                // external transfer
+                name = await dispatch(
+                    getExternalAccountOwnerThunk({
+                        accountNumber: account,
+                        bankId: parseInt(selectedBank),
+                    })
+                ).unwrap();
+            }
 
             if (name && name.length > 0) {
                 setReceiverName(name);
@@ -136,8 +154,12 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                 message: form.getValues().message,
                 receiverAccount: form.getValues().receiverAccount,
                 receiverName: receiverName,
+                receiverBankId: parseInt(selectedBank),
                 receiverBank:
-                    type === "internal" || type === "debt-payment" ? "WNC Bank" : selectedBank,
+                    type === "internal" || type === "debt-payment"
+                        ? "WNC Bank"
+                        : partnerBanks.find((bank) => bank.id === parseInt(selectedBank))
+                              ?.bankName || "-",
                 senderAccount:
                     formatAccountNumber(userAccount ? userAccount.accountNumber : "") || "-",
                 senderName: userAccount?.name || "-",
@@ -152,7 +174,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     };
 
     useEffect(() => {
-        dispatch(setFilteredReceivers(selectedBank));
+        dispatch(setFilteredReceivers(parseInt(selectedBank)));
     }, [dispatch, selectedBank]);
 
     useEffect(() => {
@@ -168,7 +190,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
     useEffect(() => {
         const fetchAccount = async () => {
             try {
-                await dispatch(getAccountThunk()).unwrap();
+                await dispatch(getUserAccountThunk()).unwrap();
             } catch (error) {
                 makeToast(
                     "error",
@@ -189,6 +211,25 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                 : `${userAccount?.name} chuyen tien`
         );
     }, [dispatch, userAccount]);
+
+    useEffect(() => {
+        // only do this for external transfers
+        if (type === "external") {
+            const fetchBanks = async () => {
+                try {
+                    await dispatch(getPartnerBanksThunk()).unwrap();
+                } catch (error) {
+                    makeToast(
+                        "error",
+                        "Truy vấn danh sách ngân hàng liên kết thất bại",
+                        (error as Error).message
+                    );
+                }
+            };
+
+            fetchBanks();
+        }
+    }, [dispatch]);
 
     return (
         <>
@@ -252,7 +293,10 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                             allowDeselect={false}
                             withAsterisk
                             placeholder="Chọn ngân hàng"
-                            data={["Vietcombank", "Techcombank", "Agribank"]}
+                            data={partnerBanks.map((bank) => ({
+                                label: `${bank.bankName} (${bank.shortName})`,
+                                value: String(bank.id),
+                            }))}
                             value={selectedBank}
                             onChange={(value) => {
                                 if (value) {
@@ -265,7 +309,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                     <Tooltip
                         label="Vui lòng chọn ngân hàng trước khi nhập số tài khoản"
                         disabled={
-                            type === "internal" || type === "debt-payment" || selectedBank !== ""
+                            type === "internal" || type === "debt-payment" || selectedBank !== "0"
                         }
                     >
                         <Input.Wrapper
@@ -289,7 +333,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                                 rightSectionPointerEvents="all"
                                 key={form.key("receiverAccount")}
                                 {...form.getInputProps("receiverAccount")}
-                                disabled={type === "external" && selectedBank === ""}
+                                disabled={type === "external" && selectedBank === "0"}
                                 rightSection={
                                     type === "debt-payment" ? null : (
                                         <ReceiverDrawer

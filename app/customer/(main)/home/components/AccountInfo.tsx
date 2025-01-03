@@ -38,7 +38,7 @@ const makeTransactionInfoModalContent = (transaction: Transaction) => {
             { label: "Thời gian", value: formatDateString(transaction.createdAt) },
             {
                 label: "Loại giao dịch",
-                value: mapTransactionType(transaction.type),
+                value: mapTransactionType(transaction.type, transaction.amount),
                 color: mapColor(transaction.type),
             },
             {
@@ -60,8 +60,8 @@ const AccountInfo: React.FC = () => {
     const dispatch = useAppDispatch();
     const transactions = useAppSelector((state) => state.transactions.transactionHistory);
 
-    const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("all");
-    const [timeFilter, setTimeFilter] = useState<string>("Mới nhất");
+    const [transactionScopeFilter, setTransactionScopeFilter] = useState<string>("all");
+    const [transactionDirectionFilter, setTransactionDirectionFilter] = useState<string>("all");
     const [activePage, setActivePage] = useState<number>(1);
 
     useEffect(() => {
@@ -80,25 +80,45 @@ const AccountInfo: React.FC = () => {
         fetchTransactions();
     }, [dispatch]);
 
-    // sort transactions by time
-    const sortByTime = (elements: Transaction[], filter: string) => {
-        return elements.sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
-            return filter === "Mới nhất"
-                ? dateB.getTime() - dateA.getTime()
-                : dateA.getTime() - dateB.getTime();
-        });
-    };
-
     // filter transactions based on selected filters
-    const filteredTransactions = sortByTime(
-        transactions.filter((transaction) => {
-            if (transactionTypeFilter === "all") return true;
-            return transaction.type === transactionTypeFilter;
-        }),
-        timeFilter
-    );
+    const filteredTransactions = transactions.filter((transaction) => {
+        if (transactionScopeFilter === "all" && transactionDirectionFilter === "all") return true;
+
+        let direction = transaction.amount > 0 ? "in" : "out";
+
+        if (transaction.type === "debt_payment") {
+            direction = "debt";
+        }
+
+        if (transactionScopeFilter === "all") {
+            return direction === transactionDirectionFilter;
+        }
+
+        if (transactionDirectionFilter === "all" && transactionScopeFilter !== "debt") {
+            return transaction.type === transactionScopeFilter;
+        }
+
+        switch (transactionDirectionFilter) {
+            case "in":
+                return (
+                    transaction.amount > 0 &&
+                    transaction.type === transactionScopeFilter &&
+                    transaction.type !== "debt_payment"
+                );
+            case "out":
+                return (
+                    transaction.amount < 0 &&
+                    transaction.type === transactionScopeFilter &&
+                    transaction.type !== "debt_payment"
+                );
+            case "debt":
+                return transaction.type === "debt_payment" && transactionScopeFilter !== "external";
+        }
+
+        return (
+            transaction.type === transactionScopeFilter && direction === transactionDirectionFilter
+        );
+    });
 
     // chunk the filtered transactions into pages
     const paginatedTransactions = chunk(filteredTransactions, 6);
@@ -122,7 +142,7 @@ const AccountInfo: React.FC = () => {
             <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
             <Table.Td>{formatCurrency(transaction.amount)}</Table.Td>
             <Table.Td c={mapColor(transaction.type)} fw={600}>
-                {mapTransactionType(transaction.type)}
+                {mapTransactionType(transaction.type, transaction.amount)}
             </Table.Td>
             <Table.Td>{formatCurrency(transaction.balance)}</Table.Td>
             <Table.Td>
@@ -139,7 +159,7 @@ const AccountInfo: React.FC = () => {
 
             {/* Filter Section */}
             <Group justify="space-between" align="center" mb="md" mt="xl">
-                <Group justify="flex-start" gap="md">
+                <Group justify="flex-end" gap="md">
                     <Button
                         radius="md"
                         variant="default"
@@ -167,33 +187,37 @@ const AccountInfo: React.FC = () => {
                             }
                         }}
                     >
-                        Notify
+                        🔔
                     </Button>
 
-                    <Text>Thời gian:</Text>
+                    <Text>Giao dịch:</Text>
 
                     <SegmentedControl
                         radius="md"
                         color="blue"
-                        value={timeFilter}
-                        onChange={setTimeFilter}
-                        data={["Mới nhất", "Cũ nhất"]}
+                        value={transactionDirectionFilter}
+                        onChange={setTransactionDirectionFilter}
+                        data={[
+                            { label: "Tất cả", value: "all" },
+                            { label: "Nhận tiền", value: "in" },
+                            { label: "Chuyển tiền", value: "out" },
+                            { label: "Thanh toán nợ", value: "debt" },
+                        ]}
                     />
                 </Group>
 
                 <Group justify="flex-end" gap="md">
-                    <Text>Loại giao dịch:</Text>
+                    <Text>Phạm vi:</Text>
 
                     <SegmentedControl
                         radius="md"
                         color="blue"
-                        value={transactionTypeFilter}
-                        onChange={setTransactionTypeFilter}
+                        value={transactionScopeFilter}
+                        onChange={setTransactionScopeFilter}
                         data={[
                             { label: "Tất cả", value: "all" },
-                            { label: "CK nội bộ", value: "internal" },
-                            { label: "CK liên ngân hàng", value: "external" },
-                            { label: "Thanh toán nợ", value: "debt_payment" },
+                            { label: "Nội bộ", value: "internal" },
+                            { label: "Liên ngân hàng", value: "external" },
                         ]}
                     />
                 </Group>

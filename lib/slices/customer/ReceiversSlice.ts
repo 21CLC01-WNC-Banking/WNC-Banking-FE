@@ -20,10 +20,19 @@ export const receiversSlice = createSlice({
         setReceivers: (state, action: PayloadAction<ReceiverAccount[]>) => {
             state.receivers = action.payload;
         },
-        setFilteredReceivers: (state, action: PayloadAction<string>) => {
-            // state.filteredReceivers = state.receivers.filter((receiver: ReceiverAccount) => {
-            //     return receiver.bank.toLowerCase().includes(action.payload.toLowerCase());
-            // });
+        setFilteredReceivers: (state, action: PayloadAction<number>) => {
+            if (action.payload === 0) {
+                state.filteredReceivers = state.receivers.filter((receiver: ReceiverAccount) => {
+                    return receiver.bankId === null;
+                });
+            } else {
+                state.filteredReceivers = state.receivers.filter((receiver: ReceiverAccount) => {
+                    return receiver.bankId === action.payload;
+                });
+            }
+        },
+        resetFilter: (state) => {
+            state.filteredReceivers = state.receivers;
         },
         resetReceivers: (state) => {
             state.receivers = { ...initialState.receivers };
@@ -32,5 +41,6 @@ export const receiversSlice = createSlice({
     },
 });
 
-export const { setReceivers, setFilteredReceivers, resetReceivers } = receiversSlice.actions;
+export const { setReceivers, setFilteredReceivers, resetFilter, resetReceivers } =
+    receiversSlice.actions;
 export const receiversReducer = receiversSlice.reducer;

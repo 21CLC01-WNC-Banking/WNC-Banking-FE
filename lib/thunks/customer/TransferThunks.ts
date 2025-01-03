@@ -78,3 +78,41 @@ export const internalTransferThunk = createAppAsyncThunk(
         }
     }
 );
+
+export const externalPreTransferThunk = createAppAsyncThunk(
+    "transfer/external-pre-transfer",
+    async (data: TransferRequest, { dispatch }) => {
+        const response = await fetch(`${apiUrl}/transaction/pre-external-transfer`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+
+        const responseData = await response.json();
+
+        dispatch(setCurrentTransferId(responseData.data));
+    }
+);
+
+export const externalTransferThunk = createAppAsyncThunk(
+    "transfer/external-transfer",
+    async (data: { transactionId: string; otp: string }) => {
+        const response = await fetch(`${apiUrl}/transaction/external-transfer`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+    }
+);

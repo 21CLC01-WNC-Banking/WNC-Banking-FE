@@ -1,4 +1,4 @@
-import { TransferRequest } from "@/lib/types/customer";
+import { Transaction, TransferRequest } from "@/lib/types/customer";
 import { createAppAsyncThunk } from "../../hooks/withTypes";
 import {
     setReceivedRequests,
@@ -11,6 +11,10 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const getTransactionHistoryThunk = createAppAsyncThunk(
     "transactions/get-transaction-history",
     async (_, { dispatch }) => {
+        // calculate date 30 days ago
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
         const response = await fetch(`${apiUrl}/customer/transaction`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -24,7 +28,13 @@ export const getTransactionHistoryThunk = createAppAsyncThunk(
 
         const responseData = await response.json();
 
-        dispatch(setTransactionHistory(responseData.data));
+        // only keep transactions that are created within 30 days
+        const filteredTransactions = responseData.data.filter((transaction: Transaction) => {
+            const transactionDate = new Date(transaction.createdAt);
+            return transactionDate >= thirtyDaysAgo;
+        });
+
+        dispatch(setTransactionHistory(filteredTransactions));
     }
 );
 

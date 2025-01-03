@@ -20,12 +20,9 @@ import {
 import { useForm } from "@mantine/form";
 import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
 import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { resetFilter } from "@/lib/slices/customer/ReceiversSlice";
 
-interface CompletionScreenProps {
-    handleNextStep?: () => void;
-}
-
-const CompletionScreen: React.FC<CompletionScreenProps> = () => {
+const CompletionScreen = () => {
     const router = useRouter();
 
     const dispatch = useAppDispatch();
@@ -63,10 +60,10 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
                     : transfer
                     ? transfer.receiverName
                     : "<chưa có tên gợi nhớ>";
-
             try {
                 await dispatch(
                     addInternalReceiverThunk({
+                        bankId: transfer?.receiverBankId || 0,
                         receiverAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
                         receiverNickname: name,
                     })
@@ -79,9 +76,21 @@ const CompletionScreen: React.FC<CompletionScreenProps> = () => {
                 );
 
                 dispatch(resetTransfer());
+                dispatch(resetFilter());
+
                 router.push("/customer/home");
             } catch (error) {
-                makeToast("error", "Lưu người nhận thất bại", (error as Error).message);
+                const message = (error as Error).message;
+
+                if (message === "receiver already exists") {
+                    makeToast(
+                        "error",
+                        "Lưu người nhận thất bại",
+                        "Người nhận này đã được lưu từ trước. Vui lòng kiểm tra lại ở Trang chủ."
+                    );
+                } else {
+                    makeToast("error", "Lưu người nhận thất bại", message);
+                }
             }
         } else {
             makeToast(
