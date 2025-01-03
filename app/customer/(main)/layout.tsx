@@ -62,7 +62,7 @@ const menuItems = [
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
-    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+    const isLoggedIn = useAppSelector((state) => state.auth.userAccount?.role);
 
     useEffect(() => {
         if (!isLoggedIn) {
