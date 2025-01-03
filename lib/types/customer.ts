@@ -9,8 +9,8 @@ export interface Transfer {
 
 export interface UserAccount {
     name: string;
-    accountNumber: string;
-    balance: number;
+    role: string;
+    userId: string;
 }
 
 export interface ReceiverAccount {

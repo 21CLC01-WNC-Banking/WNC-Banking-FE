@@ -1,5 +1,6 @@
 import { createAppAsyncThunk } from "../hooks/withTypes";
 import { login } from "../slices/AuthSlice";
+import { UserAccount } from "../types/customer";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,5 +27,11 @@ export const loginThunk = createAppAsyncThunk("auth/login", async (data: object,
 
         throw new Error(message || "Đã xảy ra lỗi kết nối với máy chủ.");
     }
-    dispatch(login());
+    const responseData = await response.json();
+    const newUserAccount: UserAccount = {
+        name: responseData.data.name,
+        role: responseData.data.role,
+        userId: responseData.data.userId
+    }
+    dispatch(login(newUserAccount));
 });

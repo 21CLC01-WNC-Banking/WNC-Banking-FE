@@ -20,7 +20,7 @@ import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
 import useCaptcha from "@/lib/hooks/useCaptcha";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useAppDispatch } from "@/lib/hooks/withTypes";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { loginThunk } from "@/lib/thunks/AuthThunks";
 
 const Login = () => {
@@ -51,7 +51,6 @@ const Login = () => {
                 message: "Chào mừng bạn quay trở lại với WNC Banking App.",
                 position: "bottom-right",
             });
-
             router.push("/staff/create-account");
         } catch (error) {
             notifications.show({
