@@ -7,7 +7,6 @@ import storage from "redux-persist/lib/storage";
 import { transferReducer } from "./slices/customer/TransferSlice";
 import { receiversReducer } from "./slices/customer/ReceiversSlice";
 import { authReducer } from "./slices/AuthSlice";
-import { staffAuthReducer } from "./slices/staff/AuthSlice"; 
 import { forgotPasswordReducer } from "./slices/customer/ForgotPasswordSlice";
 import { transactionsReducer } from "./slices/customer/TransactionsSlice";
 import { notificationsReducer } from "./slices/customer/NotificationsSlice";
@@ -37,7 +36,6 @@ export const makeStore = () => {
             account: accountReducer,
 
             // staff
-            staffAuth: staffAuthReducer,
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
