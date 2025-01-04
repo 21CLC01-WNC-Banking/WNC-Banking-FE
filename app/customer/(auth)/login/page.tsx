@@ -19,6 +19,7 @@ import {
     PasswordInput,
     TextInput,
     Title,
+    Text,
 } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 
@@ -84,14 +85,40 @@ const Login = () => {
                             {...form.getInputProps("email")}
                         />
 
+                        <Group justify="space-between" mt="md">
+                            <Group gap={3}>
+                                <Text component="label" htmlFor="password" size="md" fw={500}>
+                                    Mật khẩu
+                                </Text>
+
+                                <Text
+                                    component="label"
+                                    htmlFor="password"
+                                    size="md"
+                                    c="red"
+                                    fw={500}
+                                >
+                                    *
+                                </Text>
+                            </Group>
+
+                            <Link
+                                href="/customer/forgot-password"
+                                passHref
+                                style={{ textDecoration: "none" }}
+                            >
+                                <Anchor fw={500} fz="xs" component="button">
+                                    Quên mật khẩu
+                                </Anchor>
+                            </Link>
+                        </Group>
+
                         <PasswordInput
                             radius="md"
                             size="md"
-                            label="Mật khẩu"
                             placeholder="Mật khẩu"
-                            mt="md"
+                            id="password"
                             mb="lg"
-                            withAsterisk
                             key={form.key("password")}
                             {...form.getInputProps("password")}
                         />
@@ -112,25 +139,17 @@ const Login = () => {
                             >
                                 Đăng nhập
                             </Button>
-
-                            <Link
-                                href="/customer/forgot-password"
-                                passHref
-                                style={{ textDecoration: "none" }}
-                            >
-                                <Anchor component="button">Quên mật khẩu</Anchor>
-                            </Link>
                         </Group>
                     </form>
-                </Paper>
 
-                <Center>
-                    <Link href="/staff/login" passHref style={{ textDecoration: "none" }}>
-                        <Anchor component="button" mt="lg">
-                            Chuyển sang portal nhân viên
-                        </Anchor>
-                    </Link>
-                </Center>
+                    <Center>
+                        <Link href="/staff/login" passHref style={{ textDecoration: "none" }}>
+                            <Anchor component="button" mt="lg">
+                                Chuyển sang portal nhân viên
+                            </Anchor>
+                        </Link>
+                    </Center>
+                </Paper>
             </Container>
         </Center>
     );

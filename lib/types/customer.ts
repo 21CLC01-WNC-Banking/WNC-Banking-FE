@@ -23,7 +23,7 @@ export interface TransferRequest {
     type: string;
 }
 
-export interface CustomerAccount {
+export interface UserAccount {
     name: string;
     accountNumber: string;
     balance: number;
