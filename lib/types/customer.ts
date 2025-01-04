@@ -25,8 +25,8 @@ export interface TransferRequest {
 
 export interface CustomerAccount {
     name: string;
-    accountNumber: string;
-    balance: number;
+    role: string;
+    userId: string;
 }
 
 export interface ReceiverAccount {
