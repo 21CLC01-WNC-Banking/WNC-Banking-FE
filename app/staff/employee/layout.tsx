@@ -5,7 +5,7 @@ import { IconUserPlus, IconHistory, IconCreditCardPay } from "@tabler/icons-reac
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "./components/StaffPortalShortcut";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks/withTypes";
 import Loading from "@/components/Loading";
 
@@ -33,14 +33,22 @@ const menuItems = [
 export default function EmployeeLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const router = useRouter();
     const role = useAppSelector((state) => state.auth.authUser?.role);
+    const [isCheckingRole, setIsCheckingRole] = useState(true);
 
     useEffect(() => {
+        if (!role) {
+            setIsCheckingRole(true);
+            return;
+        }
+
         if (role !== "staff") {
-            router.push("/staff/login");
+            router.push("/staff/admin/employee-list");
+        } else {
+            setIsCheckingRole(false);
         }
     }, [role, router]);
 
-    if (!role) {
+    if (isCheckingRole) {
         return <Loading />;
     }
 

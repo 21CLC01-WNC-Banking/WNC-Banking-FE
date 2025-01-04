@@ -20,20 +20,17 @@ import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
 import useCaptcha from "@/lib/hooks/useCaptcha";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
+import { useAppDispatch } from "@/lib/hooks/withTypes";
 import { loginThunk } from "@/lib/thunks/AuthThunks";
 
 const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha } = useCaptcha();
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const role = useAppSelector((state) => state.auth.authUser?.role);
 
     const form = useForm({
         mode: "uncontrolled",
-        validateInputOnChange: true,
         initialValues: { email: "", password: "" },
-
         validate: {
             email: isEmail("Email không hợp lệ"),
             password: isNotEmpty("Vui lòng nhập mật khẩu"),
@@ -52,10 +49,7 @@ const Login = () => {
                 message: "Chào mừng bạn quay trở lại với WNC Banking App.",
                 position: "bottom-right",
             });
-
-            role === "admin"
-                ? router.push("/staff/admin/employee-list")
-                : router.push("/staff/employee/create-account");
+            router.push("/staff/admin/employee-list");
         } catch (error) {
             notifications.show({
                 withBorder: true,
