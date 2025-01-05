@@ -4,7 +4,12 @@ import Timetable from "./Timetable";
 import Notification from "./Notification";
 import { useState } from "react";
 
-const StaffPortal: React.FC = () => {
+interface StaffPortalProps {
+    name: string | undefined,
+    userId: string | undefined,
+}
+
+const StaffPortal: React.FC<StaffPortalProps> = ({ name, userId }) => {
     const [chosenTab, setChosenTab] = useState<string>("notification");
 
     return (
@@ -15,10 +20,10 @@ const StaffPortal: React.FC = () => {
                         <Avatar src="/staff_avatar.jpg" alt="Staff avatar" size="lg" />
                         <Flex direction="column">
                             <Text>
-                                <strong>Kim Mẫn Đình</strong>
+                                <strong>{name}</strong>
                             </Text>
                             <Text>
-                                Mã số: <strong>2001</strong>
+                                Mã số: <strong>{userId}</strong>
                             </Text>
                         </Flex>
                     </Group>

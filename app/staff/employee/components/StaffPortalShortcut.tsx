@@ -4,10 +4,12 @@ import { useDisclosure } from "@mantine/hooks";
 import { Drawer, Button, Group, Flex, Avatar, Text } from "@mantine/core";
 import { IconMenu2 } from "@tabler/icons-react";
 import StaffPortal from "./StaffPortal";
+import { useAppSelector } from "@/lib/hooks/withTypes";
 
 const StaffPortalShortcut: React.FC = () => {
     const [opened, { open, close }] = useDisclosure(false);
-
+    const name = useAppSelector((state) => state.auth.authUser?.name)
+    const userId = useAppSelector((state) => state.auth.authUser?.userId)
     return (
         <Group>
             <Flex
@@ -23,10 +25,10 @@ const StaffPortalShortcut: React.FC = () => {
                     <Avatar src="/staff_avatar.jpg" alt="Staff avatar" size="lg" />
                     <Flex direction="column" c="white">
                         <Text>
-                            <strong>Kim Mẫn Đình</strong>
+                            <strong>{name}</strong>
                         </Text>
                         <Text>
-                            Mã số: <strong>2001</strong>
+                            Mã số: <strong>{userId}</strong>
                         </Text>
                     </Flex>
                 </Group>
@@ -43,7 +45,7 @@ const StaffPortalShortcut: React.FC = () => {
                 position="right"
                 padding={0}
             >
-                <StaffPortal />
+                <StaffPortal name={name} userId={userId} />
             </Drawer>
         </Group>
     );
