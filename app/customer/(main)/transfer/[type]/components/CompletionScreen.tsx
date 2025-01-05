@@ -6,7 +6,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
 import { formatCurrency, makeToast } from "@/lib/utils/customer";
 import { resetTransfer } from "@/lib/slices/customer/TransferSlice";
-import { addInternalReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
+import { addReceiverThunk } from "@/lib/thunks/customer/ReceiversThunks";
 import { resetFilter } from "@/lib/slices/customer/ReceiversSlice";
 
 import {
@@ -62,7 +62,7 @@ const CompletionScreen = () => {
                     : "<chưa có tên gợi nhớ>";
             try {
                 await dispatch(
-                    addInternalReceiverThunk({
+                    addReceiverThunk({
                         bankId: transfer?.receiverBankId || 0,
                         receiverAccountNumber: transfer?.receiverAccount.split(" ").join("") || "",
                         receiverNickname: name,
@@ -122,7 +122,6 @@ const CompletionScreen = () => {
                         <Text variant="text">{item.label}</Text>
 
                         <Stack gap={0}>
-                            {" "}
                             {item.value.map((value, index) => (
                                 <Text key={index} ta="right" fw={700}>
                                     {value}

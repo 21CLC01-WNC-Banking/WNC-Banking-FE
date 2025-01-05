@@ -34,6 +34,7 @@ import EditReceiverModal from "./EditReceiverModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
 
 import classes from "./ReceiversTable.module.css";
+import AddReceiverModal from "./AddReceiverModal";
 
 interface SortableTableHeaderProps {
     children: React.ReactNode;
@@ -195,14 +196,18 @@ const ReceiversTable = () => {
 
     return (
         <Stack>
-            <TextInput
-                placeholder="Tìm kiếm"
-                radius="md"
-                size="md"
-                leftSection={<IconSearch size={20} />}
-                value={search}
-                onChange={handleSearchChange}
-            />
+            <Group grow justify="space-between" align="center">
+                <TextInput
+                    placeholder="Tìm kiếm"
+                    radius="md"
+                    size="md"
+                    leftSection={<IconSearch size={20} />}
+                    value={search}
+                    onChange={handleSearchChange}
+                />
+
+                <AddReceiverModal />
+            </Group>
 
             <ScrollArea h={450}>
                 <Table horizontalSpacing="sm" verticalSpacing="xs" layout="auto" highlightOnHover>

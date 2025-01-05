@@ -24,8 +24,8 @@ export const getReceiversThunk = createAppAsyncThunk(
     }
 );
 
-export const addInternalReceiverThunk = createAppAsyncThunk(
-    "transfer/add-internal-receiver",
+export const addReceiverThunk = createAppAsyncThunk(
+    "transfer/add-receiver",
     async (data: { receiverAccountNumber: string; receiverNickname: string; bankId: number }) => {
         const response = await fetch(`${apiUrl}/customer/saved-receiver/`, {
             method: "POST",
