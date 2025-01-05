@@ -36,14 +36,20 @@ export interface Transaction {
 }
 
 export interface ExternalTransaction {
-    id: number,
-    createdAt: string;
-    sourceAccountNumber: string;
     amount: number;
-    targetAccountNumber: string;
-    bank: string,
-    balance: number;
+    bankId: number;
+    createdAt: string;
+    deletedAt: string;
     description: string;
+    id: string;
+    isSourceFee: boolean;
+    sourceAccountNumber: string;
+    sourceBalance: number;
+    status: string;
+    targetAccountNumber: string,
+    targetBalance: number,
+    type: string,
+    updatedAt: string
 }
 
 export interface Employee {

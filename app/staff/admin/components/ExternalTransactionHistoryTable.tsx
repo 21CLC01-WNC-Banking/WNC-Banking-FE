@@ -9,7 +9,7 @@ import classes from "../../employee/components/AccountCard.module.css";
 import { chunk } from "../../../../lib/utils/staff";
 import { formatDateString } from "@/lib/utils/customer";
 import { ExternalTransaction } from "@/lib/types/staff";
-import { DatePickerInput } from '@mantine/dates';
+import { DatePickerInput, DateValue } from '@mantine/dates';
 import { formatDate } from "@/lib/utils/staff";
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
@@ -21,42 +21,52 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const [transactions, setTransactions] = useState<ExternalTransaction[]>([]);
 
     // State for datepicker from and to
-    const [from, setFrom] = useState<Date>(new Date(new Date().setMonth(new Date().getMonth() - 1)));
-    const [to, setTo] = useState<Date>(new Date());
+    const [from, setFrom] = useState<DateValue>(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+    const [to, setTo] = useState<DateValue>(new Date());
+    const handleFromDateChange = (newFromDate: DateValue) => {
+        setFrom(newFromDate);
+        fetchExternalTransactions();
+    }
+    const handleToDateChange = (newToDate: DateValue) => {
+        setTo(newToDate);
+        fetchExternalTransactions();
+    }
 
     const [error, setError] = useState<string>("");
 
 
     const [statsData, setStatsData] = useState<{ title: string; stats: string }[]>([
-        { title: "Ngân hàng", stats: "WNC BANK" },
+        { title: "Ngân hàng", stats: "Tất cả ngân hàng" },
         { title: "Tổng số giao dịch", stats: "0" },
         { title: "Tổng số tiền", stats: "0" }
     ]);
 
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    useEffect(() => {
-        const fetchExternalTransactions = async () => {
-            try {
-                const response = await fetch(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`,
-                    {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                    }
-                );
-                if (response.ok) {
-                    setError("");
-                    const data = await response.json();
-                    setTransactions(data.data);
-                } else {
-                    setTransactions([]);
+    const fetchExternalTransactions = async () => {
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`,
+                {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
                 }
-            } catch (error) {
-                setError("Đã xảy ra lỗi kết nối với máy chủ");
+            );
+            if (response.ok) {
+                setError("");
+                const data = await response.json();
+                console.log(data.data);
+                setTransactions(data.data);
+            } else {
                 setTransactions([]);
             }
-        };
+        } catch (error) {
+            setError("Đã xảy ra lỗi kết nối với máy chủ");
+            setTransactions([]);
+        }
+    };
+
+    useEffect(() => {
         fetchExternalTransactions();
     }, []);
 
@@ -168,7 +178,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     <DatePickerInput
                         placeholder="Từ ngày"
                         value={from}
-                        onChange={setFrom}
+                        onChange={handleFromDateChange}
                         locale="vi"
                     />
                 </Group>
@@ -179,7 +189,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     <DatePickerInput
                         placeholder="Từ ngày"
                         value={to}
-                        onChange={setTo}
+                        onChange={handleToDateChange}
                         locale="vi"
                     />
                 </Group>
