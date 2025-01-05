@@ -6,6 +6,7 @@ import { Notifications } from "@mantine/notifications";
 import StoreProvider from "./customer/StoreProvider";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import '@mantine/dates/styles.css';
 
 export const metadata: Metadata = {
     title: "WNC Banking App",

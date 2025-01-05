@@ -9,10 +9,10 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@mantine/core": "^7.14.3",
-        "@mantine/dates": "^7.14.3",
+        "@mantine/core": "^7.15.2",
+        "@mantine/dates": "^7.15.2",
         "@mantine/form": "^7.14.3",
-        "@mantine/hooks": "^7.14.3",
+        "@mantine/hooks": "^7.15.2",
         "@mantine/modals": "^7.14.3",
         "@mantine/notifications": "^7.14.3",
         "@reduxjs/toolkit": "^2.4.0",
