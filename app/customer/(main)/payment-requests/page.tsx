@@ -11,6 +11,7 @@ const tabs = [
                 <RequestsTable type="sent" />
             </Paper>
         ),
+        query: "sent",
     },
     {
         label: "Nhắc nợ đã nhận",
@@ -19,6 +20,7 @@ const tabs = [
                 <RequestsTable type="received" />
             </Paper>
         ),
+        query: "received",
     },
 ];
 

@@ -20,6 +20,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
                 opened={opened}
                 onClose={close}
                 title={title}
+                size="lg"
                 radius="md"
                 centered
                 styles={{

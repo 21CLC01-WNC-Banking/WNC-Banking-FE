@@ -12,6 +12,7 @@ const tabs = [
                 <AccountInfo />
             </Paper>
         ),
+        query: "account",
     },
     {
         label: "Danh sách người nhận",
@@ -20,6 +21,7 @@ const tabs = [
                 <ReceiversTable />
             </Paper>
         ),
+        query: "receivers",
     },
 ];
 

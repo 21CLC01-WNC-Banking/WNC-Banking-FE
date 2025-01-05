@@ -17,9 +17,10 @@ interface SelectPopoverProps {
         amount: number;
         message: string;
     }>;
+    onSelect: (value: string) => void;
 }
 
-const SelectPopover: React.FC<SelectPopoverProps> = ({ form }) => {
+const SelectPopover: React.FC<SelectPopoverProps> = ({ form, onSelect }) => {
     const dispatch = useAppDispatch();
     const targets = useAppSelector((state) => state.receivers.filteredReceivers);
 
@@ -70,7 +71,8 @@ const SelectPopover: React.FC<SelectPopoverProps> = ({ form }) => {
                     comboboxProps={{ withinPortal: false }}
                     onChange={(value) => {
                         if (value) {
-                            form.setFieldValue("target", formatAccountNumber(value));
+                            form.setFieldValue("targetAccountNumber", formatAccountNumber(value));
+                            onSelect(formatAccountNumber(value));
                         }
                     }}
                 />
