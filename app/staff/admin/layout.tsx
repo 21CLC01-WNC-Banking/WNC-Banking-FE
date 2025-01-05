@@ -5,7 +5,7 @@ import { IconUsers, IconReceipt2 } from "@tabler/icons-react";
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "../employee/components/StaffPortalShortcut";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks/withTypes";
 import Loading from "@/components/Loading";
 
@@ -25,18 +25,26 @@ const menuItems = [
 ];
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-    // const router = useRouter();
-    // const role = useAppSelector((state) => state.auth.authUser?.role);
+    const router = useRouter();
+    const role = useAppSelector((state) => state.auth.authUser?.role);
+    const [isCheckingRole, setIsCheckingRole] = useState(true);
 
-    // useEffect(() => {
-    //     if (role !== "admin") {
-    //         router.push("/staff/login");
-    //     }
-    // }, [role, router]);
+    useEffect(() => {
+        if (!role) {
+            setIsCheckingRole(true);
+            return;
+        }
 
-    // if (!role) {
-    //     return <Loading />;
-    // }
+        if (role !== "admin") {
+            router.push("/staff/employee/create-account");
+        } else {
+            setIsCheckingRole(false);
+        }
+    }, [role, router]);
+
+    if (isCheckingRole) {
+        return <Loading />;
+    }
 
     return (
         <Group align="top" preventGrowOverflow={false} grow gap="0" wrap="nowrap">

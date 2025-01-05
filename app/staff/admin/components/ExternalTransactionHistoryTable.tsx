@@ -1,17 +1,6 @@
 "use client";
-import { IconSearch, IconEye } from "@tabler/icons-react";
-import {
-    Paper,
-    Table,
-    Text,
-    Pagination,
-    Center,
-    Group,
-    SegmentedControl,
-    Button,
-    Modal,
-    Switch,
-} from "@mantine/core";
+import { IconEye } from "@tabler/icons-react";
+import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl, Button, Modal } from "@mantine/core";
 import { Input, InputBase, Combobox, useCombobox } from '@mantine/core';
 import { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -268,7 +257,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
             {/* Filter Section */}
             <Group align="center" mb="md" mt="lg">
                 <Group justify="flex-start" gap="md">
-                    <Text>Thời gian:</Text>
+                    <Text>Từ:</Text>
 
                     <SegmentedControl
                         color="blue"
