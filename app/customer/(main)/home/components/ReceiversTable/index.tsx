@@ -154,6 +154,7 @@ const ReceiversTable = () => {
 
                     <Tooltip label="Chuyển khoản">
                         <ActionIcon
+                            maw="md"
                             radius="md"
                             variant="subtle"
                             color="green"

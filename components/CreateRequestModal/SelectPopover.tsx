@@ -51,7 +51,13 @@ const SelectPopover: React.FC<SelectPopoverProps> = ({ form, onSelect }) => {
     return (
         <Popover width={300} position="bottom" withArrow shadow="md">
             <Popover.Target>
-                <ActionIcon variant="subtle" color="gray" radius="md" aria-label="Saved targets">
+                <ActionIcon
+                    maw="md"
+                    variant="subtle"
+                    color="gray"
+                    radius="md"
+                    aria-label="Saved targets"
+                >
                     <IconAddressBook size={20} />
                 </ActionIcon>
             </Popover.Target>

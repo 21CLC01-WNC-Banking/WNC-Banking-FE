@@ -95,7 +95,7 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickn
             </Modal>
 
             <Tooltip label="Chỉnh sửa" onClick={open}>
-                <ActionIcon radius="md" variant="subtle" color="gray">
+                <ActionIcon maw="md" radius="md" variant="subtle" color="gray">
                     <IconPencil size={20} />
                 </ActionIcon>
             </Tooltip>

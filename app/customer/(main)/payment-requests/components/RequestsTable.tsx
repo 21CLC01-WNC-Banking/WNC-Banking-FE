@@ -156,6 +156,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
                     {type === "received" && request.debtReminder.status === "pending" && (
                         <Tooltip label="Thanh toán">
                             <ActionIcon
+                                maw="md"
                                 radius="md"
                                 variant="subtle"
                                 color="green"

@@ -67,7 +67,7 @@ const DeleteReceiverModal: React.FC<DeleteModalProps> = ({ receiverId }) => {
             </Modal>
 
             <Tooltip label="Xóa">
-                <ActionIcon radius="md" variant="subtle" color="red" onClick={open}>
+                <ActionIcon maw="md" radius="md" variant="subtle" color="red" onClick={open}>
                     <IconTrash size={20} />
                 </ActionIcon>
             </Tooltip>

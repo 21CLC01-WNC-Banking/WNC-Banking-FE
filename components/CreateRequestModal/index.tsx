@@ -275,7 +275,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
 
             {isFromReceiversList ? (
                 <Tooltip label="Nhắc nợ">
-                    <ActionIcon radius="md" variant="subtle" color="blue" onClick={open}>
+                    <ActionIcon maw="md" radius="md" variant="subtle" color="blue" onClick={open}>
                         <IconMessageDollar size={20} />
                     </ActionIcon>
                 </Tooltip>

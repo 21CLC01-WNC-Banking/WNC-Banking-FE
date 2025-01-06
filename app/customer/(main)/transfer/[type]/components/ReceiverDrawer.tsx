@@ -81,6 +81,7 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
     return (
         <>
             <ActionIcon
+                maw="md"
                 variant="subtle"
                 color="gray"
                 radius="md"
