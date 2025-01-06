@@ -57,7 +57,7 @@ const Login = () => {
                 icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
                 color: "red",
                 title: "Đăng nhập thất bại",
-                message: (error as Error).message || "Đã xảy ra lỗi kết nối với máy chủ.",
+                message: "Đã xảy ra lỗi kết nối với máy chủ.",
                 position: "bottom-right",
             });
         }

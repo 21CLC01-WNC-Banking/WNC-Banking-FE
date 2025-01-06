@@ -73,7 +73,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
 
     // State for filters and pagination
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả ngân hàng");
-    const partner = ['Tất cả ngân hàng', 'BANK1', 'J97 Bank (sắp ra mắt)'];
+    const partner = ['Tất cả ngân hàng', 'abc', 'J97 Bank (sắp ra mắt)'];
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
@@ -144,7 +144,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
             <Table.Td>{formatDateString(transaction.updatedAt)}</Table.Td>
             <Table.Td>{transaction.amount.toLocaleString("vi-VN")}</Table.Td>
             <Table.Td>{transaction.partnerBankShortName}</Table.Td>
-            <Table.Td>{transaction.sourceBalance.toLocaleString("vi-VN")}</Table.Td>
+            <Table.Td>{transaction.partnerBankCode}</Table.Td>
             <Table.Td>
                 <Button
                     variant="subtle"
@@ -240,11 +240,11 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     <Table verticalSpacing="sm" mt="xl" striped>
                         <Table.Thead>
                             <Table.Tr>
-                                <Table.Th>Thời gian</Table.Th>
-                                <Table.Th>Giao dịch</Table.Th>
-                                <Table.Th>Ngân hàng</Table.Th>
-                                <Table.Th>Số dư hiện tại</Table.Th>
-                                <Table.Th>Xem chi tiết</Table.Th>
+                                <Table.Th>Thời Gian</Table.Th>
+                                <Table.Th>Giao Dịch</Table.Th>
+                                <Table.Th>Ngân Hàng</Table.Th>
+                                <Table.Th>Mã Ngân Hàng</Table.Th>
+                                <Table.Th>Xem Chi Tiết</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>{rows}</Table.Tbody>
