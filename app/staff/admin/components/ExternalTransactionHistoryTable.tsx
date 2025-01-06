@@ -39,7 +39,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
             console.log(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`);
-            const response = await fetch(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`,
+            const response = await fetch(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}%2023:59:59`,
                 {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
@@ -49,8 +49,15 @@ const ExternalTransactionHistoryTable: React.FC = () => {
             if (response.ok) {
                 setError("");
                 const data = await response.json();
-                console.log(data.data);
                 setTransactions(data.data);
+                console.log(data.data);
+                const totalTransactions = data.data.length;
+                const totalAmount = data.data.reduce((sum: number, transaction: { amount: number }) => sum + transaction.amount, 0);
+                setStatsData([
+                    { title: "Ngân hàng", stats: "Tất cả ngân hàng" },
+                    { title: "Tổng số giao dịch", stats: totalTransactions.toString() },
+                    { title: "Tổng số tiền", stats: totalAmount.toLocaleString("vi-VN") },
+                ]);
             } else {
                 setTransactions([]);
             }
@@ -65,8 +72,8 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     }, [from, to]);
 
     // State for filters and pagination
-    const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả");
-    const partner = ['Tất cả', 'ABC Bank', 'DEF Bank'];
+    const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả ngân hàng");
+    const partner = ['Tất cả ngân hàng', 'BANK1', 'J97 Bank (sắp ra mắt)'];
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
@@ -86,22 +93,22 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     // Filter transactions based on selected filters
     const filteredTransactions =
         transactions.filter((transaction) => {
-            if (transactionTypeFilter === "Tất cả") return true;
-            return transaction.bank === transactionTypeFilter;
+            if (transactionTypeFilter === "Tất cả ngân hàng") return true;
+            return transaction.partnerBankShortName === transactionTypeFilter;
         });
 
 
     // Adjust data for stats based on selected filters
     const HandleBankChange = (bank: string) => {
-        const filtered = bank === "Tất cả"
+        const filtered = bank === "Tất cả ngân hàng"
             ? transactions
-            : transactions.filter((transaction) => transaction.bank === bank);
+            : transactions.filter((transaction) => transaction.partnerBankShortName === bank);
 
         const totalTransactions = filtered.length;
         const totalAmount = filtered.reduce((sum, transaction) => sum + transaction.amount, 0);
 
         setStatsData([
-            { title: "Ngân hàng", stats: bank },
+            { title: "Ngân hàng", stats: bank.includes("J97") ? "J97 Bank" : bank },
             { title: "Tổng số giao dịch", stats: totalTransactions.toString() },
             { title: "Tổng số tiền", stats: totalAmount.toLocaleString("vi-VN") },
         ]);
@@ -134,9 +141,9 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     // Create table rows for current page
     const rows = currentPageTransactions.map((transaction, index) => (
         <Table.Tr key={index}>
-            <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
+            <Table.Td>{formatDateString(transaction.updatedAt)}</Table.Td>
             <Table.Td>{transaction.amount.toLocaleString("vi-VN")}</Table.Td>
-            <Table.Td>{transaction.bankId}</Table.Td>
+            <Table.Td>{transaction.partnerBankShortName}</Table.Td>
             <Table.Td>{transaction.sourceBalance.toLocaleString("vi-VN")}</Table.Td>
             <Table.Td>
                 <Button

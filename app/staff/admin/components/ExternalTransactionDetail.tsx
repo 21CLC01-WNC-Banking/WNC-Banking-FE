@@ -24,7 +24,7 @@ const ExternalTransactionDetail: React.FC<TransactionDetailProps> = ({ transacti
             <Flex direction="column">
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Ngày thực hiện</Text>
-                    <Text fw={700}>{formatDateString(transaction.createdAt)}</Text>
+                    <Text fw={700}>{formatDateString(transaction.updatedAt)}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
@@ -39,7 +39,7 @@ const ExternalTransactionDetail: React.FC<TransactionDetailProps> = ({ transacti
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Từ</Text>
-                    <Text fw={700}>{transaction.sourceAccountNumber ? transaction.sourceAccountNumber : "Cổng nhân viên"}</Text>
+                    <Text fw={700}>{transaction.sourceAccountNumber ? transaction.sourceAccountNumber : "Cổng nhân viên WNC Bank"}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">
@@ -48,7 +48,7 @@ const ExternalTransactionDetail: React.FC<TransactionDetailProps> = ({ transacti
                 </Flex>
                 <Flex justify="space-between" align="flex-start" mb="sm">
                     <Text>Đối tác</Text>
-                    <Text fw={700}>{transaction.bank}</Text>
+                    <Text fw={700}>{transaction.partnerBankShortName}</Text>
                 </Flex>
 
                 <Flex justify="space-between" align="flex-start" mb="sm">

@@ -37,7 +37,7 @@ export interface Transaction {
 
 export interface ExternalTransaction {
     amount: number;
-    bankId: number;
+    partnerBankShortName: string;
     createdAt: string;
     deletedAt: string;
     description: string;
