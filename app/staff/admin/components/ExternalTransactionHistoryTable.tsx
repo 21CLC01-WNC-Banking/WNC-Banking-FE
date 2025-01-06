@@ -23,14 +23,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     // State for datepicker from and to
     const [from, setFrom] = useState<DateValue>(new Date(new Date().setMonth(new Date().getMonth() - 1)));
     const [to, setTo] = useState<DateValue>(new Date());
-    const handleFromDateChange = (newFromDate: DateValue) => {
-        setFrom(newFromDate);
-        fetchExternalTransactions();
-    }
-    const handleToDateChange = (newToDate: DateValue) => {
-        setTo(newToDate);
-        fetchExternalTransactions();
-    }
+
 
     const [error, setError] = useState<string>("");
 
@@ -45,6 +38,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const fetchExternalTransactions = async () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            console.log(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`);
             const response = await fetch(`${apiUrl}/admin/external-transaction?fromDate=${formatDate(from)}&toDate=${formatDate(to)}`,
                 {
                     method: "GET",
@@ -68,7 +62,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
 
     useEffect(() => {
         fetchExternalTransactions();
-    }, []);
+    }, [from, to]);
 
     // State for filters and pagination
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả");
@@ -142,8 +136,8 @@ const ExternalTransactionHistoryTable: React.FC = () => {
         <Table.Tr key={index}>
             <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
             <Table.Td>{transaction.amount.toLocaleString("vi-VN")}</Table.Td>
-            <Table.Td>{transaction.bank}</Table.Td>
-            <Table.Td>{transaction.balance.toLocaleString("vi-VN")}</Table.Td>
+            <Table.Td>{transaction.bankId}</Table.Td>
+            <Table.Td>{transaction.sourceBalance.toLocaleString("vi-VN")}</Table.Td>
             <Table.Td>
                 <Button
                     variant="subtle"
@@ -178,7 +172,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     <DatePickerInput
                         placeholder="Từ ngày"
                         value={from}
-                        onChange={handleFromDateChange}
+                        onChange={setFrom}
                         locale="vi"
                     />
                 </Group>
@@ -189,7 +183,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     <DatePickerInput
                         placeholder="Từ ngày"
                         value={to}
-                        onChange={handleToDateChange}
+                        onChange={setTo}
                         locale="vi"
                     />
                 </Group>
