@@ -15,9 +15,9 @@ import {
     IconHome,
     IconCreditCardPay,
     IconMessageDollar,
-    IconKey,
     IconBell,
     IconBellRinging,
+    IconUserCog,
 } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
@@ -74,9 +74,9 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
             top: false,
         },
         {
-            link: "/customer/change-password",
-            label: "Đổi mật khẩu",
-            icon: <IconKey />,
+            link: "/customer/account-settings",
+            label: "Cài đặt tài khoản",
+            icon: <IconUserCog />,
             top: false,
         },
     ];
@@ -88,6 +88,8 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
     }, [role, router]);
 
     useEffect(() => {
+        if (!role) return;
+
         const fetchNotifications = async () => {
             try {
                 await dispatch(getNotificationsThunk()).unwrap();
