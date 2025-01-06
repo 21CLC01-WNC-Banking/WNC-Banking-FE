@@ -1,10 +1,21 @@
+"use client";
+
 import React from "react";
+
+import { NotificationToast, Transfer, TransferRequest, Notification } from "@/lib/types/customer";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { AppDispatch } from "@/lib/store";
+import {
+    getReceivedRequestsThunk,
+    getSentRequestsThunk,
+    getTransactionHistoryThunk,
+} from "@/lib/thunks/customer/TransactionsThunk";
+import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
+import { getNotificationsThunk } from "@/lib/thunks/customer/NotificationsThunk";
 
 import { rem } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
-
-import { Transfer, TransferRequest } from "../types/customer";
 
 // chunk data into pages for tables
 export const chunk = <T>(array: T[], size: number): T[][] => {
@@ -64,7 +75,7 @@ export const formatTransferRequest = (transfer: Transfer | null, type: string): 
 };
 
 // make toast
-export const makeToast = (type: "success" | "error" | "info", title: string, message: string) => {
+export const makeToast = (type: "success" | "error", title: string, message: string) => {
     switch (type) {
         case "success":
             notifications.show({
@@ -92,15 +103,6 @@ export const makeToast = (type: "success" | "error" | "info", title: string, mes
             });
 
             break;
-        case "info":
-            notifications.show({
-                withBorder: true,
-                radius: "md",
-                color: "blue",
-                title: title,
-                message: message,
-                position: "bottom-right",
-            });
     }
 
     return null;
@@ -159,4 +161,111 @@ export const mapColor = (type: string) => {
         default:
             return "";
     }
+};
+
+// handle object received from WebSocket server and make a toast notification
+export const handleNotification = async (
+    notif: NotificationToast,
+    router?: AppRouterInstance,
+    dispatch?: AppDispatch,
+    currentPath?: string
+) => {
+    let title = "";
+    let message = "";
+    let route = "";
+
+    switch (notif.Type) {
+        case "incoming_transfer":
+            title = `Đã nhận ${formatCurrency(notif.Amount)} từ ${notif.Name}`;
+            message = `Bạn có thể xem chi tiết giao dịch tại Trang chủ.`;
+            route = "/customer/home?tab=account";
+
+            if (dispatch && currentPath?.includes("/customer/home")) {
+                await dispatch(getUserAccountThunk());
+                await dispatch(getTransactionHistoryThunk());
+            }
+
+            break;
+        case "outgoing_transfer":
+            title = `Đã chuyển ${formatCurrency(notif.Amount)} cho ${notif.Name}`;
+            message = `Bạn có thể xem chi tiết giao dịch tại Trang chủ.`;
+            break;
+        case "debt_reminder":
+            title = `Bạn nợ ${notif.Name} ${formatCurrency(notif.Amount)}`;
+            message = `Bạn có thể xem chi tiết và thanh toán nợ tại trang Nhắc nợ.`;
+            route = "/customer/payment-requests?tab=received";
+
+            if (dispatch && currentPath?.includes("/customer/payment-requests?tab=received")) {
+                await dispatch(getReceivedRequestsThunk());
+            }
+
+            break;
+        case "debt_cancel":
+            title = `${notif.Name} đã hủy nhắc nợ`;
+            message = `Bạn có thể xem chi tiết tại trang Nhắc nợ.`;
+            route = "/customer/payment-requests";
+
+            if (dispatch && currentPath?.includes("/customer/payment-requests")) {
+                await dispatch(getReceivedRequestsThunk());
+                await dispatch(getSentRequestsThunk());
+            }
+
+            break;
+    }
+
+    if (dispatch) {
+        await dispatch(getNotificationsThunk()).unwrap();
+    }
+
+    notifications.show({
+        withBorder: true,
+        radius: "md",
+        color: "blue",
+        title: title,
+        message: message,
+        position: "bottom-right",
+        style: route !== "" ? { cursor: "pointer" } : {},
+        onClick: router && route !== "" ? () => router.push(route) : undefined,
+    });
+};
+
+// map notification entity from database to props for NotificationItem component
+export const mapNotification = (notif: Notification) => {
+    let title = "";
+    const content = JSON.parse(notif.content);
+    let message = `${content.transactionId} - `;
+
+    switch (notif.type) {
+        case "incoming_transfer":
+            title = `Nhận tiền vào tài khoản`;
+            message += `Bạn đã nhận ${formatCurrency(content.amount)} từ ${content.name}.`;
+
+            break;
+        case "outgoing_transfer":
+            title = `Chuyển tiền đến tài khoản`;
+            message += `Bạn đã chuyển ${formatCurrency(content.amount)} cho ${content.name}.`;
+            break;
+        case "debt_reminder":
+            title = `Bạn có nợ cần thanh toán`;
+            message += `Bạn nợ ${content.name} ${formatCurrency(content.amount)}.`;
+            break;
+        case "debt_cancel":
+            title = `Nhắc nợ bị hủy`;
+            message += ` ${content.name} đã hủy nhắc nợ ${formatCurrency(content.amount)} của bạn.`;
+
+            break;
+    }
+
+    return {
+        id: notif.id,
+        title,
+        content: message,
+        time: formatDateString(notif.createdAt),
+        read: notif.isSeen,
+        transactionId: content.transactionId,
+    };
+};
+
+export const getUnseenNotificationsCount = (notifications: Notification[]): number => {
+    return notifications.filter((notif) => !notif.isSeen).length;
 };

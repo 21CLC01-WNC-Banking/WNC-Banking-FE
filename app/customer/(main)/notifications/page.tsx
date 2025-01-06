@@ -1,85 +1,25 @@
 "use client";
 
+import { mapNotification } from "@/lib/utils/customer";
+import { Notification } from "@/lib/types/customer";
+import { useAppSelector } from "@/lib/hooks/withTypes";
+
 import { Paper, Center, Title } from "@mantine/core";
 
 import NotificationItem from "@/components/NotificationItem";
 
 const Notifications = () => {
+    const notifications = useAppSelector((state) => state.notifications.notifications);
+
     return (
         <Paper withBorder mx={120} radius="md" p={30} my={50}>
             <Center mb="xl">
                 <Title order={2}>Thông báo</Title>
             </Center>
 
-            <NotificationItem
-                title="Nhận tiền chuyển khoản"
-                content="Nội dung thông báo"
-                time="12:00 01/01/2022"
-                read={false}
-            />
-
-            <NotificationItem
-                title="Nhận tiền chuyển khoản"
-                content="Nội dung thông báo"
-                time="12:00 01/01/2022"
-                read={false}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
-
-            <NotificationItem
-                title="Nợ chưa thanh toán"
-                content="Nội dung thông báo"
-                time="10:00 01/01/2022"
-                read={true}
-            />
+            {notifications.map((notif: Notification) => (
+                <NotificationItem key={notif.id} {...mapNotification(notif)} />
+            ))}
         </Paper>
     );
 };

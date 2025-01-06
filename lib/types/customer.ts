@@ -87,8 +87,16 @@ export interface Notification {
     updatedAt: string;
     deletedAt: string;
     isSeen: boolean;
-    title: string;
     type: string;
+}
+
+// PascalCase because for some god forsaken reason the backend uses PascalCase
+export interface NotificationToast {
+    Name: string;
+    Amount: number;
+    TransactionID: string;
+    Type: "incoming_transfer" | "outgoing_transfer" | "debt_reminder" | "debt_cancel";
+    CreatedAt: string;
 }
 
 export interface PartnerBank {

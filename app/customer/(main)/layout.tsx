@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
 
-import { useAppSelector } from "@/lib/hooks/withTypes";
-import { makeToast } from "@/lib/utils/customer";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/withTypes";
+import { handleNotification, makeToast } from "@/lib/utils/customer";
 import useWebSocket from "@/lib/hooks/useWebSocket";
+import { getNotificationsThunk } from "@/lib/thunks/customer/NotificationsThunk";
+import { getUnseenNotificationsCount } from "@/lib/utils/customer";
 
 import { Group } from "@mantine/core";
 import {
@@ -14,57 +17,69 @@ import {
     IconMessageDollar,
     IconKey,
     IconBell,
+    IconBellRinging,
 } from "@tabler/icons-react";
 
 import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
-
-const menuItems = [
-    {
-        link: "/customer/home",
-        label: "Trang chủ",
-        icon: <IconHome />,
-        top: true,
-    },
-    {
-        label: "Chuyển khoản",
-        icon: <IconCreditCardPay />,
-        top: true,
-        innerLinks: [
-            {
-                link: "/customer/transfer/internal",
-                label: "Nội bộ",
-            },
-            {
-                link: "/customer/transfer/external",
-                label: "Liên ngân hàng",
-            },
-        ],
-    },
-    {
-        link: "/customer/payment-requests",
-        label: "Nhắc nợ",
-        icon: <IconMessageDollar />,
-        top: true,
-    },
-    {
-        link: "/customer/notifications",
-        label: "Thông báo",
-        icon: <IconBell />,
-        top: false,
-    },
-    {
-        link: "/customer/change-password",
-        label: "Đổi mật khẩu",
-        icon: <IconKey />,
-        top: false,
-    },
-];
+import { Notification } from "@/lib/types/customer";
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+    const pathname = usePathname();
     const router = useRouter();
+
+    const dispatch = useAppDispatch();
     const role = useAppSelector((state) => state.auth.authUser?.role);
+    const notifications = useAppSelector((state) => state.notifications.notifications);
+
+    const [unseenCount, setUnseenCount] = useState(0);
+
+    const menuItems = [
+        {
+            link: "/customer/home",
+            label: "Trang chủ",
+            icon: <IconHome />,
+            top: true,
+        },
+        {
+            label: "Chuyển khoản",
+            icon: <IconCreditCardPay />,
+            top: true,
+            innerLinks: [
+                {
+                    link: "/customer/transfer/internal",
+                    label: "Nội bộ",
+                },
+                {
+                    link: "/customer/transfer/external",
+                    label: "Liên ngân hàng",
+                },
+            ],
+        },
+        {
+            link: "/customer/payment-requests",
+            label: "Nhắc nợ",
+            icon: <IconMessageDollar />,
+            top: true,
+        },
+        {
+            link: "/customer/notifications",
+            label: unseenCount > 0 ? `Thông báo (${unseenCount})` : "Thông báo",
+            icon: notifications.some((notif: Notification) => !notif.isSeen) ? (
+                <IconBellRinging />
+            ) : (
+                <IconBell />
+            ),
+            top: false,
+        },
+        {
+            link: "/customer/change-password",
+            label: "Đổi mật khẩu",
+            icon: <IconKey />,
+            top: false,
+        },
+    ];
 
     useEffect(() => {
         if (role !== "customer") {
@@ -72,16 +87,34 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
         }
     }, [role, router]);
 
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                await dispatch(getNotificationsThunk()).unwrap();
+            } catch (error) {
+                makeToast(
+                    "error",
+                    "Truy vấn danh sách thông báo thất bại",
+                    (error as Error).message
+                );
+            }
+        };
+
+        fetchNotifications();
+    }, [dispatch]);
+
+    useEffect(() => {
+        setUnseenCount(getUnseenNotificationsCount(notifications));
+    }, [notifications]);
+
     // websocket connection to receive notifications
     useWebSocket((data) => {
         if (data === "established") return;
 
         try {
-            // const parts = data.split("\n");
             const audio = new Audio("/notification.mp3");
             audio.play();
-            console.log(data);
-            // makeToast("info", parts[0], parts[1]);
+            handleNotification(JSON.parse(data), router, dispatch, pathname);
         } catch (error) {
             console.error("Error parsing message:", error);
         }
