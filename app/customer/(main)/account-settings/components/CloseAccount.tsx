@@ -1,4 +1,4 @@
-import { Stack, Center, Title, Button, Text } from "@mantine/core";
+import { Stack, Center, Title, Text } from "@mantine/core";
 import ConfirmCloseAccountModal from "./ConfirmCloseAccountModal";
 
 const CloseAccount = () => {
