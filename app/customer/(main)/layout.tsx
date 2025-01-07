@@ -10,13 +10,12 @@ import useWebSocket from "@/lib/hooks/useWebSocket";
 import { getNotificationsThunk } from "@/lib/thunks/customer/NotificationsThunk";
 import { getUnseenNotificationsCount } from "@/lib/utils/customer";
 
-import { Group } from "@mantine/core";
+import { Group, Indicator } from "@mantine/core";
 import {
     IconHome,
     IconCreditCardPay,
     IconMessageDollar,
     IconBell,
-    IconBellRinging,
     IconUserCog,
 } from "@tabler/icons-react";
 
@@ -32,6 +31,8 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
     const dispatch = useAppDispatch();
     const role = useAppSelector((state) => state.auth.authUser?.role);
     const notifications = useAppSelector((state) => state.notifications.notifications);
+
+    console.log(notifications.some((notif: Notification) => !notif.isSeen));
 
     const [unseenCount, setUnseenCount] = useState(0);
 
@@ -66,10 +67,12 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
         {
             link: "/customer/notifications",
             label: unseenCount > 0 ? `Thông báo (${unseenCount})` : "Thông báo",
-            icon: notifications.some((notif: Notification) => !notif.isSeen) ? (
-                <IconBellRinging />
-            ) : (
-                <IconBell />
+            icon: (
+                <Indicator inline color="yellow" disabled={unseenCount === 0} size={8} offset={2}>
+                    <Group align="center" justify="center">
+                        <IconBell />
+                    </Group>
+                </Indicator>
             ),
             top: false,
         },
