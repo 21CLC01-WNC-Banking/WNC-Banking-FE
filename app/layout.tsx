@@ -4,14 +4,14 @@ import NextTopLoader from "nextjs-toploader";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
-import StoreProvider from "./customer/StoreProvider";
+import StoreProvider from "./StoreProvider";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import '@mantine/dates/styles.css';
+import "@mantine/dates/styles.css";
 
 export const metadata: Metadata = {
     title: "WNC Banking App",
-    description: "Final project for HCMUS' Advanced Web Development course",
+    description: "Đồ án học phần Lập trình Web nâng cao - 21KTPM1 (Nhóm 03)",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
