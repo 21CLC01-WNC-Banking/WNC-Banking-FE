@@ -44,7 +44,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ forCustomer, items }) => {
                 router.push("/staff/login");
             }
         } catch (error) {
-            makeToast("error", "Gửi mã OTP thất bại", (error as Error).message);
+            makeToast("error", "Đăng xuất thất bại", (error as Error).message);
         }
     };
 
