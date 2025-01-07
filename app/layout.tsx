@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextTopLoader from "nextjs-toploader";
 
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <body>
                 <MantineProvider>
                     <Notifications />
+                    <NextTopLoader color="#72bcfc" showSpinner={false} />
                     <StoreProvider>{children}</StoreProvider>
                 </MantineProvider>
             </body>

@@ -4,7 +4,7 @@ import { Stack, Group } from "@mantine/core";
 import { IconUserPlus, IconHistory, IconCreditCardPay } from "@tabler/icons-react";
 import SideMenu from "@/components/SideMenu";
 import StaffPortalShortcut from "./components/StaffPortalShortcut";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks/withTypes";
 import Loading from "@/components/Loading";
