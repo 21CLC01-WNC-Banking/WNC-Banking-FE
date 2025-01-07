@@ -58,6 +58,26 @@ export const getTransactionThunk = createAppAsyncThunk(
     }
 );
 
+export const getPaymentRequestReplyThunk = createAppAsyncThunk(
+    "transactions/get-request-reply",
+    async (data: { debtReminderId: number }) => {
+        const response = await fetch(`${apiUrl}/debt-reply/${data.debtReminderId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+
+        const responseData = await response.json();
+
+        return responseData.data;
+    }
+);
+
 export const getSentRequestsThunk = createAppAsyncThunk(
     "transactions/get-sent-requests",
     async (_, { dispatch }) => {

@@ -9,11 +9,15 @@ import {
     mapTransactionType,
     formatAccountNumber,
     makeToast,
+    mapNotificationType,
 } from "@/lib/utils/customer";
 import { useAppDispatch } from "@/lib/hooks/withTypes";
-import { getTransactionThunk } from "@/lib/thunks/customer/TransactionsThunk";
+import {
+    getPaymentRequestReplyThunk,
+    getTransactionThunk,
+} from "@/lib/thunks/customer/TransactionsThunk";
 import { AppDispatch } from "@/lib/store";
-import { Transaction } from "@/lib/types/customer";
+import { DebtCancelReply, Transaction } from "@/lib/types/customer";
 import {
     setSeenNotificationThunk,
     getNotificationsThunk,
@@ -37,9 +41,25 @@ const fetchTransaction = async (transactionId: number, dispatch: AppDispatch) =>
     }
 };
 
-const makeNotificationDetailModalContent = (transaction: Transaction) => {
+const fetchDebtCancelReply = async (transactionId: number, dispatch: AppDispatch) => {
+    try {
+        const reply = await dispatch(
+            getPaymentRequestReplyThunk({ debtReminderId: transactionId })
+        ).unwrap();
+
+        return reply;
+    } catch (error) {
+        makeToast("error", "Truy vấn thông tin giao dịch thất bại", (error as Error).message);
+    }
+};
+
+const makeNotificationDetailModalContent = (
+    transaction: Transaction,
+    type: string,
+    reply?: DebtCancelReply | null
+) => {
     return {
-        title: "Chi tiết thông báo",
+        title: `Thông báo ${mapNotificationType(type)}`,
         content: [
             { label: "Mã giao dịch", value: transaction.id },
             { label: "Thời gian", value: formatDateString(transaction.createdAt) },
@@ -56,9 +76,29 @@ const makeNotificationDetailModalContent = (transaction: Transaction) => {
                 label: "Tài khoản thụ hưởng",
                 value: formatAccountNumber(transaction.targetAccountNumber),
             },
-            { label: "Số tiền giao dịch", value: formatCurrency(transaction.amount) },
+            {
+                label: `Số tiền ${
+                    type === "debt_reminder" || type === "debt_cancel" ? "nợ" : "giao dịch"
+                }`,
+                value: formatCurrency(transaction.amount),
+            },
             { label: "Nội dung", value: transaction.description },
-            { label: "Số dư sau giao dịch", value: formatCurrency(transaction.balance) },
+            ...(type !== "debt_cancel" && type !== "debt_reminder"
+                ? [
+                      {
+                          label: "Số dư sau giao dịch",
+                          value: formatCurrency(transaction.balance),
+                      },
+                  ]
+                : []),
+            ...(reply
+                ? [
+                      { label: "divider" },
+                      { label: "Người hủy", value: reply.userReplyName },
+                      { label: "Nội dung hủy", value: reply.content },
+                      { label: "Thời gian hủy", value: formatDateString(reply.updatedAt) },
+                  ]
+                : []),
         ],
     };
 };
@@ -68,6 +108,7 @@ interface Notification {
     title: string;
     content: string;
     time: string;
+    type: string;
     read: boolean;
     transactionId: number;
 }
@@ -77,11 +118,13 @@ const NotificationItem: React.FC<Notification> = ({
     title,
     content,
     time,
+    type,
     read,
     transactionId,
 }) => {
     const dispatch = useAppDispatch();
     const [transaction, setTransaction] = useState<Transaction | null>();
+    const [debtCancelReply, setDebtCancelReply] = useState(null);
     const dummyInfoModalContent = { title: "", content: [] };
     const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -106,6 +149,14 @@ const NotificationItem: React.FC<Notification> = ({
             setTransaction(data);
         }
 
+        // if the notification is a debt cancel, fetch the reply to inject into the info modal
+        if (type === "debt_cancel" && debtCancelReply === null) {
+            const replyData = await fetchDebtCancelReply(transactionId, dispatch);
+            setDebtCancelReply(replyData);
+        } else if (type !== "debt_cancel") {
+            setDebtCancelReply(null);
+        }
+
         // trigger the info modal
         triggerRef.current?.click();
     };
@@ -122,7 +173,11 @@ const NotificationItem: React.FC<Notification> = ({
 
                     {transaction ? (
                         <InfoModal
-                            {...makeNotificationDetailModalContent(transaction)}
+                            {...makeNotificationDetailModalContent(
+                                transaction,
+                                type,
+                                debtCancelReply
+                            )}
                             triggerRef={triggerRef}
                         />
                     ) : (

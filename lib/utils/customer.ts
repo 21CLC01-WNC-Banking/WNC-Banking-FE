@@ -260,10 +260,26 @@ export const mapNotification = (notif: Notification) => {
         id: notif.id,
         title,
         content: message,
+        type: notif.type,
         time: formatDateString(notif.createdAt),
         read: notif.isSeen,
         transactionId: content.transactionId,
     };
+};
+
+export const mapNotificationType = (type: string) => {
+    switch (type) {
+        case "incoming_transfer":
+            return "NHẬN TIỀN";
+        case "outgoing_transfer":
+            return "CHUYỂN TIỀN";
+        case "debt_reminder":
+            return "NHẮC NỢ";
+        case "debt_cancel":
+            return "HỦY NHẮC NỢ";
+        default:
+            return "";
+    }
 };
 
 export const getUnseenNotificationsCount = (notifications: Notification[]): number => {

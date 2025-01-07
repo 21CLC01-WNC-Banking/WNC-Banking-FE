@@ -109,3 +109,13 @@ export interface PartnerBank {
     updatedAt: string;
     deletedAt: string;
 }
+
+export interface DebtCancelReply {
+    content: string;
+    createdAt: string;
+    debtReminderId: string;
+    deletedAt: string;
+    id: number;
+    updatedAt: string;
+    userReplyName: string;
+}
