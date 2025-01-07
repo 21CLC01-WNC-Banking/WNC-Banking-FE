@@ -22,7 +22,6 @@ import {
 import SideMenu from "@/components/SideMenu";
 import Loading from "@/components/Loading";
 import ScrollToTop from "@/components/ScrollToTop";
-import { Notification } from "@/lib/types/customer";
 
 export default function CustomerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     const pathname = usePathname();
@@ -31,8 +30,6 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
     const dispatch = useAppDispatch();
     const role = useAppSelector((state) => state.auth.authUser?.role);
     const notifications = useAppSelector((state) => state.notifications.notifications);
-
-    console.log(notifications.some((notif: Notification) => !notif.isSeen));
 
     const [unseenCount, setUnseenCount] = useState(0);
 
