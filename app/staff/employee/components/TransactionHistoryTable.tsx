@@ -21,7 +21,6 @@ import classes from "./AccountCard.module.css";
 import { chunk } from "../../../../lib/utils/staff";
 import { formatDateString } from "@/lib/utils/customer";
 
-
 const TransactionHistoryTable: React.FC = () => {
     // State for modal control
     const [opened, { open, close }] = useDisclosure(false);
@@ -43,8 +42,8 @@ const TransactionHistoryTable: React.FC = () => {
                 value.trim() === ""
                     ? "Số tài khoản không được để trống"
                     : value.length !== 12
-                        ? "Số tài khoản không hợp lệ"
-                        : null,
+                    ? "Số tài khoản không hợp lệ"
+                    : null,
         },
     });
 
@@ -69,15 +68,22 @@ const TransactionHistoryTable: React.FC = () => {
                     { title: "Tổng số giao dịch", stats: `${data.data.transactions.length}` },
                 ]);
                 setTransactions(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     data.data.transactions.map((transaction: any) => ({
                         ...transaction,
-                        transactionType: transaction.type === "payment" ? "Thanh toán" : transaction.amount < 0 ? "Chuyển khoản" : "Nhận tiền"
+                        transactionType:
+                            transaction.type === "payment"
+                                ? "Thanh toán"
+                                : transaction.amount < 0
+                                ? "Chuyển khoản"
+                                : "Nhận tiền",
                     }))
                 );
             } else {
                 setError("Số tài khoản không tồn tại!");
                 setTransactions([]);
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setError("Đã xảy ra lỗi kết nối với máy chủ");
             setTransactions([]);
@@ -121,7 +127,6 @@ const TransactionHistoryTable: React.FC = () => {
         timeFilter
     );
 
-
     // Chunk the filtered transactions into pages (5 items per page)
     const paginatedTransactions = chunk(filteredTransactions, 5);
 
@@ -153,8 +158,8 @@ const TransactionHistoryTable: React.FC = () => {
                 transaction.transactionType === "Chuyển khoản"
                     ? "yellow.1"
                     : transaction.transactionType === "Nhận tiền"
-                        ? "green.1"
-                        : "red.2"
+                    ? "green.1"
+                    : "red.2"
             }
         >
             <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
@@ -244,9 +249,7 @@ const TransactionHistoryTable: React.FC = () => {
             {/* Table */}
             {filteredTransactions.length === 0 ? (
                 <Center mt="xl" bg="red.3">
-                    <Text size="sm">
-                        {error ? error : "Chưa có lịch sử giao dịch nào!"}
-                    </Text>
+                    <Text size="sm">{error ? error : "Chưa có lịch sử giao dịch nào!"}</Text>
                 </Center>
             ) : (
                 <>

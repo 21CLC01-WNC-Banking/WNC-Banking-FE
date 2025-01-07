@@ -2,11 +2,13 @@
 
 import { TextInput, Fieldset, Button, Text, Paper, Title, Flex, Loader } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import toVietnamese from './ToVietnamese.js';
+import toVietnamese from "./ToVietnamese.js";
 import { useState, useRef, useEffect } from "react";
 
 const DepositForm = () => {
-    const [transactionState, setTransactionState] = useState<'idle' | 'submitting' | 'success' | 'failure'>('idle');
+    const [transactionState, setTransactionState] = useState<
+        "idle" | "submitting" | "success" | "failure"
+    >("idle");
     const invoiceRef = useRef<HTMLDivElement>(null);
 
     const form = useForm({
@@ -26,8 +28,8 @@ const DepositForm = () => {
                 value < 1000
                     ? "Hạn mức không được ít hơn 1 ngàn đồng"
                     : value > 1000000000
-                        ? "Hạn mức không được lớn hơn 1 tỷ đồng"
-                        : null,
+                    ? "Hạn mức không được lớn hơn 1 tỷ đồng"
+                    : null,
             message: (value) =>
                 value.length > 100 ? "Nội dung không được vượt quá 100 ký tự" : null,
         },
@@ -42,11 +44,14 @@ const DepositForm = () => {
             // Nếu đủ 12 ký tự, gọi API để lấy tên tài khoản
             if (input.length === 12) {
                 try {
-                    const response = await fetch(`${apiUrl}/account/customer-name?accountNumber=${input}`, {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                    });
+                    const response = await fetch(
+                        `${apiUrl}/account/customer-name?accountNumber=${input}`,
+                        {
+                            method: "GET",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                        }
+                    );
                     if (!response.ok) {
                         throw new Error("Không thể lấy thông tin tài khoản");
                     }
@@ -67,7 +72,10 @@ const DepositForm = () => {
         if (/^\d*$/.test(input)) {
             const numericValue = input ? parseFloat(input) : 0;
             form.setFieldValue("amount", numericValue);
-            form.setFieldValue("amountInWords", numericValue ? `${toVietnamese(numericValue).toUpperCase()} ĐỒNG` : "KHÔNG ĐỒNG");
+            form.setFieldValue(
+                "amountInWords",
+                numericValue ? `${toVietnamese(numericValue).toUpperCase()} ĐỒNG` : "KHÔNG ĐỒNG"
+            );
         }
     };
 
@@ -75,10 +83,10 @@ const DepositForm = () => {
         if (invoiceRef.current) {
             invoiceRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [transactionState])
+    }, [transactionState]);
 
     const handleSubmit = async (values: typeof form.values) => {
-        setTransactionState('submitting');
+        setTransactionState("submitting");
 
         try {
             const response = await fetch(`${apiUrl}/staff/add-amount`, {
@@ -93,16 +101,16 @@ const DepositForm = () => {
             });
 
             if (response.ok) {
-                setTransactionState('success');
+                setTransactionState("success");
             } else {
-                setTransactionState('failure');
+                setTransactionState("failure");
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             // Xử lý khi giao dịch thất bại
-            setTransactionState('failure');
+            setTransactionState("failure");
         }
     };
-
 
     return (
         <>
@@ -172,13 +180,7 @@ const DepositForm = () => {
 
             {/* Hóa đơn */}
             {transactionState !== "idle" && (
-                <Paper
-                    ref={invoiceRef}
-                    radius="md"
-                    p={30}
-                    mt="lg"
-                    withBorder
-                >
+                <Paper ref={invoiceRef} radius="md" p={30} mt="lg" withBorder>
                     <Flex justify="space-between" align="center" mb="md">
                         <Title order={3} c="blue">
                             WNC Bank
@@ -191,9 +193,14 @@ const DepositForm = () => {
                         gap="md"
                         align="center"
                         style={{
-                            backgroundColor: transactionState === "submitting" ? "#FFFBE6" : transactionState === "success" ? "#E6F9E6" : "#FDEDEE",
-                            borderRadius: '8px',
-                            padding: '10px',
+                            backgroundColor:
+                                transactionState === "submitting"
+                                    ? "#FFFBE6"
+                                    : transactionState === "success"
+                                    ? "#E6F9E6"
+                                    : "#FDEDEE",
+                            borderRadius: "8px",
+                            padding: "10px",
                         }}
                     >
                         <Text
@@ -201,16 +208,18 @@ const DepositForm = () => {
                                 transactionState === "submitting"
                                     ? "#FFC107"
                                     : transactionState === "success"
-                                        ? "green"
-                                        : "red"
+                                    ? "green"
+                                    : "red"
                             }
                             fw={700}
                         >
-                            {transactionState === 'submitting' ? 'Đang thực hiện giao dịch...' :
-                                transactionState === 'success' ? "Giao dịch thành công!" :
-                                    "Giao dịch thất bại, vui lòng thử lại sau!"}
+                            {transactionState === "submitting"
+                                ? "Đang thực hiện giao dịch..."
+                                : transactionState === "success"
+                                ? "Giao dịch thành công!"
+                                : "Giao dịch thất bại, vui lòng thử lại sau!"}
                         </Text>
-                        {transactionState === 'submitting' && <Loader size={30} color="#FFC107" />}
+                        {transactionState === "submitting" && <Loader size={30} color="#FFC107" />}
                     </Flex>
 
                     {/* Thông tin hóa đơn */}
@@ -239,10 +248,10 @@ const DepositForm = () => {
                         <Text c="gray">Nội dung</Text>
                         <div
                             style={{
-                                maxWidth: '75%',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
+                                maxWidth: "75%",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
                             }}
                         >
                             {form.values.message}

@@ -80,6 +80,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
                     position: "bottom-right",
                 });
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             showNotification({
                 title: "Lỗi",

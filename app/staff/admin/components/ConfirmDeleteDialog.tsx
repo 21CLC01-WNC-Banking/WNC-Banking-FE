@@ -1,17 +1,17 @@
 import { Employee } from "@/lib/types/staff";
-import { Button, Group, Text, Center, Modal, em } from "@mantine/core";
+import { Button, Group, Text, Center, Modal } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 const ConfirmDeleteDialog = ({
     onConfirm,
     onCancel,
     opened,
-    employee
+    employee,
 }: {
     onConfirm: () => void;
     onCancel: () => void;
     opened: boolean;
-    employee: Employee | null
+    employee: Employee | null;
 }) => {
     return (
         <Modal
@@ -30,7 +30,7 @@ const ConfirmDeleteDialog = ({
             </Center>
             <Center>
                 <Text size="lg" fw={500} c="red" mb="md">
-                    Bạn có chắc chắn muốn xóa nhân viên '{employee?.name}' không?
+                    Bạn có chắc chắn muốn xóa nhân viên &apos;{employee?.name}&apos; không?
                 </Text>
             </Center>
             <Group justify="center">

@@ -50,6 +50,7 @@ const Login = () => {
                 position: "bottom-right",
             });
             router.push("/staff/admin/employee-list");
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             notifications.show({
                 withBorder: true,

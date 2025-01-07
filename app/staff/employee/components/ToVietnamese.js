@@ -51,6 +51,7 @@
             if (arr[i] == '000') {
                 digit_counter += 1;
             } else if (arr[i] != '') {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 digit_counter = 0;
                 result.push(block_of_three(arr[i]));
                 const digit = digits[i];

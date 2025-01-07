@@ -8,8 +8,8 @@ import { useAppSelector } from "@/lib/hooks/withTypes";
 
 const StaffPortalShortcut: React.FC = () => {
     const [opened, { open, close }] = useDisclosure(false);
-    const name = useAppSelector((state) => state.auth.authUser?.name)
-    const userId = useAppSelector((state) => state.auth.authUser?.userId)
+    const name = useAppSelector((state) => state.auth.authUser?.name);
+    const userId = useAppSelector((state) => state.auth.authUser?.userId);
     return (
         <Group>
             <Flex
@@ -45,7 +45,7 @@ const StaffPortalShortcut: React.FC = () => {
                 position="right"
                 padding={0}
             >
-                <StaffPortal name={name} userId={userId} />
+                <StaffPortal name={name} userId={userId?.toString()} />
             </Drawer>
         </Group>
     );

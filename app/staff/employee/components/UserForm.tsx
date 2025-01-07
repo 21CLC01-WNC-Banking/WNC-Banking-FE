@@ -56,6 +56,7 @@ const UserForm: React.FC = () => {
                     position: "bottom-right",
                 });
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             showNotification({
                 title: "Lỗi",

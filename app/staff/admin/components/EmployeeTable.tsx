@@ -9,9 +9,7 @@ import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { showNotification } from "@mantine/notifications";
 import EmployeeForm from "./EmployeeForm";
 
-
 const EmployeeListTable: React.FC = () => {
-
     // Handle get all employees
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [error, setError] = useState<string>("");
@@ -19,13 +17,11 @@ const EmployeeListTable: React.FC = () => {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch(`${apiUrl}/admin/staff`,
-                    {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                    }
-                );
+                const response = await fetch(`${apiUrl}/admin/staff`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                });
                 if (response.ok) {
                     setError("");
                     const data = await response.json();
@@ -33,6 +29,7 @@ const EmployeeListTable: React.FC = () => {
                 } else {
                     setEmployees([]);
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 setError("Đã xảy ra lỗi kết nối với máy chủ");
                 setEmployees([]);
@@ -70,37 +67,34 @@ const EmployeeListTable: React.FC = () => {
                 setEmployees((prev) =>
                     prev.filter((employee) => employee.id !== employeeToDelete.id)
                 );
-            }
-            else {
+            } else {
                 showNotification({
                     title: "Lỗi",
                     message: "Đã xảy ra lỗi khi xóa tài khoản nhân viên!",
                     color: "red",
-                    position: "bottom-right"
-                })
+                    position: "bottom-right",
+                });
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             showNotification({
                 title: "Lỗi",
                 message: "Đã xảy ra lỗi kết nối với máy chủ!",
                 color: "red",
-                position: "bottom-right"
-            })
+                position: "bottom-right",
+            });
         } finally {
             setEmployeeToDelete(null);
             setIsDeleteDialogOpen(false);
         }
     };
 
-
     // Handle edit employee
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const handleSave = (updatedEmployee: Employee) => {
         setEmployees((prev) =>
-            prev.map((emp) =>
-                emp.id === updatedEmployee.id ? updatedEmployee : emp
-            )
+            prev.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
         );
     };
 
@@ -122,7 +116,6 @@ const EmployeeListTable: React.FC = () => {
     // Get current page employees
     const currentPageEmployees = paginatedEmployees[activePage - 1] || [];
 
-
     // Create table rows for current page
     const rows = currentPageEmployees.map((employee, index) => (
         <Table.Tr key={index}>
@@ -135,7 +128,8 @@ const EmployeeListTable: React.FC = () => {
                     onClick={() => {
                         setSelectedEmployee(employee);
                         setIsEditModalOpen(true);
-                    }}>
+                    }}
+                >
                     <IconEdit />
                 </Button>
             </Table.Td>
@@ -150,15 +144,13 @@ const EmployeeListTable: React.FC = () => {
                     <IconTrash />
                 </Button>
             </Table.Td>
-        </Table.Tr >
+        </Table.Tr>
     ));
 
     return (
         <Paper radius="md" mt="lg" p="lg">
             <Flex justify="flex-end">
-                <Button
-                    onClick={() => setIsAddModalOpen(true)}
-                >
+                <Button onClick={() => setIsAddModalOpen(true)}>
                     <IconUserPlus />
                     Thêm mới nhân viên
                 </Button>
@@ -167,12 +159,10 @@ const EmployeeListTable: React.FC = () => {
             {/* Table */}
             {employees.length === 0 ? (
                 <Center mt="xl" bg="red.3">
-                    <Text size="sm">
-                        {error ? error : "Chưa có nhân viên nào!"}
-                    </Text>
-                </Center>)
-                :
-                (<Table verticalSpacing="sm" mt="xl" striped>
+                    <Text size="sm">{error ? error : "Chưa có nhân viên nào!"}</Text>
+                </Center>
+            ) : (
+                <Table verticalSpacing="sm" mt="xl" striped>
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>ID</Table.Th>
@@ -183,11 +173,9 @@ const EmployeeListTable: React.FC = () => {
                             <Table.Th>Xóa</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
-                    <Table.Tbody>
-                        {rows}
-                    </Table.Tbody>
-                </Table>)
-            }
+                    <Table.Tbody>{rows}</Table.Tbody>
+                </Table>
+            )}
 
             {/* Pagination */}
             <Center>
