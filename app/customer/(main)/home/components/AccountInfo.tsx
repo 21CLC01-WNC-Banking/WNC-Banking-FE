@@ -183,6 +183,10 @@ const AccountInfo: React.FC = () => {
                 </Group>
             </Group>
 
+            <Text ta="center" c="dimmed" fs="italic">
+                Chỉ các giao dịch trong vòng 30 ngày trước được hiển thị ở đây.
+            </Text>
+
             {/* Table */}
             <Table verticalSpacing="sm" mt="xl" highlightOnHover>
                 <Table.Thead>
