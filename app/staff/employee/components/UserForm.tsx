@@ -28,14 +28,17 @@ const UserForm: React.FC = () => {
                 phoneNumber: values.phone,
             };
 
-            const response = await fetch("http://localhost:3001/api/v1/staff/register-customer", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(payload),
-            });
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/staff/register-customer`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(payload),
+                }
+            );
 
             if (response.ok) {
                 showNotification({
@@ -50,8 +53,8 @@ const UserForm: React.FC = () => {
                     title: "Lỗi",
                     message: "Email đã được sử dụng",
                     color: "red",
-                    position: "bottom-right"
-                })
+                    position: "bottom-right",
+                });
             }
         } catch (error) {
             showNotification({

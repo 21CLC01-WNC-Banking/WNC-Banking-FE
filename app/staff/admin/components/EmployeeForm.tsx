@@ -5,7 +5,6 @@ import { Button, Fieldset, TextInput, Modal, Title, Center } from "@mantine/core
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 
-
 interface EmployeeFormProps {
     opened: boolean;
     onClose: () => void;
@@ -40,7 +39,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
             };
 
             console.log(payload);
-            const response = await fetch("http://localhost:3001/api/v1/admin/staff", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/staff`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -61,8 +60,8 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
                     id: data.data.id,
                     name: payload.name,
                     email: payload.email,
-                    phoneNumber: payload.phoneNumber
-                }
+                    phoneNumber: payload.phoneNumber,
+                };
                 onSave(newEmployee);
                 form.reset();
                 onClose();
@@ -71,8 +70,8 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
                     title: "Lỗi",
                     message: "Email đã được sử dụng",
                     color: "red",
-                    position: "bottom-right"
-                })
+                    position: "bottom-right",
+                });
             }
         } catch (error) {
             showNotification({
@@ -85,15 +84,9 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
     };
 
     return (
-        <Modal
-            opened={opened}
-            onClose={onClose}
-            size="lg"
-        >
+        <Modal opened={opened} onClose={onClose} size="lg">
             <Center>
-                <Title>
-                    Thêm mới nhân viên
-                </Title>
+                <Title>Thêm mới nhân viên</Title>
             </Center>
             <Fieldset radius="md" p={30} mt="lg" style={{ border: "none" }}>
                 <form onSubmit={form.onSubmit(handleSubmit)}>
