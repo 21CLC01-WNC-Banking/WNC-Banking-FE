@@ -106,6 +106,7 @@ export default function CustomerLayout({ children }: Readonly<{ children: React.
         };
 
         fetchNotifications();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
 
     useEffect(() => {
