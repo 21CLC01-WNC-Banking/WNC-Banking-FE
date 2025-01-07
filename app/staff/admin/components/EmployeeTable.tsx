@@ -41,7 +41,7 @@ const EmployeeListTable: React.FC = () => {
             }
         };
         fetchEmployees();
-    }, [employees]);
+    }, []);
 
     // Handle add a new employee
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);

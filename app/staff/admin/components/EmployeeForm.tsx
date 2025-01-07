@@ -25,7 +25,8 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
             email: isEmail("Vui lòng nhập email hợp lệ"),
             phone: (value) =>
                 /^(?:\+84|0)(?:\d){9}$/.test(value) ? null : "Vui lòng nhập số điện thoại hợp lệ",
-            password: isNotEmpty("Vui lòng nhập mật khẩu"),
+            password: (value) =>
+                value.length >= 10 ? null : "Mật khẩu phải có tối thiểu 10 ký tự",
         },
     });
 
