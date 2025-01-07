@@ -472,6 +472,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         radius="md"
                         fullWidth
                         loading={loading}
+                        disabled={loading}
                         onClick={toggleConfirmModal}
                         mt="lg"
                     >

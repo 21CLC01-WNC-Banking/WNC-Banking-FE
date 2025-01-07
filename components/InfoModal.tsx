@@ -1,17 +1,19 @@
 import { Modal, Tooltip, ActionIcon, Group, Stack, Text, Divider } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
+import React from "react";
 
 interface InfoModalProps {
-    title: string;
-    content: {
+    title?: string;
+    content?: {
         label: string;
         value?: string;
         color?: string;
     }[];
+    triggerRef?: React.RefObject<HTMLButtonElement>;
 }
 
-const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
+const InfoModal: React.FC<InfoModalProps> = ({ title, content, triggerRef }) => {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
@@ -20,6 +22,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
                 opened={opened}
                 onClose={close}
                 title={title}
+                size="lg"
                 radius="md"
                 centered
                 styles={{
@@ -36,25 +39,35 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content }) => {
                 }}
             >
                 <Stack my={20} gap="md">
-                    {content.map((item) =>
-                        item.label === "divider" ? (
-                            <Divider key={item.label} my="md" />
-                        ) : (
-                            <Group key={item.label} grow justify="between" align="flex-start">
-                                <Text variant="text">{item.label}</Text>
+                    {content &&
+                        content.map((item) =>
+                            item.label === "divider" ? (
+                                <Divider key={item.label} my="md" />
+                            ) : (
+                                <Group key={item.label} grow justify="between" align="flex-start">
+                                    <Text variant="text">{item.label}</Text>
 
-                                <Text ta="right" fw={700} c={item.color}>
-                                    {item.value}
-                                </Text>
-                            </Group>
-                        )
-                    )}
+                                    <Text ta="right" fw={700} c={item.color}>
+                                        {item.value}
+                                    </Text>
+                                </Group>
+                            )
+                        )}
                 </Stack>
             </Modal>
 
-            <Tooltip label="Chi tiết">
-                <ActionIcon radius="md" variant="subtle" color="blue" onClick={open}>
-                    <IconInfoCircle size={20} />
+            <Tooltip label="Chi tiết" disabled={triggerRef ? true : false}>
+                <ActionIcon
+                    maw="md"
+                    size={triggerRef ? 0 : "md"}
+                    radius="md"
+                    variant="subtle"
+                    color="blue"
+                    id="info-modal-trigger"
+                    onClick={open}
+                    ref={opened ? undefined : triggerRef}
+                >
+                    {triggerRef ? null : <IconInfoCircle size={20} />}
                 </ActionIcon>
             </Tooltip>
         </>

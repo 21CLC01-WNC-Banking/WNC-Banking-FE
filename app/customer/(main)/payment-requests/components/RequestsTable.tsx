@@ -39,7 +39,7 @@ const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" |
         title: "Thông tin nhắc nợ",
         content: [
             { label: "Mã nhắc nợ", value: request.debtReminder.id },
-            { label: "Thời gian", value: formatDateString(request.debtReminder.updatedAt) },
+            { label: "Thời gian nhắc", value: formatDateString(request.debtReminder.createdAt) },
             {
                 label: type === "received" ? "Người nhắc nợ" : "Người nợ",
                 value: type === "received" ? request.sender : request.receiver,
@@ -57,6 +57,12 @@ const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" |
                       { label: "Người hủy", value: request.reply.userReplyName },
                       { label: "Nội dung hủy", value: request.reply.content },
                       { label: "Thời gian hủy", value: formatDateString(request.reply.updatedAt) },
+                  ]
+                : []),
+            ...(request.debtReminder.status === "success"
+                ? [
+                      { label: "divider" },
+                      { label: "Thời gian thanh toán", value: request.debtReminder.updatedAt },
                   ]
                 : []),
         ],
@@ -139,7 +145,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
     // create table rows for current page
     const rows = currentPageRequests.map((request, index) => (
         <Table.Tr key={index}>
-            <Table.Td>{formatDateString(request.debtReminder.updatedAt)}</Table.Td>
+            <Table.Td>{formatDateString(request.debtReminder.createdAt)}</Table.Td>
             <Table.Td>{type === "received" ? request.sender : request.receiver}</Table.Td>
             <Table.Td>{formatCurrency(request.debtReminder.amount)}</Table.Td>
             <Table.Td fw={600} c={mapColor(request.debtReminder.status)}>
@@ -150,6 +156,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
                     {type === "received" && request.debtReminder.status === "pending" && (
                         <Tooltip label="Thanh toán">
                             <ActionIcon
+                                maw="md"
                                 radius="md"
                                 variant="subtle"
                                 color="green"
@@ -181,7 +188,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ type }) => {
             {/* Filter Section */}
             <Group justify="space-between" align="center" mb="md" mt="xl">
                 <Group justify="flex-start" gap="md">
-                    <Text>Thời gian gửi nhắc nợ:</Text>
+                    <Text>Thời gian nhắc:</Text>
 
                     <SegmentedControl
                         radius="md"

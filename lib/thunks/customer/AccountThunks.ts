@@ -1,4 +1,5 @@
 import { createAppAsyncThunk } from "@/lib/hooks/withTypes";
+import { logout } from "@/lib/slices/AuthSlice";
 import { setCustomerAccount } from "@/lib/slices/customer/AccountSlice";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -89,3 +90,39 @@ export const getExternalAccountOwnerThunk = createAppAsyncThunk(
         return responseData.data;
     }
 );
+
+// the two thunks below are supposed to be in AuthThunks.ts, but since that slice's being used for all roles
+// putting it here keeps the separation between customer and staff features a little more concrete
+export const changePasswordThunk = createAppAsyncThunk(
+    "account/change-password",
+    async (data: { password: string; newPassword: string }, { dispatch }) => {
+        const response = await fetch(`${apiUrl}/auth/change-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+
+        dispatch(logout());
+    }
+);
+
+export const closeAccountThunk = createAppAsyncThunk("account/close", async (_, { dispatch }) => {
+    const response = await fetch(`${apiUrl}/auth/close`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const responseData = await response.json();
+        throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+    }
+
+    dispatch(logout());
+});

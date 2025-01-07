@@ -32,7 +32,7 @@ export class WebSocketManager {
         this.socket = new WebSocket(url);
 
         this.socket.onopen = () => {
-            console.log("WebSocket connection established");
+            // console.log("WebSocket connection established");
             this.isConnecting = false;
         };
 

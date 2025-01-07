@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IMaskInput } from "react-imask";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/withTypes";
-import { getUserAccountThunk } from "@/lib/thunks/customer/AccountThunks";
+import {
+    getUserAccountThunk,
+    getInternalAccountOwnerThunk,
+} from "@/lib/thunks/customer/AccountThunks";
 import { makeToast } from "@/lib/utils/customer";
-import { createRequestThunk } from "@/lib/thunks/customer/TransactionsThunk";
+import { createRequestThunk, getSentRequestsThunk } from "@/lib/thunks/customer/TransactionsThunk";
 
 import {
     Button,
@@ -19,6 +22,7 @@ import {
     Tooltip,
     NumberInputHandlers,
     Stack,
+    TextInput,
 } from "@mantine/core";
 import { useForm, isNotEmpty } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -40,6 +44,8 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
 
     const [opened, { open, close }] = useDisclosure(false);
 
+    const [targetName, setTargetName] = useState("");
+
     // for NumberInput increment and decrement functions
     const handlersRef = useRef<NumberInputHandlers>(null);
 
@@ -49,7 +55,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
         initialValues: {
             targetAccountNumber: targetAccountNumber || "",
             amount: 0,
-            message: "Nhac thanh toan no",
+            message: `${userAccount?.name} nhac thanh toan no`,
         },
         validate: {
             targetAccountNumber: (value) =>
@@ -58,7 +64,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                     : /[0-9\s]{14}/.test(value)
                     ? null
                     : "Số tài khoản người nhận không hợp lệ",
-            amount: (value) => (value < 10000 ? "Số tiền nợ tối thiểu là 10000 VND" : null),
+            amount: (value) => (value < 10000 ? "Số tiền nợ tối thiểu là 2.000 ₫" : null),
             message: isNotEmpty("Vui lòng nhập nội dung nhắc nợ"),
         },
         transformValues: (values) => ({
@@ -67,6 +73,21 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
             message: values.message.trim(),
         }),
     });
+
+    const getTargetName = async (account: string) => {
+        try {
+            const name = await dispatch(
+                getInternalAccountOwnerThunk({ accountNumber: account })
+            ).unwrap();
+
+            console.log(name);
+            if (name && name.length > 0) {
+                setTargetName(name);
+            }
+        } catch (error) {
+            makeToast("error", "Truy vấn thông tin người nợ thất bại", (error as Error).message);
+        }
+    };
 
     const handleSubmit = async (values: typeof form.values) => {
         try {
@@ -79,6 +100,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
             };
 
             await dispatch(createRequestThunk(newRequest)).unwrap();
+            await dispatch(getSentRequestsThunk()).unwrap();
 
             makeToast(
                 "success",
@@ -95,6 +117,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
     const handleModalClose = () => {
         close();
         form.reset();
+        setTargetName("");
     };
 
     useEffect(() => {
@@ -139,7 +162,12 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                 }}
             >
                 <form onSubmit={form.onSubmit(handleSubmit)}>
-                    <Input.Wrapper size="md" mt="lg" label="Số tài khoản người nợ" withAsterisk>
+                    <Input.Wrapper
+                        size="md"
+                        label="Số tài khoản người nợ"
+                        error={form.errors.targetAccountNumber}
+                        withAsterisk
+                    >
                         <Input
                             component={IMaskInput}
                             size="md"
@@ -147,12 +175,38 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
                             mask="0000 0000 0000"
                             placeholder="XXXX XXXX XXXX"
                             rightSectionPointerEvents="all"
-                            error={form.errors.target}
                             key={form.key("targetAccountNumber")}
                             {...form.getInputProps("targetAccountNumber")}
-                            rightSection={<SelectPopover form={form} />}
+                            rightSection={<SelectPopover form={form} onSelect={getTargetName} />}
+                            onBlur={(event) => {
+                                if (event.currentTarget.value.length >= 14) {
+                                    form.setFieldValue(
+                                        "targetAccountNumber",
+                                        event.currentTarget.value
+                                    );
+                                    getTargetName(event.currentTarget.value);
+                                }
+                            }}
                         />
                     </Input.Wrapper>
+
+                    <TextInput
+                        size="md"
+                        radius="md"
+                        mt="lg"
+                        label="Tên người nợ"
+                        value={targetName}
+                        styles={{
+                            root: {
+                                display: targetName.length > 0 ? "block" : "none",
+                            },
+                            input: {
+                                color: "var(--mantine-color-blue-filled)",
+                                backgroundColor: "var(--mantine-color-blue-light)",
+                            },
+                        }}
+                        readOnly
+                    />
 
                     <Stack mt="lg" gap="md">
                         <NumberInput
@@ -221,7 +275,7 @@ const CreateRequestModal: React.FC<CreateModalProps> = ({
 
             {isFromReceiversList ? (
                 <Tooltip label="Nhắc nợ">
-                    <ActionIcon radius="md" variant="subtle" color="blue" onClick={open}>
+                    <ActionIcon maw="md" radius="md" variant="subtle" color="blue" onClick={open}>
                         <IconMessageDollar size={20} />
                     </ActionIcon>
                 </Tooltip>

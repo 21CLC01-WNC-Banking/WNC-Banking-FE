@@ -23,7 +23,7 @@ export interface TransferRequest {
     type: string;
 }
 
-export interface UserAccount {
+export interface CustomerAccount {
     name: string;
     accountNumber: string;
     balance: number;
@@ -87,8 +87,16 @@ export interface Notification {
     updatedAt: string;
     deletedAt: string;
     isSeen: boolean;
-    title: string;
     type: string;
+}
+
+// PascalCase because for some god forsaken reason the backend uses PascalCase
+export interface NotificationToast {
+    Name: string;
+    Amount: number;
+    TransactionID: string;
+    Type: "incoming_transfer" | "outgoing_transfer" | "debt_reminder" | "debt_cancel";
+    CreatedAt: string;
 }
 
 export interface PartnerBank {
@@ -100,4 +108,14 @@ export interface PartnerBank {
     createdAt: string;
     updatedAt: string;
     deletedAt: string;
+}
+
+export interface DebtCancelReply {
+    content: string;
+    createdAt: string;
+    debtReminderId: string;
+    deletedAt: string;
+    id: number;
+    updatedAt: string;
+    userReplyName: string;
 }

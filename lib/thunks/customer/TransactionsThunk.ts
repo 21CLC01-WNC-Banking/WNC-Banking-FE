@@ -9,7 +9,7 @@ import {
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getTransactionHistoryThunk = createAppAsyncThunk(
-    "transactions/get-transaction-history",
+    "transactions/get-history",
     async (_, { dispatch }) => {
         // calculate date 30 days ago
         const thirtyDaysAgo = new Date();
@@ -35,6 +35,46 @@ export const getTransactionHistoryThunk = createAppAsyncThunk(
         });
 
         dispatch(setTransactionHistory(filteredTransactions));
+    }
+);
+
+export const getTransactionThunk = createAppAsyncThunk(
+    "transactions/get-transaction",
+    async (data: { transactionId: number }) => {
+        const response = await fetch(`${apiUrl}/customer/transaction/${data.transactionId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+
+        const responseData = await response.json();
+
+        return responseData.data;
+    }
+);
+
+export const getPaymentRequestReplyThunk = createAppAsyncThunk(
+    "transactions/get-request-reply",
+    async (data: { debtReminderId: number }) => {
+        const response = await fetch(`${apiUrl}/debt-reply/${data.debtReminderId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.errors[0].message || "Đã xảy ra lỗi kết nối với máy chủ.");
+        }
+
+        const responseData = await response.json();
+
+        return responseData.data;
     }
 );
 

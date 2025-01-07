@@ -105,7 +105,7 @@ const CancelModal: React.FC<CancelModalProps> = ({ requestId, type }) => {
             </Modal>
 
             <Tooltip label="Hủy">
-                <ActionIcon radius="md" variant="subtle" color="red" onClick={open}>
+                <ActionIcon maw="md" radius="md" variant="subtle" color="red" onClick={open}>
                     <IconCancel size={20} />
                 </ActionIcon>
             </Tooltip>
