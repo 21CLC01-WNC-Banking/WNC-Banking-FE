@@ -51,25 +51,36 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                 setError("");
                 const data = await response.json();
                 setTransactions(data.data);
-                const totalTransactions = data.data.length;
-                const totalAmount = data.data.reduce(
+
+                // Filter transactions based on transactionTypeFilter
+                const filteredTransactions =
+                    transactionTypeFilter === "Tất cả ngân hàng"
+                        ? data.data
+                        : data.data.filter(
+                            (transaction: ExternalTransaction) =>
+                                transaction.partnerBankShortName === transactionTypeFilter
+                        );
+
+                const totalTransactions = filteredTransactions.length;
+                const totalAmount = filteredTransactions.reduce(
                     (sum: number, transaction: { amount: number }) => sum + transaction.amount,
                     0
                 );
+
                 setStatsData([
-                    { title: "Ngân hàng", stats: "Tất cả ngân hàng" },
+                    { title: "Ngân hàng", stats: transactionTypeFilter },
                     { title: "Tổng số giao dịch", stats: totalTransactions.toString() },
                     { title: "Tổng số tiền", stats: totalAmount.toLocaleString("vi-VN") },
                 ]);
             } else {
                 setTransactions([]);
             }
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setError("Đã xảy ra lỗi kết nối với máy chủ");
             setTransactions([]);
         }
     };
+
 
     useEffect(() => {
         fetchExternalTransactions();
@@ -124,9 +135,7 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const [activePage, setActivePage] = useState<number>(1);
 
     // State for selected transaction
-    const [selectedTransaction, setSelectedTransaction] = useState<ExternalTransaction | null>(
-        null
-    );
+    const [selectedTransaction, setSelectedTransaction] = useState<ExternalTransaction | null>(null);
 
     // Filter transactions based on selected filters
     const filteredTransactions = transactions.filter((transaction) => {
