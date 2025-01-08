@@ -25,7 +25,12 @@ const EmployeeListTable: React.FC = () => {
                 if (response.ok) {
                     setError("");
                     const data = await response.json();
-                    setEmployees(data.data);
+                    if (data.data !== null) {
+                        setEmployees(data.data);
+                    }
+                    else {
+                        setEmployees([]);
+                    }
                 } else {
                     setEmployees([]);
                 }
@@ -36,7 +41,7 @@ const EmployeeListTable: React.FC = () => {
             }
         };
         fetchEmployees();
-    }, [employees]);
+    }, []);
 
     // Handle add a new employee
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
