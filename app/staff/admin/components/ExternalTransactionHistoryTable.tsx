@@ -57,9 +57,9 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                     transactionTypeFilter === "Tất cả ngân hàng"
                         ? data.data
                         : data.data.filter(
-                            (transaction: ExternalTransaction) =>
-                                transaction.partnerBankShortName === transactionTypeFilter
-                        );
+                              (transaction: ExternalTransaction) =>
+                                  transaction.partnerBankShortName === transactionTypeFilter
+                          );
 
                 const totalTransactions = filteredTransactions.length;
                 const totalAmount = filteredTransactions.reduce(
@@ -75,12 +75,12 @@ const ExternalTransactionHistoryTable: React.FC = () => {
             } else {
                 setTransactions([]);
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             setError("Đã xảy ra lỗi kết nối với máy chủ");
             setTransactions([]);
         }
     };
-
 
     useEffect(() => {
         fetchExternalTransactions();
@@ -89,18 +89,16 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const fetchPartner = async () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-            const response = await fetch(
-                `${apiUrl}/partner-bank/`,
-                {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                }
-            );
+            const response = await fetch(`${apiUrl}/partner-bank/`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
             if (response.ok) {
                 const data = await response.json();
                 if (data.data && data.data.length > 0) {
                     const shortNames = data.data.map((bank: PartnerBank) => bank.shortName);
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     setPartner((prevPartner) => ["Tất cả ngân hàng", ...shortNames]);
                 } else {
                     setPartner(["Tất cả ngân hàng"]);
@@ -134,7 +132,9 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const [activePage, setActivePage] = useState<number>(1);
 
     // State for selected transaction
-    const [selectedTransaction, setSelectedTransaction] = useState<ExternalTransaction | null>(null);
+    const [selectedTransaction, setSelectedTransaction] = useState<ExternalTransaction | null>(
+        null
+    );
 
     // Filter transactions based on selected filters
     const filteredTransactions = transactions.filter((transaction) => {
