@@ -100,7 +100,6 @@ const ExternalTransactionHistoryTable: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 if (data.data && data.data.length > 0) {
-                    console.log(data.data);
                     const shortNames = data.data.map((bank: PartnerBank) => bank.shortName);
                     setPartner((prevPartner) => ["Tất cả ngân hàng", ...shortNames]);
                 } else {

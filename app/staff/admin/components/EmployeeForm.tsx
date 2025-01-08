@@ -38,8 +38,6 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ opened, onClose, onSave }) 
                 phoneNumber: values.phone,
                 password: values.password,
             };
-
-            console.log(payload);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/staff`, {
                 method: "POST",
                 headers: {

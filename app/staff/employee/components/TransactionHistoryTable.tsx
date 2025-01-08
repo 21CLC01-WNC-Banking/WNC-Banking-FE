@@ -42,8 +42,8 @@ const TransactionHistoryTable: React.FC = () => {
                 value.trim() === ""
                     ? "Số tài khoản không được để trống"
                     : value.length !== 12
-                    ? "Số tài khoản không hợp lệ"
-                    : null,
+                        ? "Số tài khoản không hợp lệ"
+                        : null,
         },
     });
 
@@ -61,7 +61,6 @@ const TransactionHistoryTable: React.FC = () => {
             if (response.ok) {
                 setError("");
                 const data = await response.json();
-                console.log(data.data.transactions);
                 setAccountInfo([
                     { title: "Chủ tài khoản", stats: data.data.customerName },
                     { title: "Số tài khoản", stats: values.accountNumber },
@@ -75,8 +74,8 @@ const TransactionHistoryTable: React.FC = () => {
                             transaction.type === "payment"
                                 ? "Thanh toán"
                                 : transaction.amount < 0
-                                ? "Chuyển khoản"
-                                : "Nhận tiền",
+                                    ? "Chuyển khoản"
+                                    : "Nhận tiền",
                     }))
                 );
             } else {
@@ -158,8 +157,8 @@ const TransactionHistoryTable: React.FC = () => {
                 transaction.transactionType === "Chuyển khoản"
                     ? "yellow.1"
                     : transaction.transactionType === "Nhận tiền"
-                    ? "green.1"
-                    : "red.2"
+                        ? "green.1"
+                        : "red.2"
             }
         >
             <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>

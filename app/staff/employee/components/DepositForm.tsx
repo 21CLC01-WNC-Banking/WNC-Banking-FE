@@ -28,8 +28,8 @@ const DepositForm = () => {
                 value < 1000
                     ? "Hạn mức không được ít hơn 1 ngàn đồng"
                     : value > 1000000000
-                    ? "Hạn mức không được lớn hơn 1 tỷ đồng"
-                    : null,
+                        ? "Hạn mức không được lớn hơn 1 tỷ đồng"
+                        : null,
             message: (value) =>
                 value.length > 100 ? "Nội dung không được vượt quá 100 ký tự" : null,
         },
@@ -58,7 +58,6 @@ const DepositForm = () => {
                     const data = await response.json();
                     form.setFieldValue("accountName", data.data.name || "");
                 } catch (error) {
-                    console.error(error);
                     form.setFieldValue("accountName", "");
                 }
             } else {
@@ -197,8 +196,8 @@ const DepositForm = () => {
                                 transactionState === "submitting"
                                     ? "#FFFBE6"
                                     : transactionState === "success"
-                                    ? "#E6F9E6"
-                                    : "#FDEDEE",
+                                        ? "#E6F9E6"
+                                        : "#FDEDEE",
                             borderRadius: "8px",
                             padding: "10px",
                         }}
@@ -208,16 +207,16 @@ const DepositForm = () => {
                                 transactionState === "submitting"
                                     ? "#FFC107"
                                     : transactionState === "success"
-                                    ? "green"
-                                    : "red"
+                                        ? "green"
+                                        : "red"
                             }
                             fw={700}
                         >
                             {transactionState === "submitting"
                                 ? "Đang thực hiện giao dịch..."
                                 : transactionState === "success"
-                                ? "Giao dịch thành công!"
-                                : "Giao dịch thất bại, vui lòng thử lại sau!"}
+                                    ? "Giao dịch thành công!"
+                                    : "Giao dịch thất bại, vui lòng thử lại sau!"}
                         </Text>
                         {transactionState === "submitting" && <Loader size={30} color="#FFC107" />}
                     </Flex>
