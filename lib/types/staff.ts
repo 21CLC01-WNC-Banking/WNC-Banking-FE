@@ -59,3 +59,14 @@ export interface Employee {
     email: string,
     phoneNumber: string,
 }
+
+export interface PartnerBank {
+    id: number;
+    bankCode: string;
+    bankName: string;
+    shortName: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
+    logoUrl: string
+}

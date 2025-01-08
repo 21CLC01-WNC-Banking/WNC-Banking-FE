@@ -8,7 +8,7 @@ import ExternalTransactionDetail from "./ExternalTransactionDetail";
 import classes from "../../employee/components/AccountCard.module.css";
 import { chunk } from "../../../../lib/utils/staff";
 import { formatDateString } from "@/lib/utils/customer";
-import { ExternalTransaction } from "@/lib/types/staff";
+import { ExternalTransaction, PartnerBank } from "@/lib/types/staff";
 import { DatePickerInput, DateValue } from "@mantine/dates";
 import { formatDate } from "@/lib/utils/staff";
 import dayjs from "dayjs";
@@ -37,11 +37,6 @@ const ExternalTransactionHistoryTable: React.FC = () => {
     const fetchExternalTransactions = async () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-            console.log(
-                `${apiUrl}/admin/external-transaction?fromDate=${formatDate(
-                    from
-                )}&toDate=${formatDate(to)}`
-            );
             const response = await fetch(
                 `${apiUrl}/admin/external-transaction?fromDate=${formatDate(
                     from
@@ -56,7 +51,6 @@ const ExternalTransactionHistoryTable: React.FC = () => {
                 setError("");
                 const data = await response.json();
                 setTransactions(data.data);
-                console.log(data.data);
                 const totalTransactions = data.data.length;
                 const totalAmount = data.data.reduce(
                     (sum: number, transaction: { amount: number }) => sum + transaction.amount,
@@ -81,9 +75,42 @@ const ExternalTransactionHistoryTable: React.FC = () => {
         fetchExternalTransactions();
     }, [from, to]);
 
+    const fetchPartner = async () => {
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(
+                `${apiUrl}/partner-bank/`,
+                {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                }
+            );
+            if (response.ok) {
+                const data = await response.json();
+                if (data.data && data.data.length > 0) {
+                    console.log(data.data);
+                    const shortNames = data.data.map((bank: PartnerBank) => bank.shortName);
+                    setPartner((prevPartner) => ["Tất cả ngân hàng", ...shortNames]);
+                } else {
+                    setPartner(["Tất cả ngân hàng"]);
+                }
+            } else {
+                setPartner(["Tất cả ngân hàng"]);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            setPartner(["Tất cả ngân hàng"]);
+        }
+    };
+
+    useEffect(() => {
+        fetchPartner();
+    }, []);
+
     // State for filters and pagination
     const [transactionTypeFilter, setTransactionTypeFilter] = useState<string>("Tất cả ngân hàng");
-    const partner = ["Tất cả ngân hàng", "abc", "J97 Bank (sắp ra mắt)"];
+    const [partner, setPartner] = useState(["Tất cả ngân hàng"]);
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
