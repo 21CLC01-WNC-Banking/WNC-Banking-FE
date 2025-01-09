@@ -25,7 +25,7 @@ import {
 
 import { Text, Group, Paper } from "@mantine/core";
 
-import InfoModal from "@/components/InfoModal";
+import InfoModal, { InfoModalProps } from "@/components/InfoModal";
 
 import classes from "./NotificationItem.module.css";
 
@@ -54,56 +54,66 @@ const fetchDebtCancelReply = async (transactionId: number, dispatch: AppDispatch
 };
 
 const makeNotificationDetailModalContent = (
-    transaction: Transaction,
+    t: Transaction,
     type: string,
     reply?: DebtCancelReply | null
-) => {
+): InfoModalProps => {
+    const actionUrl =
+        type === "debt_reminder"
+            ? "/customer/payment-requests?tab=received"
+            : type === "debt_cancel"
+            ? "/customer/payment-requests"
+            : "/customer/home?tab=account";
+    const actionLabel = type.includes("debt") ? "Đến trang Nhắc nợ" : "Đến trang Giao dịch";
+
     return {
         title: `Thông báo ${mapNotificationType(type)}`,
         content: [
-            { label: "Mã giao dịch", value: transaction.id },
-            { label: "Thời gian", value: formatDateString(transaction.createdAt) },
+            { label: "Mã giao dịch", values: [t.transaction.id] },
+            { label: "Thời gian", values: [formatDateString(t.transaction.createdAt)] },
             {
                 label: "Loại giao dịch",
-                value: mapTransactionType(transaction.type, transaction.amount),
-                color: mapColor(transaction.type),
+                values: [mapTransactionType(t.transaction.type, t.transaction.amount)],
+                color: mapColor(t.transaction.type),
             },
             {
                 label: "Tài khoản nguồn",
-                value: formatAccountNumber(transaction.sourceAccountNumber),
+                values: [formatAccountNumber(t.transaction.sourceAccountNumber)],
             },
             {
                 label: "Tài khoản thụ hưởng",
-                value: formatAccountNumber(transaction.targetAccountNumber),
+                values: [formatAccountNumber(t.transaction.targetAccountNumber)],
             },
+            ...(t.bankName ? [{ label: "Ngân hàng thụ hưởng", values: [t.bankName] }] : []),
             {
                 label: `Số tiền ${
                     type === "debt_reminder" || type === "debt_cancel" ? "nợ" : "giao dịch"
                 }`,
-                value: formatCurrency(transaction.amount),
+                values: [formatCurrency(t.transaction.amount)],
             },
-            { label: "Nội dung", value: transaction.description },
+            { label: "Nội dung", values: [t.transaction.description] },
             ...(type !== "debt_cancel" && type !== "debt_reminder"
                 ? [
                       {
                           label: "Số dư sau giao dịch",
-                          value: formatCurrency(transaction.balance),
+                          values: [formatCurrency(t.transaction.balance)],
                       },
                   ]
                 : []),
             ...(reply
                 ? [
                       { label: "divider" },
-                      { label: "Người hủy", value: reply.userReplyName },
-                      { label: "Nội dung hủy", value: reply.content },
-                      { label: "Thời gian hủy", value: formatDateString(reply.updatedAt) },
+                      { label: "Người hủy", values: [reply.userReplyName] },
+                      { label: "Nội dung hủy", values: [reply.content] },
+                      { label: "Thời gian hủy", values: [formatDateString(reply.updatedAt)] },
                   ]
                 : []),
+            { label: "action", values: [actionLabel, actionUrl] },
         ],
     };
 };
 
-interface Notification {
+interface NotificationItemProps {
     id: number;
     title: string;
     content: string;
@@ -113,7 +123,7 @@ interface Notification {
     transactionId: number;
 }
 
-const NotificationItem: React.FC<Notification> = ({
+const NotificationItem: React.FC<NotificationItemProps> = ({
     id,
     title,
     content,

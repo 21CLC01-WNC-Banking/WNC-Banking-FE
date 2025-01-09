@@ -17,31 +17,38 @@ import { makeToast } from "@/lib/utils/customer";
 
 import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
 
-import InfoModal from "@/components/InfoModal";
+import InfoModal, { InfoModalProps } from "@/components/InfoModal";
 import AccountCard from "./AccountCard";
 
-const makeTransactionInfoModalContent = (transaction: Transaction) => {
+const makeTransactionInfoModalContent = (t: Transaction): InfoModalProps => {
     return {
         title: "Thông tin giao dịch",
         content: [
-            { label: "Mã giao dịch", value: transaction.id },
-            { label: "Thời gian", value: formatDateString(transaction.createdAt) },
+            { label: "Mã giao dịch", values: [t.transaction.id] },
+            { label: "Thời gian", values: [formatDateString(t.transaction.createdAt)] },
             {
                 label: "Loại giao dịch",
-                value: mapTransactionType(transaction.type, transaction.amount),
-                color: mapColor(transaction.type),
+                values: [mapTransactionType(t.transaction.type, t.transaction.amount)],
+                color: mapColor(t.transaction.type),
             },
             {
                 label: "Tài khoản nguồn",
-                value: formatAccountNumber(transaction.sourceAccountNumber),
+                values: [formatAccountNumber(t.transaction.sourceAccountNumber)],
             },
             {
                 label: "Tài khoản thụ hưởng",
-                value: formatAccountNumber(transaction.targetAccountNumber),
+                values: [formatAccountNumber(t.transaction.targetAccountNumber)],
             },
-            { label: "Số tiền giao dịch", value: formatCurrency(transaction.amount) },
-            { label: "Nội dung", value: transaction.description },
-            { label: "Số dư sau giao dịch", value: formatCurrency(transaction.balance) },
+            ...(t.bankName
+                ? [{ label: "Ngân hàng thụ hưởng", values: [t.bankName, `(${t.bankCode})`] }]
+                : []),
+            { label: "Số tiền giao dịch", values: [formatCurrency(t.transaction.amount)] },
+            { label: "Nội dung", values: [t.transaction.description] },
+            {
+                label: "Số dư sau giao dịch",
+                values: [formatCurrency(t.transaction.balance)],
+                color: "blue",
+            },
         ],
     };
 };
@@ -49,6 +56,8 @@ const makeTransactionInfoModalContent = (transaction: Transaction) => {
 const AccountInfo: React.FC = () => {
     const dispatch = useAppDispatch();
     const transactions = useAppSelector((state) => state.transactions.transactionHistory);
+
+    console.log(transactions);
 
     const [transactionScopeFilter, setTransactionScopeFilter] = useState<string>("all");
     const [transactionDirectionFilter, setTransactionDirectionFilter] = useState<string>("all");
@@ -71,12 +80,12 @@ const AccountInfo: React.FC = () => {
     }, [dispatch]);
 
     // filter transactions based on selected filters
-    const filteredTransactions = transactions.filter((transaction) => {
+    const filteredTransactions = transactions.filter((t) => {
         if (transactionScopeFilter === "all" && transactionDirectionFilter === "all") return true;
 
-        let direction = transaction.amount > 0 ? "in" : "out";
+        let direction = t.transaction.amount > 0 ? "in" : "out";
 
-        if (transaction.type === "debt_payment") {
+        if (t.transaction.type === "debt_payment") {
             direction = "debt";
         }
 
@@ -85,28 +94,31 @@ const AccountInfo: React.FC = () => {
         }
 
         if (transactionDirectionFilter === "all" && transactionScopeFilter !== "debt") {
-            return transaction.type === transactionScopeFilter;
+            return t.transaction.type === transactionScopeFilter;
         }
 
         switch (transactionDirectionFilter) {
             case "in":
                 return (
-                    transaction.amount > 0 &&
-                    transaction.type === transactionScopeFilter &&
-                    transaction.type !== "debt_payment"
+                    t.transaction.amount > 0 &&
+                    t.transaction.type === transactionScopeFilter &&
+                    t.transaction.type !== "debt_payment"
                 );
             case "out":
                 return (
-                    transaction.amount < 0 &&
-                    transaction.type === transactionScopeFilter &&
-                    transaction.type !== "debt_payment"
+                    t.transaction.amount < 0 &&
+                    t.transaction.type === transactionScopeFilter &&
+                    t.transaction.type !== "debt_payment"
                 );
             case "debt":
-                return transaction.type === "debt_payment" && transactionScopeFilter !== "external";
+                return (
+                    t.transaction.type === "debt_payment" && transactionScopeFilter !== "external"
+                );
         }
 
         return (
-            transaction.type === transactionScopeFilter && direction === transactionDirectionFilter
+            t.transaction.type === transactionScopeFilter &&
+            direction === transactionDirectionFilter
         );
     });
 
@@ -127,17 +139,17 @@ const AccountInfo: React.FC = () => {
     const currentPageTransactions = paginatedTransactions[activePage - 1] || [];
 
     // create table rows for current page
-    const rows = currentPageTransactions.map((transaction, index) => (
+    const rows = currentPageTransactions.map((t, index) => (
         <Table.Tr key={index}>
-            <Table.Td>{formatDateString(transaction.createdAt)}</Table.Td>
-            <Table.Td>{formatCurrency(transaction.amount)}</Table.Td>
-            <Table.Td c={mapColor(transaction.type)} fw={600}>
-                {mapTransactionType(transaction.type, transaction.amount)}
+            <Table.Td>{formatDateString(t.transaction.createdAt)}</Table.Td>
+            <Table.Td>{formatCurrency(t.transaction.amount)}</Table.Td>
+            <Table.Td c={mapColor(t.transaction.type)} fw={600}>
+                {mapTransactionType(t.transaction.type, t.transaction.amount)}
             </Table.Td>
-            <Table.Td>{formatCurrency(transaction.balance)}</Table.Td>
+            <Table.Td>{formatCurrency(t.transaction.balance)}</Table.Td>
             <Table.Td>
                 <Group justify="flex-end" grow>
-                    <InfoModal {...makeTransactionInfoModalContent(transaction)} />
+                    <InfoModal {...makeTransactionInfoModalContent(t)} />
                 </Group>
             </Table.Td>
         </Table.Tr>

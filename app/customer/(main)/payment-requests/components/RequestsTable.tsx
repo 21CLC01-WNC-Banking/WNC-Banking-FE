@@ -30,39 +30,45 @@ import {
 } from "@mantine/core";
 import { IconCreditCardPay } from "@tabler/icons-react";
 
-import InfoModal from "@/components/InfoModal";
+import InfoModal, { InfoModalProps } from "@/components/InfoModal";
 import CreateRequestModal from "@/components/CreateRequestModal";
 import CancelModal from "./CancelModal";
 
-const makeRequestInfoModalContent = (request: PaymentRequest, type: "received" | "sent") => {
+const makeRequestInfoModalContent = (
+    request: PaymentRequest,
+    type: "received" | "sent"
+): InfoModalProps => {
     return {
         title: "Thông tin nhắc nợ",
         content: [
-            { label: "Mã nhắc nợ", value: request.debtReminder.id },
-            { label: "Thời gian nhắc", value: formatDateString(request.debtReminder.createdAt) },
+            { label: "Mã nhắc nợ", values: [request.debtReminder.id] },
+            { label: "Thời gian nhắc", values: [formatDateString(request.debtReminder.createdAt)] },
             {
                 label: type === "received" ? "Người nhắc nợ" : "Người nợ",
-                value: type === "received" ? request.sender : request.receiver,
+                values: type === "received" ? [request.sender] : [request.receiver],
             },
-            { label: "Số tiền nợ", value: formatCurrency(request.debtReminder.amount) },
-            { label: "Nội dung", value: request.debtReminder.description },
+            { label: "Số tiền nợ", values: [formatCurrency(request.debtReminder.amount)] },
+            { label: "Nội dung", values: [request.debtReminder.description] },
             {
                 label: "Trạng thái",
-                value: mapRequestStatus(request.debtReminder.status),
+                values: [mapRequestStatus(request.debtReminder.status)],
                 color: mapColor(request.debtReminder.status),
             },
             ...(request.reply
                 ? [
                       { label: "divider" },
-                      { label: "Người hủy", value: request.reply.userReplyName },
-                      { label: "Nội dung hủy", value: request.reply.content },
-                      { label: "Thời gian hủy", value: formatDateString(request.reply.updatedAt) },
+                      { label: "Người hủy", values: [request.reply.userReplyName] },
+                      { label: "Nội dung hủy", values: [request.reply.content] },
+                      {
+                          label: "Thời gian hủy",
+                          values: [formatDateString(request.reply.updatedAt)],
+                      },
                   ]
                 : []),
             ...(request.debtReminder.status === "success"
                 ? [
                       { label: "divider" },
-                      { label: "Thời gian thanh toán", value: request.debtReminder.updatedAt },
+                      { label: "Thời gian thanh toán", values: [request.debtReminder.updatedAt] },
                   ]
                 : []),
         ],

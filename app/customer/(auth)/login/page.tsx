@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "nextjs-toploader/app";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -27,6 +28,7 @@ const Login = () => {
     const { captchaToken, captchaRef, handleCaptcha, refreshCaptcha } = useCaptcha();
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const [loading, setLoading] = useState(false);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -43,6 +45,8 @@ const Login = () => {
     });
 
     const handleSubmit = async (values: typeof form.values) => {
+        setLoading(true);
+
         try {
             await dispatch(loginThunk({ ...values, recaptchaToken: captchaToken })).unwrap();
 
@@ -55,8 +59,9 @@ const Login = () => {
             router.push("/customer");
         } catch (error) {
             makeToast("error", "Đăng nhập thất bại", (error as Error).message);
-
             refreshCaptcha();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -132,10 +137,13 @@ const Login = () => {
                         <Group justify="center">
                             <Button
                                 fullWidth
-                                disabled={!captchaToken || Object.keys(form.errors).length > 0}
+                                disabled={
+                                    !captchaToken || Object.keys(form.errors).length > 0 || loading
+                                }
                                 type="submit"
                                 mt="xl"
                                 radius="md"
+                                loading={loading}
                             >
                                 Đăng nhập
                             </Button>
