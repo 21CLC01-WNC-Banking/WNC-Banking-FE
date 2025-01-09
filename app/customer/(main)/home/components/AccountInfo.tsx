@@ -17,31 +17,31 @@ import { makeToast } from "@/lib/utils/customer";
 
 import { Paper, Table, Text, Pagination, Center, Group, SegmentedControl } from "@mantine/core";
 
-import InfoModal from "@/components/InfoModal";
+import InfoModal, { InfoModalProps } from "@/components/InfoModal";
 import AccountCard from "./AccountCard";
 
-const makeTransactionInfoModalContent = (transaction: Transaction) => {
+const makeTransactionInfoModalContent = (transaction: Transaction): InfoModalProps => {
     return {
         title: "Thông tin giao dịch",
         content: [
-            { label: "Mã giao dịch", value: transaction.id },
-            { label: "Thời gian", value: formatDateString(transaction.createdAt) },
+            { label: "Mã giao dịch", values: [transaction.id] },
+            { label: "Thời gian", values: [formatDateString(transaction.createdAt)] },
             {
                 label: "Loại giao dịch",
-                value: mapTransactionType(transaction.type, transaction.amount),
+                values: [mapTransactionType(transaction.type, transaction.amount)],
                 color: mapColor(transaction.type),
             },
             {
                 label: "Tài khoản nguồn",
-                value: formatAccountNumber(transaction.sourceAccountNumber),
+                values: [formatAccountNumber(transaction.sourceAccountNumber)],
             },
             {
                 label: "Tài khoản thụ hưởng",
-                value: formatAccountNumber(transaction.targetAccountNumber),
+                values: [formatAccountNumber(transaction.targetAccountNumber)],
             },
-            { label: "Số tiền giao dịch", value: formatCurrency(transaction.amount) },
-            { label: "Nội dung", value: transaction.description },
-            { label: "Số dư sau giao dịch", value: formatCurrency(transaction.balance) },
+            { label: "Số tiền giao dịch", values: [formatCurrency(transaction.amount)] },
+            { label: "Nội dung", values: [transaction.description] },
+            { label: "Số dư sau giao dịch", values: [formatCurrency(transaction.balance)] },
         ],
     };
 };

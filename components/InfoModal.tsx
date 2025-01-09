@@ -1,13 +1,17 @@
-import { Modal, Tooltip, ActionIcon, Group, Stack, Text, Divider } from "@mantine/core";
+"use client";
+
+import Link from "next/link";
+
+import { Modal, Tooltip, ActionIcon, Group, Stack, Text, Divider, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 import React from "react";
 
-interface InfoModalProps {
+export interface InfoModalProps {
     title?: string;
     content?: {
         label: string;
-        value?: string;
+        values?: string[];
         color?: string;
     }[];
     triggerRef?: React.RefObject<HTMLButtonElement>;
@@ -38,21 +42,45 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content, triggerRef }) => 
                     },
                 }}
             >
-                <Stack my={20} gap="md">
+                <Stack mt={20} gap="md">
                     {content &&
                         content.map((item) =>
                             item.label === "divider" ? (
                                 <Divider key={item.label} my="md" />
-                            ) : (
+                            ) : item.label !== "action" ? (
                                 <Group key={item.label} grow justify="between" align="flex-start">
                                     <Text variant="text">{item.label}</Text>
 
-                                    <Text ta="right" fw={700} c={item.color}>
-                                        {item.value}
-                                    </Text>
+                                    {item.values &&
+                                        item.values.map((value) => (
+                                            <Text key={value} ta="right" fw={700} c={item.color}>
+                                                {value}
+                                            </Text>
+                                        ))}
+                                </Group>
+                            ) : null
+                        )}
+
+                    {(() => {
+                        const actionItem = content?.find((item) => item.label === "action");
+                        return (
+                            actionItem && (
+                                <Group mt="lg" justify="flex-end">
+                                    <Button radius="md" onClick={close} variant="default">
+                                        Quay lại
+                                    </Button>
+
+                                    <Button
+                                        radius="md"
+                                        component={Link}
+                                        href={actionItem.values?.[1] ?? "#"}
+                                    >
+                                        {actionItem.values?.[0] ?? "Xem chi tiết"}
+                                    </Button>
                                 </Group>
                             )
-                        )}
+                        );
+                    })()}
                 </Stack>
             </Modal>
 

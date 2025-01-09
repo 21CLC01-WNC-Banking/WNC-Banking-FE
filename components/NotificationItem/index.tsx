@@ -25,7 +25,7 @@ import {
 
 import { Text, Group, Paper } from "@mantine/core";
 
-import InfoModal from "@/components/InfoModal";
+import InfoModal, { InfoModalProps } from "@/components/InfoModal";
 
 import classes from "./NotificationItem.module.css";
 
@@ -57,53 +57,62 @@ const makeNotificationDetailModalContent = (
     transaction: Transaction,
     type: string,
     reply?: DebtCancelReply | null
-) => {
+): InfoModalProps => {
+    const actionUrl =
+        type === "debt_reminder"
+            ? "/customer/payment-requests?tab=received"
+            : type === "debt_cancel"
+            ? "/customer/payment-requests"
+            : "/customer/home?tab=account";
+    const actionLabel = type.includes("debt") ? "Đến trang Nhắc nợ" : "Đến trang Giao dịch";
+
     return {
         title: `Thông báo ${mapNotificationType(type)}`,
         content: [
-            { label: "Mã giao dịch", value: transaction.id },
-            { label: "Thời gian", value: formatDateString(transaction.createdAt) },
+            { label: "Mã giao dịch", values: [transaction.id] },
+            { label: "Thời gian", values: [formatDateString(transaction.createdAt)] },
             {
                 label: "Loại giao dịch",
-                value: mapTransactionType(transaction.type, transaction.amount),
+                values: [mapTransactionType(transaction.type, transaction.amount)],
                 color: mapColor(transaction.type),
             },
             {
                 label: "Tài khoản nguồn",
-                value: formatAccountNumber(transaction.sourceAccountNumber),
+                values: [formatAccountNumber(transaction.sourceAccountNumber)],
             },
             {
                 label: "Tài khoản thụ hưởng",
-                value: formatAccountNumber(transaction.targetAccountNumber),
+                values: [formatAccountNumber(transaction.targetAccountNumber)],
             },
             {
                 label: `Số tiền ${
                     type === "debt_reminder" || type === "debt_cancel" ? "nợ" : "giao dịch"
                 }`,
-                value: formatCurrency(transaction.amount),
+                values: [formatCurrency(transaction.amount)],
             },
-            { label: "Nội dung", value: transaction.description },
+            { label: "Nội dung", values: [transaction.description] },
             ...(type !== "debt_cancel" && type !== "debt_reminder"
                 ? [
                       {
                           label: "Số dư sau giao dịch",
-                          value: formatCurrency(transaction.balance),
+                          values: [formatCurrency(transaction.balance)],
                       },
                   ]
                 : []),
             ...(reply
                 ? [
                       { label: "divider" },
-                      { label: "Người hủy", value: reply.userReplyName },
-                      { label: "Nội dung hủy", value: reply.content },
-                      { label: "Thời gian hủy", value: formatDateString(reply.updatedAt) },
+                      { label: "Người hủy", values: [reply.userReplyName] },
+                      { label: "Nội dung hủy", values: [reply.content] },
+                      { label: "Thời gian hủy", values: [formatDateString(reply.updatedAt)] },
                   ]
                 : []),
+            { label: "action", values: [actionLabel, actionUrl] },
         ],
     };
 };
 
-interface Notification {
+interface NotificationItemProps {
     id: number;
     title: string;
     content: string;
@@ -113,7 +122,7 @@ interface Notification {
     transactionId: number;
 }
 
-const NotificationItem: React.FC<Notification> = ({
+const NotificationItem: React.FC<NotificationItemProps> = ({
     id,
     title,
     content,

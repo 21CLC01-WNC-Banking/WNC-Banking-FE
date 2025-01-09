@@ -136,9 +136,15 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
                     </Text>
                 </Group>
 
-                <Button fullWidth onClick={handleTransferSubmit} mt="md" radius="md">
-                    Xác nhận
-                </Button>
+                <Group mt="lg" justify="flex-end">
+                    <Button radius="md" onClick={handleClose} variant="default">
+                        Quay lại
+                    </Button>
+
+                    <Button onClick={handleTransferSubmit} mt="md" radius="md">
+                        Xác nhận
+                    </Button>
+                </Group>
             </Stack>
         </Modal>
     );
