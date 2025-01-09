@@ -38,7 +38,7 @@ const Login = () => {
             email: isEmail("Email không hợp lệ"),
             password: (value) => {
                 if (!isNotEmpty(value)) return "Mật khẩu không được để trống";
-                if (value.length < 10) return "Mật khẩu phải gồm ít nhất 10 ký tự";
+                if (value.length < 8) return "Mật khẩu phải gồm ít nhất 8 ký tự";
                 return null;
             },
         },

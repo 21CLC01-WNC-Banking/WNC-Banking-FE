@@ -20,7 +20,7 @@ const ChangePasswordForm = () => {
         validate: {
             oldPassword: isNotEmpty("Mật khẩu hiện tại không được để trống"),
             newPassword: (value) =>
-                value.length < 10 ? "Mật khẩu mới phải gồm ít nhất 10 ký tự" : null,
+                value.length < 8 ? "Mật khẩu mới phải gồm ít nhất 8 ký tự" : null,
             confirmPassword: (value: string): string | null =>
                 value.length === 0
                     ? "Vui lòng nhập lại mật khẩu mới"

@@ -8,7 +8,7 @@ import { forgotPasswordThunk } from "@/lib/thunks/customer/ForgotPasswordThunks"
 import { makeToast } from "@/lib/utils/customer";
 
 import { Fieldset, Center, Title, Group, Button, PasswordInput, Anchor } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { useForm } from "@mantine/form";
 
 const ResetPasswordForm = () => {
     const dispatch = useAppDispatch();
@@ -22,10 +22,10 @@ const ResetPasswordForm = () => {
         validateInputOnBlur: true,
         initialValues: { password: "", confirmPassword: "" },
         validate: {
-            password: isNotEmpty("Vui lòng nhập mật khẩu"),
+            password: (value) => (value.length < 8 ? "Mật khẩu phải gồm ít nhất 8 ký tự" : null),
             confirmPassword: (value: string): string | null =>
                 value.length === 0
-                    ? "Vui lòng nhập lại mật khẩu"
+                    ? "Vui lòng nhập lại mật khẩu mới"
                     : form.getValues().password !== value
                     ? "Mật khẩu không trùng khớp"
                     : null,

@@ -33,7 +33,11 @@ const Login = () => {
         initialValues: { email: "", password: "" },
         validate: {
             email: isEmail("Email không hợp lệ"),
-            password: isNotEmpty("Vui lòng nhập mật khẩu"),
+            password: (value) => {
+                if (!isNotEmpty(value)) return "Mật khẩu không được để trống";
+                if (value.length < 8) return "Mật khẩu phải gồm ít nhất 8 ký tự";
+                return null;
+            },
         },
     });
 
