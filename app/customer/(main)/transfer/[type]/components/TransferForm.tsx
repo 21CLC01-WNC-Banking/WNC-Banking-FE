@@ -89,6 +89,7 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
             message: isNotEmpty("Vui lòng nhập diễn giải chuyển khoản"),
         },
         transformValues: (values) => ({
+            ...values,
             sourceAccountNumber: userAccount?.accountNumber || "",
             targetAccountNumber: values.receiverAccount.split(" ").join(""),
             amount: values.amount,
@@ -450,7 +451,12 @@ const TransferForm: React.FC<TransferFormProps> = ({ handleNextStep, type }) => 
                         maxLength={100}
                         key={form.key("message")}
                         {...form.getInputProps("message")}
-                        onChange={(event) => setMessageLength(event.currentTarget.value.length)}
+                        onChange={(event) => {
+                            setMessageLength(event.currentTarget.value.length);
+                        }}
+                        onBlur={(event) => {
+                            form.setFieldValue("message", event.currentTarget.value);
+                        }}
                     />
 
                     {type !== "debt-payment" && (
