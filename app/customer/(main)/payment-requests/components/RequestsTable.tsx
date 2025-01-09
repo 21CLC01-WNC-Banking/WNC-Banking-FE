@@ -68,7 +68,10 @@ const makeRequestInfoModalContent = (
             ...(request.debtReminder.status === "success"
                 ? [
                       { label: "divider" },
-                      { label: "Thời gian thanh toán", values: [request.debtReminder.updatedAt] },
+                      {
+                          label: "Thời gian thanh toán",
+                          values: [formatDateString(request.debtReminder.updatedAt)],
+                      },
                   ]
                 : []),
         ],
