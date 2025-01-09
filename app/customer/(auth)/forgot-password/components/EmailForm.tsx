@@ -57,6 +57,7 @@ const EmailForm: React.FC<EmailFormProps> = ({ handleNextStep }) => {
                         mt="md"
                         label="Địa chỉ email"
                         placeholder="you@wnc.bank"
+                        maxLength={100}
                         withAsterisk
                         key={form.key("email")}
                         {...form.getInputProps("email")}

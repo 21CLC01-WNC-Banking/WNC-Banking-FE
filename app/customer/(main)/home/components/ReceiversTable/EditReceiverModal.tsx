@@ -79,6 +79,7 @@ const EditReceiverModal: React.FC<EditModalProps> = ({ receiverId, receiverNickn
                         label="Tên gợi nhớ"
                         placeholder="Tên gợi nhớ"
                         withAsterisk
+                        maxLength={100}
                         key={form.key("nickname")}
                         {...form.getInputProps("nickname")}
                     />

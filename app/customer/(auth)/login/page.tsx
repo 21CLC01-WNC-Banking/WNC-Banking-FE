@@ -86,6 +86,7 @@ const Login = () => {
                             label="Địa chỉ email"
                             placeholder="you@wnc.bank"
                             withAsterisk
+                            maxLength={100}
                             key={form.key("email")}
                             {...form.getInputProps("email")}
                         />
@@ -124,6 +125,7 @@ const Login = () => {
                             placeholder="Mật khẩu"
                             id="password"
                             mb="lg"
+                            maxLength={100}
                             key={form.key("password")}
                             {...form.getInputProps("password")}
                         />

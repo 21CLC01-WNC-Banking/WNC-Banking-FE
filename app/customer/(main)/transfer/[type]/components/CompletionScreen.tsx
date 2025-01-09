@@ -158,6 +158,7 @@ const CompletionScreen = () => {
                         <TextInput
                             size="md"
                             radius="md"
+                            maxLength={100}
                             placeholder="Nhập tên gợi nhớ (tùy chọn)"
                             key={form.key("nickname")}
                             {...form.getInputProps("nickname")}

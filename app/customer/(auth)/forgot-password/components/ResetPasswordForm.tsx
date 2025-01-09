@@ -62,10 +62,12 @@ const ResetPasswordForm = () => {
                     mt="md"
                     label="Mật khẩu mới"
                     withAsterisk
+                    maxLength={100}
                     placeholder="Mật khẩu mới"
                     key={form.key("password")}
                     {...form.getInputProps("password")}
                 />
+
                 <PasswordInput
                     size="md"
                     radius="md"
@@ -73,6 +75,7 @@ const ResetPasswordForm = () => {
                     mb="lg"
                     label="Nhập lại mật khẩu"
                     withAsterisk
+                    maxLength={100}
                     placeholder="Nhập lại mật khẩu"
                     key={form.key("confirmPassword")}
                     {...form.getInputProps("confirmPassword")}

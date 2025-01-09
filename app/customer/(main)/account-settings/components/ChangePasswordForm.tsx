@@ -67,6 +67,7 @@ const ChangePasswordForm = () => {
                     radius="md"
                     label="Mật khẩu hiện tại"
                     withAsterisk
+                    maxLength={100}
                     placeholder="Mật khẩu hiện tại"
                     key={form.key("oldPassword")}
                     {...form.getInputProps("oldPassword")}
@@ -78,6 +79,7 @@ const ChangePasswordForm = () => {
                     mt="md"
                     label="Mật khẩu mới"
                     withAsterisk
+                    maxLength={100}
                     placeholder="Mật khẩu mới"
                     key={form.key("newPassword")}
                     {...form.getInputProps("newPassword")}
@@ -90,6 +92,7 @@ const ChangePasswordForm = () => {
                     mb="lg"
                     label="Nhập lại mật khẩu mới"
                     withAsterisk
+                    maxLength={100}
                     placeholder="Nhập lại mật khẩu mới"
                     key={form.key("confirmPassword")}
                     {...form.getInputProps("confirmPassword")}

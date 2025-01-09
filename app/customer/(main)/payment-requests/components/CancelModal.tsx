@@ -86,6 +86,7 @@ const CancelModal: React.FC<CancelModalProps> = ({ requestId, type }) => {
                         withAsterisk
                         placeholder="Đã trả trực tiếp"
                         autosize
+                        maxLength={100}
                         minRows={2}
                         maxRows={4}
                         key={form.key("message")}

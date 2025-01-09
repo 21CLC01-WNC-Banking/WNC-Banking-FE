@@ -117,6 +117,7 @@ const ReceiverDrawer: React.FC<ReceiverDrawerProps> = ({
                         setQuery(event.currentTarget.value);
                     }}
                     leftSection={<IconSearch size={20} />}
+                    maxLength={100}
                     placeholder="Tìm kiếm"
                 />
                 <div>

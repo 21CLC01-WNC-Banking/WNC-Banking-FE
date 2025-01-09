@@ -213,6 +213,7 @@ const AddReceiverModal = () => {
                         radius="md"
                         mt="lg"
                         label="Tên người nhận"
+                        maxLength={100}
                         value={receiverName}
                         styles={{
                             root: {
@@ -231,6 +232,7 @@ const AddReceiverModal = () => {
                         radius="md"
                         mt="lg"
                         label="Tên gợi nhớ"
+                        maxLength={100}
                         placeholder="Nhập tên gợi nhớ (tùy chọn)"
                         key={form.key("receiverNickname")}
                         {...form.getInputProps("receiverNickname")}
