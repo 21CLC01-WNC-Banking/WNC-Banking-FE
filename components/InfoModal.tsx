@@ -42,7 +42,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content, triggerRef }) => 
                     },
                 }}
             >
-                <Stack mt={20} gap="md">
+                <Stack mt={20} mb={10} gap="md">
                     {content &&
                         content.map((item) =>
                             item.label === "divider" ? (
@@ -51,12 +51,20 @@ const InfoModal: React.FC<InfoModalProps> = ({ title, content, triggerRef }) => 
                                 <Group key={item.label} grow justify="between" align="flex-start">
                                     <Text variant="text">{item.label}</Text>
 
-                                    {item.values &&
-                                        item.values.map((value) => (
-                                            <Text key={value} ta="right" fw={700} c={item.color}>
-                                                {value}
-                                            </Text>
-                                        ))}
+                                    {item.values && (
+                                        <Stack gap={0}>
+                                            {item.values.map((value) => (
+                                                <Text
+                                                    key={value}
+                                                    ta="right"
+                                                    fw={700}
+                                                    c={item.color}
+                                                >
+                                                    {value}
+                                                </Text>
+                                            ))}
+                                        </Stack>
+                                    )}
                                 </Group>
                             ) : null
                         )}

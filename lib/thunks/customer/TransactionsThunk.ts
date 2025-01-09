@@ -29,8 +29,8 @@ export const getTransactionHistoryThunk = createAppAsyncThunk(
         const responseData = await response.json();
 
         // only keep transactions that are created within 30 days
-        const filteredTransactions = responseData.data.filter((transaction: Transaction) => {
-            const transactionDate = new Date(transaction.createdAt);
+        const filteredTransactions = responseData.data.filter((t: Transaction) => {
+            const transactionDate = new Date(t.transaction.createdAt);
             return transactionDate >= thirtyDaysAgo;
         });
 

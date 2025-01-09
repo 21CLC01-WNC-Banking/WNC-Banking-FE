@@ -54,7 +54,7 @@ const fetchDebtCancelReply = async (transactionId: number, dispatch: AppDispatch
 };
 
 const makeNotificationDetailModalContent = (
-    transaction: Transaction,
+    t: Transaction,
     type: string,
     reply?: DebtCancelReply | null
 ): InfoModalProps => {
@@ -69,33 +69,34 @@ const makeNotificationDetailModalContent = (
     return {
         title: `Thông báo ${mapNotificationType(type)}`,
         content: [
-            { label: "Mã giao dịch", values: [transaction.id] },
-            { label: "Thời gian", values: [formatDateString(transaction.createdAt)] },
+            { label: "Mã giao dịch", values: [t.transaction.id] },
+            { label: "Thời gian", values: [formatDateString(t.transaction.createdAt)] },
             {
                 label: "Loại giao dịch",
-                values: [mapTransactionType(transaction.type, transaction.amount)],
-                color: mapColor(transaction.type),
+                values: [mapTransactionType(t.transaction.type, t.transaction.amount)],
+                color: mapColor(t.transaction.type),
             },
             {
                 label: "Tài khoản nguồn",
-                values: [formatAccountNumber(transaction.sourceAccountNumber)],
+                values: [formatAccountNumber(t.transaction.sourceAccountNumber)],
             },
             {
                 label: "Tài khoản thụ hưởng",
-                values: [formatAccountNumber(transaction.targetAccountNumber)],
+                values: [formatAccountNumber(t.transaction.targetAccountNumber)],
             },
+            ...(t.bankName ? [{ label: "Ngân hàng thụ hưởng", values: [t.bankName] }] : []),
             {
                 label: `Số tiền ${
                     type === "debt_reminder" || type === "debt_cancel" ? "nợ" : "giao dịch"
                 }`,
-                values: [formatCurrency(transaction.amount)],
+                values: [formatCurrency(t.transaction.amount)],
             },
-            { label: "Nội dung", values: [transaction.description] },
+            { label: "Nội dung", values: [t.transaction.description] },
             ...(type !== "debt_cancel" && type !== "debt_reminder"
                 ? [
                       {
                           label: "Số dư sau giao dịch",
-                          values: [formatCurrency(transaction.balance)],
+                          values: [formatCurrency(t.transaction.balance)],
                       },
                   ]
                 : []),

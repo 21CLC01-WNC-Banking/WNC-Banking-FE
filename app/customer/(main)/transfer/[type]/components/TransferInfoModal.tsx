@@ -34,7 +34,11 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
 
     const content = [
         { label: "Tài khoản nguồn", value: [transfer?.senderAccount, transfer?.senderName] },
-        { label: "Nguời nhận", value: [transfer?.receiverAccount, transfer?.receiverName] },
+        {
+            label: "Tài khoản thụ hưởng",
+            value: [transfer?.receiverAccount, transfer?.receiverName],
+        },
+        { label: "Ngân hàng thụ hưởng", value: [transfer?.receiverBank] },
         { label: "Số tiền", value: [formatCurrency(transfer ? transfer.amount : 0)] },
         { label: "Diễn giải", value: [transfer?.message] },
         {
@@ -105,7 +109,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
                 },
             }}
         >
-            <Stack my={20} gap="md">
+            <Stack mt={20} mb={10} gap="md">
                 {content.map((item) => (
                     <Group
                         key={item.label}
@@ -117,7 +121,6 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
                         <Text variant="text">{item.label}</Text>
 
                         <Stack gap={0}>
-                            {" "}
                             {item.value.map((value, index) => (
                                 <Text key={index} ta="right" fw={700}>
                                     {value}
@@ -127,7 +130,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
                     </Group>
                 ))}
 
-                <Group grow preventGrowOverflow={false} justify="between" align="flex-start">
+                <Group grow preventGrowOverflow={false} justify="between" align="flex-end">
                     <Text fw={600}>Tổng số tiền</Text>
                     <Text ta="right" fw={700} fz="h3" c="blue">
                         {transfer?.senderHandlesFee
@@ -141,7 +144,7 @@ const TransferInfoModal: React.FC<TransferInfoModal> = ({
                         Quay lại
                     </Button>
 
-                    <Button onClick={handleTransferSubmit} mt="md" radius="md">
+                    <Button onClick={handleTransferSubmit} radius="md">
                         Xác nhận
                     </Button>
                 </Group>

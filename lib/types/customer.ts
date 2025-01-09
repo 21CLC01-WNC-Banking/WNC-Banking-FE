@@ -69,14 +69,18 @@ export interface PaymentRequest {
 
 // for retrieving transaction history
 export interface Transaction {
-    id: string;
-    amount: number;
-    balance: number;
-    createdAt: string;
-    description: string;
-    sourceAccountNumber: string;
-    targetAccountNumber: string;
-    type: string;
+    transaction: {
+        id: string;
+        amount: number;
+        balance: number;
+        createdAt: string;
+        description: string;
+        sourceAccountNumber: string;
+        targetAccountNumber: string;
+        type: string;
+    };
+    bankCode: string;
+    bankName: string;
 }
 
 export interface Notification {
