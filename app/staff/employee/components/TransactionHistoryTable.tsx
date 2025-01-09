@@ -71,7 +71,7 @@ const TransactionHistoryTable: React.FC = () => {
                     data.data.transactions.map((transaction: any) => ({
                         ...transaction,
                         transactionType:
-                            transaction.type === "payment"
+                            transaction.type === "debt_payment"
                                 ? "Thanh toán"
                                 : transaction.amount < 0
                                     ? "Chuyển khoản"
