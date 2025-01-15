@@ -95,49 +95,8 @@ This is the frontend repository of a group project assignment from the course **
       
   8. Admin logs in and views transaction history with various filters
   
-## Build & run the project locally
-### Prerequisites
-- Node.js 20 and above
-- A package manager (NPM, Yarn, Bun, or PNPM)
-- [reCAPTCHA v2 key pair](https://www.google.com/recaptcha/admin)
-- A local instance of the [backend](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE)
-
-### Steps
-1. Clone the repository
-   
-2. Create a **.env** file in the same directory as **package.json** with the following variables:
-
-  ```
-  NEXT_PUBLIC_RECAPTCHA_SITE_KEY=<your reCAPTCHA site key here>
-  NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1    // replace the port with your backend's port if necessary
-  NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3636/ws
-  ```
-
-3. Install the dependencies
-
-  ```bash
-  npm install
-  # or
-  yarn install 
-  # or
-  pnpm install
-  # or
-  bun install
-  ```
-
-4. Run the project
-
-  ```bash
-  npm run dev
-  # or
-  yarn dev
-  # or
-  pnpm dev
-  # or
-  bun dev
-  ```
-
-The project will be available at **http://<i></i>localhost:3000**.
+## Run the project locally
+Please visit the [backend repository](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE) for instructions on how to run **Docker Compose** to set up both the frontend and the backend of the project locally. 
 
 
 
