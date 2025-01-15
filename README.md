@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Internet Banking Frontend
 
-## Getting Started
+This is the frontend repository of a group project assignment from the course **CSC13114 – Advanced Web Application Developmen (21KTPM1)** at VNU-HCM, University of Science. The backend repository can be visited [here](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE).
 
-First, run the development server:
+## Contributors
+1. Nguyễn Quỳnh Hương ([qhuongng](https://github.com/qhuongng)) - customer portal
+2. Hồ Hữu Tâm ([huutamisme](https://github.com/huutamisme)) - staff (bank clerk and admin) portal
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Technical stack
+- Next.js 14 (with TypeScript and App Router)
+- Redux for global state management (non-sensitive authentication info and other API-returned data that needs to be accessed by multiple components)
+- Mantine for UI components
+- Docker for containerization and deployment
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
+### Common
+- User authentication with **Google reCAPTCHA v2**
+- Role-based authorization
+- Reset password with OTP verification via email
+- Proper form validation with **@mantine/form**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Customer portal
+- Internal and external transfers with OTP verification via email
+  - Autofill transfer info from a list of saved recipients
+  - Save recipients directly from transfer screen, with an option to add a nickname
+    
+- Create, fulfill, and cancel payment requests
+  - Navigate to the transfer page with autofilled info directly from a received request
+- View detailed transaction history, ordered by time and filtered by type or scope (internal and external)
+  
+- Manage saved recipients (add, edit nickname, and delete)
+  - Navigate to the transfer page with autofilled info directly from a recipient's entry 
+  - Create a payment request with autofilled info directly from a recepient's entry
+    
+- Manage account settings
+  - Change password
+  - Close account
+    
+- Real-time notifications for transfers, received payment requests, and payment request cancellations using WebSockets
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Staff portal
+#### Bank clerk section
+- Create customer accounts
+  
+- Deposit money into customer accounts
+  - The account's initial password is auto-generated and sent to the customer's email address
+    
+- View detailed transaction history of a specific account, ordered by time and filtered by type
 
-## Learn More
+#### Admin section
+- Manage bank clerk accounts (add, edit info, and delete)
+- View detailed transaction history within specified date range, filtered by bank
 
-To learn more about Next.js, take a look at the following resources:
+## Demo
+### Customer portal
+- Deployment URL: http://18.141.180.201:3000/customer
+  
+- Dummy account for simple browsing:
+  - Email: nguyenvana@<i></i>gmail.com
+  - Password: 12345678910
+    
+- In case you want to try out features that require a real email address (transfering, as well as changing and resetting the password), create a customer account using the staff portal
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Staff portal
+- Deployment URL: http://18.141.180.201:3000/staff
+  
+- Dummy bank clerk account:
+  - Email: staff@<i></i>gmail.com
+  - Password: staff12345
+    
+- Dummy admin account:
+  - Email: admin@<i></i>gmail.com
+  - Password: 12345678910
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Demo videos
+- [Google Drive](https://drive.google.com/drive/folders/12IPHzRQrneHL5svFBMVo3vwGKmHpi4le?usp=drive_link)
+  
+- Description for each user flow are as follows:
+  1. Bank clerk logs in, creates an account for customer 1 (C1), deposits 5 million VND into CA1, and logs out
+     
+  2. C1 logs in, transfers 100k VND to an internal customer, and saves the recipient
+     
+  3. C1 transfers 200k VND to the saved recipient from flow 2
+     
+  4. C1 views list of saved recipients, adds another recipient, transfers 150k VND to this recipient, and views their transaction history
+     
+  5. This flow is for testing real-time notifications:
+     - Customer 2 (C2) logs in using another browser window, creates a payment request of 50k VND from C1
+     - C1 clicks on the received notification and fulfills the requests
+     - C2 receives a notification of the fulfilled request
 
-## Deploy on Vercel
+  6. C2 views list of payment requests made
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  7. C2 performs an external transfer to a random customer and views their transaction history
+      
+  8. Admin logs in and views transaction history with various filters
+  
+## Build & run the project locally
+### Prerequisites
+- Node.js 20 and above
+- A package manager (NPM, Yarn, Bun, or PNPM)
+- [reCAPTCHA v2 key pair](https://www.google.com/recaptcha/admin)
+- A local instance of the [backend](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Steps
+1. Clone the repository
+   
+2. Create a **.env** file in the same directory as **package.json** with the following variables:
+
+  ```
+  NEXT_PUBLIC_RECAPTCHA_SITE_KEY=<your reCAPTCHA site key here>
+  NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1    // replace the port with your backend's port if necessary
+  NEXT_PUBLIC_WEBSOCKET_URL=ws://localhost:3636/ws
+  ```
+
+3. Install the dependencies
+
+  ```bash
+  npm install
+  # or
+  yarn install 
+  # or
+  pnpm install
+  # or
+  bun install
+  ```
+
+4. Run the project
+
+  ```bash
+  npm run dev
+  # or
+  yarn dev
+  # or
+  pnpm dev
+  # or
+  bun dev
+  ```
+
+The project will be available at **http://<i></i>localhost:3000**.
+
+
+
+
