@@ -1,6 +1,6 @@
 # Internet Banking Frontend
 
-This is the frontend repository of a group project assignment from the course **CSC13114 – Advanced Web Application Developmen (21KTPM1)** at VNU-HCM, University of Science. The backend repository can be visited [here](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE).
+This is the frontend repository of a group project assignment from the course **CSC13114 – Advanced Web Application Development (21KTPM1)** at VNU-HCM, University of Science. The backend repository can be visited [here](https://github.com/21CLC01-WNC-Banking/WNC-Banking-BE).
 
 ## Contributors
 1. Nguyễn Quỳnh Hương ([qhuongng](https://github.com/qhuongng)) - customer portal
