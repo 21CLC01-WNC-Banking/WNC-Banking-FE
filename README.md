@@ -36,7 +36,7 @@ This is the frontend repository of a group project assignment from the course **
   - Change password
   - Close account
     
-- Real-time notifications for transfers, received payment requests, and payment request cancellations using WebSockets
+- Real-time notifications for transfers, received payment requests, and payment request cancellations using **WebSockets**
 
 ### Staff portal
 #### Bank clerk section
