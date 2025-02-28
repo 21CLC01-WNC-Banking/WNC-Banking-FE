@@ -52,28 +52,7 @@ This is the frontend repository of a group project assignment from the course **
 - View detailed transaction history within specified date range, filtered by bank
 
 ## Demo
-### Customer portal
-- Deployment URL: http://18.141.180.201:3000/customer
-  
-- Dummy account for simple browsing:
-  - Email: nguyenvana@<i></i>gmail.com
-  - Password: 12345678910
-    
-- In case you want to try out features that require a real email address (transfering, as well as changing and resetting the password), create a customer account using the staff portal
-
-### Staff portal
-- Deployment URL: http://18.141.180.201:3000/staff
-  
-- Dummy bank clerk account:
-  - Email: staff@<i></i>gmail.com
-  - Password: staff12345
-    
-- Dummy admin account:
-  - Email: admin@<i></i>gmail.com
-  - Password: 12345678910
-
-### Demo videos
-- [Google Drive](https://drive.google.com/drive/folders/12IPHzRQrneHL5svFBMVo3vwGKmHpi4le?usp=drive_link)
+The server deployment has been taken down due to cost. Demo videos are available in this [Google Drive](https://drive.google.com/drive/folders/12IPHzRQrneHL5svFBMVo3vwGKmHpi4le?usp=drive_link).
   
 - Description for each user flow are as follows:
   1. Bank clerk logs in, creates an account for customer 1 (C1), deposits 5 million VND into CA1, and logs out
